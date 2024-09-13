@@ -1,6 +1,6 @@
 package com.beehyv.backend.repositories;
 
-import com.telsukuntunna.practice.models.Employee;
+import com.beehyv.backend.models.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

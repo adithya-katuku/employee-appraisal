@@ -1,15 +1,12 @@
 package com.beehyv.backend.servers;
 
-import com.telsukuntunna.practice.models.Attribute;
-import com.telsukuntunna.practice.models.Designation;
-import com.telsukuntunna.practice.models.Employee;
-import com.telsukuntunna.practice.repositories.*;
+import com.beehyv.backend.models.*;
+import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BeeService {
@@ -25,34 +22,60 @@ public class BeeService {
     NotificationRepo notificationRepo;
 
     public Employee saveEmployee(Employee employee){
-        Employee tempEmployee = employeeRepo.save(employee);
-        Designation tempDesignation = designationRepo.save(employee.getDesignation());
-        List<Attribute> attributes = attributeRepo.saveAll(employee.getDesignation().getAttributes().stream().map(attribute -> {
-            if(attribute.getDesignations()!=null){
-                attribute.getDesignations().add(tempDesignation);
-            }
-            else{
-                attribute.setDesignations(Arrays.asList(tempDesignation));
-            }
-            return attribute;
-        }).collect(Collectors.toList()));
-        Designation designation = employee.getDesignation();
-        designation.setAttributes(attributes);
-        List<Employee> employees = designation.getEmployees();
-        if (employees == null) employees = Arrays.asList(tempEmployee);
-        else employees.add(tempEmployee);
-        designation.setEmployees(employees);
-        designation = designationRepo.save(designation);
-        employee.setDesignation(designation);
+        List<Attribute> attributes = attributeRepo.saveOrFindAll(employee.getDesignation().getAttributes());
+        List<Notification> notifications = notificationRepo.saveAll(employee.getNotifications());
+        List<Task> tasks = taskRepo.saveAll(employee.getTasks());
+        Designation designation = designationRepo.findByDesignation(employee.getDesignation().getDesignation());
+        if(designation==null){
+            employee.getDesignation().setAttributes(attributes);
+            designation = designationRepo.saveOrFind(employee.getDesignation());
+        }
 
-        employee.setTasks(taskRepo.saveAll(employee.getTasks().stream().map(task -> {
-            task.setEmployee(tempEmployee);
-            return task;
-        }).collect(Collectors.toList())));
-        employee.setNotifications(notificationRepo.saveAll(employee.getNotifications().stream().map(notification -> {
-            notification.setEmployee(tempEmployee);
-            return notification;
-        }).collect(Collectors.toList())));
-        return employeeRepo.save(employee);
+        employee.setDesignation(designation);
+        employee.setNotifications(notifications);
+        employee.setTasks(tasks);
+        Employee res = employeeRepo.save(employee);
+        for(Task task: tasks)task.setEmployee(res);
+        taskRepo.saveAll(tasks);
+        for(Notification notification:notifications)notification.setEmployee(res);
+        notificationRepo.saveAll(notifications);
+        return res;
+    }
+
+    public Employee findEmployee(Integer id) {
+        return employeeRepo.findById(id).orElse(null);
+    }
+
+    public Notification addNotification(Integer id, Notification notification) {
+        notification.setEmployee(findEmployee(id));
+        return notificationRepo.save(notification);
+    }
+
+    public String deleteNotification(Integer notificationId) {
+        Notification notification = notificationRepo.findById(notificationId).orElse(null);
+        if(notification!=null){
+            notificationRepo.delete(notification);
+        }
+        return "Deleted Successfully";
+    }
+
+    public String rateAttribute(Integer id, Integer attributeId, Integer attributeRating) {
+        Employee employee = employeeRepo.findById(id).orElse(null);
+
+        if(employee!=null){
+            List<Attribute> attributes = employee.getDesignation().getAttributes();
+            List<Attribute> newAttributes = new ArrayList<>();
+            for(Attribute attribute:attributes){
+                if(attribute.getAttributeId()==attributeId){
+                    attribute.setRating(attributeRating);
+                }
+                newAttributes.add(attribute.copy());
+            }
+            employee.setAttributes(newAttributes);
+            employeeRepo.save(employee);
+            return "success";
+        }
+
+        return "the employee does not exist.";
     }
 }

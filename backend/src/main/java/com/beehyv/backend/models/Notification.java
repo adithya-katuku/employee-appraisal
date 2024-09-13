@@ -19,8 +19,9 @@ public class Notification {
 
     private String notification;
     private String description;
+    private boolean read = false;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
     private Employee employee;
 

@@ -1,5 +1,6 @@
 package com.beehyv.backend.models;
 
+import com.beehyv.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,16 +24,23 @@ public class Employee {
     private String name;
     private String email;
     private Date joiningDate;
-    private String role;
+    private Role role;
     private String password;
 
-    @ManyToOne()
-    @JoinColumn(name = "designation_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Designation designation;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Task> tasks;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "employee_attribute",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "attribute_id")
+    )
+    private List<Attribute> attributes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee",  cascade = CascadeType.ALL)
+    private List<Task> tasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Notification> notifications;
+    private List<Notification> notifications = new ArrayList<>();
 }

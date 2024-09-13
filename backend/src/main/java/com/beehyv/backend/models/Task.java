@@ -20,8 +20,10 @@ public class Task {
     private String description;
     private float duration;
     private boolean appraisable;
+    private int selfRating = 0;
+    private int adminRating = 0;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
     private Employee employee;
 

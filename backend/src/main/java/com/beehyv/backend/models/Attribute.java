@@ -1,13 +1,11 @@
 package com.beehyv.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,12 +17,13 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attributeId;
     private  String attribute;
-
-    @ManyToMany
-    @JsonIgnore
-    private List<Designation> designations;
+    private int rating = 0;
 
     public Attribute(String attribute){
         this.attribute = attribute;
+    }
+
+    public Attribute copy(){
+        return new Attribute(this.attributeId, this.attribute, this.rating);
     }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -20,12 +21,13 @@ public class Designation {
     private int designationId;
     private String designation;
 
-    @ManyToMany(mappedBy = "designations")
-    private List<Attribute> attributes;
+    @ManyToMany
+    @JsonIgnore
+    private List<Attribute> attributes = new ArrayList<>();
 
     @OneToMany(mappedBy = "designation", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Employee> employees;
+    private List<Employee> employees = new ArrayList<>();
 
     public Designation(String designation, List<Attribute> attributes){
         this.designation = designation;
