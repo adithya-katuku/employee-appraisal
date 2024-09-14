@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @ToString
 @Data
@@ -30,13 +28,9 @@ public class Employee {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Designation designation;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "employee_attribute",
-            joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "attribute_id")
-    )
-    private List<Attribute> attributes = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "employee_attributes", joinColumns = @JoinColumn(name = "employee_id"))
+    Map<String, Integer> attributes = new HashMap<>();
 
     @OneToMany(mappedBy = "employee",  cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();

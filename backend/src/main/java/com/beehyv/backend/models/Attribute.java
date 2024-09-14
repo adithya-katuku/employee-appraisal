@@ -17,13 +17,9 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attributeId;
     private  String attribute;
-    private int rating = 0;
 
     public Attribute(String attribute){
         this.attribute = attribute;
     }
 
-    public Attribute copy(){
-        return new Attribute(this.attributeId, this.attribute, this.rating);
-    }
 }

@@ -22,12 +22,15 @@ public class Designation {
     private String designation;
 
     @ManyToMany
-    @JsonIgnore
     private List<Attribute> attributes = new ArrayList<>();
 
     @OneToMany(mappedBy = "designation", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Employee> employees = new ArrayList<>();
+
+    public Designation(String designation){
+        this.designation = designation;
+    }
 
     public Designation(String designation, List<Attribute> attributes){
         this.designation = designation;
