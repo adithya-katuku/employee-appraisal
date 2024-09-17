@@ -1,20 +1,15 @@
-import { Box, Flex } from '@chakra-ui/react';
-import LoginForm from './components/LoginForm';
+import LoginForm from "./components/LoginForm";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
 function App() {
-
   return (
-    <Flex
-      minH="100vh"
-      align="center"
-      justify="center"
-      bg="gray.50"
-    >
-      <Box>
-        <LoginForm />
-      </Box>
-    </Flex>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" Component={LoginForm}></Route>
+        <Route path="/*" Component={()=><Navigate to="/login"/>}></Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
