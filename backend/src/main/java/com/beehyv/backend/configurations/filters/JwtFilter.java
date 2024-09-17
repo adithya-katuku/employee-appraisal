@@ -1,4 +1,4 @@
-package com.beehyv.backend.filters;
+package com.beehyv.backend.configurations.filters;
 
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.services.EmployeeDetailsService;
@@ -33,15 +33,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(header != null && header.startsWith("Bearer ")){
             token = header.substring(7);
-        }
 
-        if(SecurityContextHolder.getContext().getAuthentication()==null){
-            EmployeeDetails employeeDetails = jwtService.isValid(token);
-            if(employeeDetails!=null){
-                UsernamePasswordAuthenticationToken authenticationToken
-                        = new UsernamePasswordAuthenticationToken(employeeDetails, null, employeeDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            if(SecurityContextHolder.getContext().getAuthentication()==null){
+                EmployeeDetails employeeDetails = jwtService.isValid(token);
+                if(employeeDetails!=null){
+                    UsernamePasswordAuthenticationToken authenticationToken
+                            = new UsernamePasswordAuthenticationToken(employeeDetails, null, employeeDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         }
 

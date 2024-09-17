@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class PublicController {
     @Autowired
     private BeeService beeService;
@@ -32,8 +33,9 @@ public class PublicController {
         return beeService.saveEmployee(employee);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public String login(@RequestBody Employee employee){
+        System.out.println("Employee: "+ employee);
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(employee.getEmail(), employee.getPassword()));
         if(authentication.isAuthenticated()){
             return jwtService.generateToken(employee.getEmail());

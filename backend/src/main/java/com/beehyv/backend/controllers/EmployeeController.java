@@ -1,6 +1,6 @@
 package com.beehyv.backend.controllers;
 
-import com.beehyv.backend.filters.JwtFilter;
+import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
@@ -9,7 +9,6 @@ import com.beehyv.backend.models.Task;
 import com.beehyv.backend.services.BeeService;
 import com.beehyv.backend.services.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
