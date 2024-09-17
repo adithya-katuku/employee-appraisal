@@ -18,7 +18,7 @@ import java.util.List;
 public class Designation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int designationId;
+    private Integer designationId;
     private String designation;
 
     @ManyToMany
@@ -35,5 +35,13 @@ public class Designation {
     public Designation(String designation, List<Attribute> attributes){
         this.designation = designation;
         this.attributes = attributes;
+    }
+
+    @Override
+    public String toString() {
+        return "Designation{" +
+                "designationId=" + designationId +
+                ", designation='" + designation + '\'' +
+                '}';
     }
 }

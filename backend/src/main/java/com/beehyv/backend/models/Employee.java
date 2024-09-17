@@ -18,11 +18,11 @@ import java.util.*;
 @Component
 public class Employee {
     @Id
-    private int employeeId;
+    private Integer employeeId;
     private String name;
     private String email;
     private Date joiningDate;
-    private Role role;
+    private List<Role> roles;
     private String password;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -37,4 +37,5 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Notification> notifications = new ArrayList<>();
+
 }

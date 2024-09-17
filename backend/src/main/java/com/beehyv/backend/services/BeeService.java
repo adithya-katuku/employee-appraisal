@@ -1,8 +1,10 @@
 package com.beehyv.backend.services;
 
+import com.beehyv.backend.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -12,15 +14,18 @@ import java.util.Map;
 @Service
 public class BeeService {
     @Autowired
-    EmployeeRepo employeeRepo;
+    private EmployeeRepo employeeRepo;
     @Autowired
-    DesignationRepo designationRepo;
+    private DesignationRepo designationRepo;
     @Autowired
-    AttributeRepo attributeRepo;
+    private AttributeRepo attributeRepo;
     @Autowired
-    TaskRepo taskRepo;
+    private TaskRepo taskRepo;
     @Autowired
-    NotificationRepo notificationRepo;
+    private NotificationRepo notificationRepo;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+
 
     public Employee saveEmployee(Employee employee){
         List<Attribute> attributes = attributeRepo.saveOrFindAll(employee.getDesignation().getAttributes());
@@ -35,6 +40,7 @@ public class BeeService {
         employee.setDesignation(designation);
         employee.setNotifications(notifications);
         employee.setTasks(tasks);
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         Employee res = employeeRepo.save(employee);
         for(Task task: tasks)task.setEmployee(res);
         taskRepo.saveAll(tasks);
@@ -46,6 +52,10 @@ public class BeeService {
 
     public Employee findEmployee(Integer employeeId) {
         return employeeRepo.findById(employeeId).orElse(null);
+    }
+
+    public List<Employee> findAllEmployees() {
+        return employeeRepo.findAll();
     }
 
     //ATTRIBUTES:
@@ -69,11 +79,8 @@ public class BeeService {
                 if(attribute.getAttributeId()==attributeId){
                     employeeAttributes.put(attribute.getAttribute(), attributeRating);
                 }
-                System.out.println(attribute);
             }
-            System.out.println(employeeAttributes);
             employee.setAttributes(employeeAttributes);
-            System.out.println("here");
 
             employeeRepo.save(employee);
             return "success";
@@ -152,6 +159,20 @@ public class BeeService {
         return null;
     }
 
+    public String addNotificationToAdmin(Notification notification) {
+        List<Employee> admins = employeeRepo.findByRole(Role.ADMIN);
+        if(admins==null){
+            return "No admins found";
+        }
+        for(Employee admin: admins){
+            notification.setEmployee(admin);
+            admin.getNotifications().add(notification);
+            employeeRepo.save(admin);
+        }
+
+        return "success";
+    }
+
     public Notification readOrUnreadNotification(Integer notificationId) {
         Notification notification = notificationRepo.findById(notificationId).orElse(null);
         if(notification!=null){
@@ -171,5 +192,7 @@ public class BeeService {
 
         return "Notification not found.";
     }
+
+
 
 }
