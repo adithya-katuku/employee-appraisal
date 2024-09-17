@@ -41,7 +41,7 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.getAttributes(employeeDetails.getDesignationId());
+        return beeService.getAttributes(employeeDetails.getEmployeeId());
     }
 
     //TASKS:

@@ -41,26 +41,53 @@ public class AdminController {
     }
 
     //ATTRIBUTES:
-    @GetMapping("/{designationId}/attributes")
-    public List<Attribute> getAttributes(@PathVariable("designationId") Integer designationId){
-        return beeService.getAttributes(designationId);
+    @GetMapping("/employee/{employeeId}/attributes")
+    public List<Attribute> getAttributes(@PathVariable("employeeId") Integer employeeId){
+        return beeService.getAttributes(employeeId);
     }
 
-    @PutMapping("/{employeeId}/attributes")
+    @PutMapping("/employee/{employeeId}/attributes")
     public String rateAttribute(@PathVariable("employeeId") Integer employeeId, @RequestParam("attributeId") Integer attributeId, @RequestParam("rating") Integer attributeRating){
         return beeService.rateAttribute(employeeId, attributeId, attributeRating);
     }
 
+
     //TASKS:
-    @GetMapping("/{employeeId}/tasks")
+    //EMPLOYEES:
+    @GetMapping("/employee/{employeeId}/tasks")
     public List<Task> getTasks(@PathVariable("employeeId") Integer employeeId){
         return beeService.getTasks(employeeId);
     }
 
-    @PutMapping("/tasks/{taskId}")
+    @PutMapping("/employee/tasks/{taskId}")
     public Task rateTaskByAdmin(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
         return beeService.rateTaskByAdmin(taskId, taskRating);
     }
+
+    //SELF:
+    @GetMapping("/tasks")
+    public List<Task> getTasks(){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return beeService.getTasks(employeeDetails.getEmployeeId());
+    }
+
+    @PostMapping("/tasks")
+    public Task addTask(@RequestBody Task task){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return beeService.addTask(employeeDetails.getEmployeeId(), task);
+    }
+
+    @DeleteMapping("/tasks/{taskId}")
+    public String deleteTask(@PathVariable("taskId") Integer taskId){
+        return beeService.deleteTask(taskId);
+    }
+
 
     //NOTIFICATIONS:
     @PostMapping("/{employeeId}/notifications")

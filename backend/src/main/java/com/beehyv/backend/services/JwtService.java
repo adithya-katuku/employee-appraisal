@@ -6,12 +6,9 @@ import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.repositories.EmployeeRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -19,7 +16,6 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.function.Function;
 
 
 @Service
@@ -38,7 +34,6 @@ public class JwtService {
         Employee employee = employeeRepo.findByEmail(username);
         claims.put("employee-id", employee.getEmployeeId().toString());
         claims.put("roles", employee.getRoles());
-        claims.put("designation-id", employee.getDesignation().getDesignationId().toString());
         return Jwts.builder()
                 .claims(claims)
                 .subject(username)
@@ -63,11 +58,6 @@ public class JwtService {
         }
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver){
-        Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
-    }
-
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getKey())
@@ -76,13 +66,21 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public EmployeeDetails isValid(String token) {
+        Claims claims = extractAllClaims(token);
+        if(claims.getExpiration().after(new Date())){
+            return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
+        };
+        return null;
     }
 
     public Integer extractEmployeeId(Claims claims){
         Object claimsEmployeeId = claims.get("employee-id");
         return Integer.valueOf(claimsEmployeeId.toString());
+    }
+
+    public String extractUsername(Claims claims) {
+        return claims.getSubject();
     }
 
     public List<Role> extractRoles(Claims claims){
@@ -96,16 +94,4 @@ public class JwtService {
         return roles;
     }
 
-    public Integer extractDesignationId(Claims claims){
-        Object claimsDesignationId = claims.get("designation-id");
-        return Integer.valueOf(claimsDesignationId.toString());
-    }
-
-    public EmployeeDetails isValid(String token) {
-        Claims claims = extractAllClaims(token);
-        if(claims.getExpiration().after(new Date())){
-            return new EmployeeDetails(extractEmployeeId(claims), extractUsername(token), extractRoles(claims), extractDesignationId(claims));
-        };
-        return null;
-    }
 }

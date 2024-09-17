@@ -18,22 +18,19 @@ import java.util.List;
 @Component
 public class EmployeeDetails implements UserDetails {
     private Integer employeeId;
-    private Integer designationId;
     private String username;
     private String password;
     private List<Role> roles;
 
     public EmployeeDetails(Employee employee){
         this.employeeId = employee.getEmployeeId();
-        this.designationId = employee.getDesignation().getDesignationId();
         this.username = employee.getEmail();
         this.password = employee.getPassword();
         this.roles = employee.getRoles();
     }
 
-    public EmployeeDetails(Integer employeeId, String username, List<Role> roles, Integer designationId) {
+    public EmployeeDetails(Integer employeeId, String username, List<Role> roles) {
         this.employeeId = employeeId;
-        this.designationId = designationId;
         this.username = username;
         this.roles = roles;
     }

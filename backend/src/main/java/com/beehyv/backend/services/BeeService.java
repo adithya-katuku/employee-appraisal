@@ -59,10 +59,10 @@ public class BeeService {
     }
 
     //ATTRIBUTES:
-    public List<Attribute> getAttributes(Integer designationId){
-        Designation designation = designationRepo.findById(designationId).orElse(null);
-        if(designation!=null){
-            return designation.getAttributes();
+    public List<Attribute> getAttributes(Integer employeeId){
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if(employee !=null && employee.getDesignation()!=null){
+            return employee.getDesignation().getAttributes();
         }
 
         return null;

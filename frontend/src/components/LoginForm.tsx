@@ -23,7 +23,7 @@ const LoginForm = () => {
   useEffect(() => {
     setUrl("http://localhost:8080/captcha/");
   }, [url]);
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await axios
@@ -71,7 +71,7 @@ const LoginForm = () => {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Box
-        maxW="md"
+        w="md"
         mx="auto"
         mt={10}
         p={6}
@@ -105,7 +105,8 @@ const LoginForm = () => {
               />
             </FormControl>
 
-            <Image src={url} alt="Captcha" />
+            <Image minH="6.3rem" src={url} alt="Captcha" />
+
             <FormControl id="captcha" isRequired>
               <FormLabel>Captcha</FormLabel>
               <Input

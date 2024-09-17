@@ -1,4 +1,4 @@
-package com.beehyv.backend.controllers;
+package com.beehyv.backend.controllers.captcha;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
