@@ -1,6 +1,7 @@
 package com.beehyv.backend.models;
 
-import com.beehyv.backend.enums.Role;
+import com.beehyv.backend.models.enums.AppraisalStatus;
+import com.beehyv.backend.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,18 +25,14 @@ public class Employee {
     private Date joiningDate;
     private List<Role> roles;
     private String password;
+    private AppraisalStatus appraisalStatus = AppraisalStatus.PENDING;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "designation_id")
     private Designation designation;
 
     @ElementCollection
     @CollectionTable(name = "employee_attributes", joinColumns = @JoinColumn(name = "employee_id"))
     Map<String, Integer> attributes = new HashMap<>();
-
-    @OneToMany(mappedBy = "employee",  cascade = CascadeType.ALL)
-    private List<Task> tasks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Notification> notifications = new ArrayList<>();
 
 }

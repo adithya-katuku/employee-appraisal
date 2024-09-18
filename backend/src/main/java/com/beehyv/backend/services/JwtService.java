@@ -1,6 +1,6 @@
 package com.beehyv.backend.services;
 
-import com.beehyv.backend.enums.Role;
+import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.repositories.EmployeeRepo;
@@ -9,6 +9,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -29,18 +32,26 @@ public class JwtService {
         SECRET_KEY = generateSecretKey();
     }
 
-    public String generateToken(String username){
+    public ResponseEntity<?> generateToken(String username){
         Map<String, Object> claims = new HashMap<>();
         Employee employee = employeeRepo.findByEmail(username);
         claims.put("employee-id", employee.getEmployeeId().toString());
         claims.put("roles", employee.getRoles());
-        return Jwts.builder()
+        String jwt = Jwts.builder()
                 .claims(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis()+1000*60*60))
                 .signWith(getKey())
                 .compact();
+
+        Map<String, String> res = new HashMap<>();
+        res.put("jwt", jwt);
+
+        String role = employee.getRoles().stream().max((r1, r2) -> r1.ordinal() - r2.ordinal()).orElse(Role.EMPLOYEE).name().toLowerCase();
+        res.put("role", role);
+
+        return new ResponseEntity<>(res, HttpStatusCode.valueOf(200));
     }
 
     private SecretKey getKey() {
@@ -66,14 +77,15 @@ public class JwtService {
                 .getPayload();
     }
 
-    public EmployeeDetails isValid(String token) {
+    public boolean isValid(String token) {
         Claims claims = extractAllClaims(token);
-        if(claims.getExpiration().after(new Date())){
-            return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
-        };
-        return null;
+        return claims.getExpiration().after(new Date());
     }
 
+    public EmployeeDetails getEmployeeDetails(String token){
+        Claims claims = extractAllClaims(token);
+        return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
+    }
     public Integer extractEmployeeId(Claims claims){
         Object claimsEmployeeId = claims.get("employee-id");
         return Integer.valueOf(claimsEmployeeId.toString());

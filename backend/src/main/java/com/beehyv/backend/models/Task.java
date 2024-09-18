@@ -16,7 +16,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int taskId;
-    private String task;
+    private String taskTitle;
     private String description;
     private float duration;
     private boolean appraisable;
@@ -25,10 +25,11 @@ public class Task {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    public Task(String task, String description, float duration, boolean appraisable){
-        this.task = task;
+    public Task(String taskTitle, String description, float duration, boolean appraisable){
+        this.taskTitle = taskTitle;
         this.description = description;
         this.duration = duration;
         this.appraisable = appraisable;

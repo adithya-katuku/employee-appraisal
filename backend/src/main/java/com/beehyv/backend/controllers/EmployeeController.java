@@ -64,7 +64,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/tasks/{taskId}")
-    public Task rateTaskBySelf(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
+    public Task rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
         return beeService.rateTaskBySelf(taskId, taskRating);
     }
 
@@ -84,7 +84,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/notifications")
-    public String addNotificationToAdmin(@RequestBody Notification notification){
+    public String addNotificationToAdmins(@RequestBody Notification notification){
         return beeService.addNotificationToAdmin(notification);
     }
 

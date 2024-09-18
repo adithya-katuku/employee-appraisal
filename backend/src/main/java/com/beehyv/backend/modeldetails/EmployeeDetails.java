@@ -1,10 +1,11 @@
 package com.beehyv.backend.modeldetails;
 
-import com.beehyv.backend.enums.Role;
+import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 @Component
 public class EmployeeDetails implements UserDetails {
     private Integer employeeId;

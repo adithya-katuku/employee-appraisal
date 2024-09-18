@@ -10,61 +10,70 @@ import {
   Image,
   Flex,
 } from "@chakra-ui/react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login, RootState } from "../stores/store";
+import { Navigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [url, setUrl] = useState("");
-  const [captcha, setCaptcha] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
 
+  const generateCaptcha = async ()=>{
+    await axios
+      .get("http://localhost:8080/captcha/generate-captcha")
+      .then(({ data }) => {
+        setUrl(`data:image/png;base64,${data.image}`);
+        setCaptchaId(data.captchaId);
+      });
+  }
   useEffect(() => {
-    setUrl("http://localhost:8080/captcha/");
-  }, [url]);
-  
+    generateCaptcha();
+  }, []);
+
+  if(isLoggedIn){
+    return <Navigate to="/home"/>
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await axios
-      .post("http://localhost:8080/captcha/verify-captcha/" + captcha)
-      .then(async () => {
-        await axios
-          .post("http://localhost:8080/login", { email, password })
-          .then(() => {
-            toast({
-              title: "Login Successful",
-              description: "You are now logged in.",
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-            });
-            setCaptcha("");
-            setUrl("");
-          })
-          .catch(() => {
-            toast({
-              title: "Login Failed",
-              description: "Invalid email or password.",
-              status: "error",
-              duration: 3000,
-              isClosable: true,
-            });
-            setCaptcha("");
-            setUrl("");
-          });
+      .post("http://localhost:8080/login", {
+        email,
+        password,
+        captchaId,
+        captchaAnswer,
       })
-      .catch((err) => {
-        console.log(err);
-        setCaptcha("");
-        setUrl("");
+      .then(() => {
+        dispatch(login(true));
+        generateCaptcha();
         toast({
-          title: "Captcha Verfication Failed",
-          description: "Please enter the correct captcha",
+          title: "Login Successful",
+          description: "You are now logged in.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setCaptchaAnswer("");
+        setUrl("");
+      })
+      .catch((err:AxiosError) => {
+        toast({
+          title: "Login Failed",
+          description: err.message,
           status: "error",
           duration: 3000,
           isClosable: true,
         });
+        setCaptchaAnswer("");
+        generateCaptcha();
       });
   };
 
@@ -112,8 +121,8 @@ const LoginForm = () => {
               <Input
                 type="text"
                 placeholder="Enter your captcha"
-                value={captcha}
-                onChange={(e) => setCaptcha(e.target.value)}
+                value={captchaAnswer}
+                onChange={(e) => setCaptchaAnswer(e.target.value)}
               />
             </FormControl>
 

@@ -1,12 +1,16 @@
 package com.beehyv.backend.services;
 
-import com.beehyv.backend.enums.Role;
+import com.beehyv.backend.dto.mappers.EmployeeDTOMapper;
+import com.beehyv.backend.dto.modeldtos.EmployeeDTO;
+import com.beehyv.backend.models.enums.AppraisalStatus;
+import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +30,8 @@ public class BeeService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
-
     public Employee saveEmployee(Employee employee){
         List<Attribute> attributes = attributeRepo.saveOrFindAll(employee.getDesignation().getAttributes());
-        List<Notification> notifications = notificationRepo.saveAll(employee.getNotifications());
-        List<Task> tasks = taskRepo.saveAll(employee.getTasks());
         Designation designation = designationRepo.findByDesignation(employee.getDesignation().getDesignation());
         if(designation==null){
             employee.getDesignation().setAttributes(attributes);
@@ -38,24 +39,19 @@ public class BeeService {
         }
 
         employee.setDesignation(designation);
-        employee.setNotifications(notifications);
-        employee.setTasks(tasks);
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        Employee res = employeeRepo.save(employee);
-        for(Task task: tasks)task.setEmployee(res);
-        taskRepo.saveAll(tasks);
-        for(Notification notification:notifications)notification.setEmployee(res);
-        notificationRepo.saveAll(notifications);
 
-        return res;
+        return employeeRepo.save(employee);
     }
 
     public Employee findEmployee(Integer employeeId) {
         return employeeRepo.findById(employeeId).orElse(null);
     }
 
-    public List<Employee> findAllEmployees() {
-        return employeeRepo.findAll();
+    public List<EmployeeDTO> findAllEmployees() {
+        List<Employee> employees = employeeRepo.findAll();
+        EmployeeDTOMapper employeeDTOMapper = new EmployeeDTOMapper();
+        return employees.stream().map(employeeDTOMapper).toList();
     }
 
     //ATTRIBUTES:
@@ -92,11 +88,11 @@ public class BeeService {
     //TASKS:
     public List<Task> getTasks(Integer employeeId){
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if(employee!=null){
-            return employee.getTasks();
+        if(employee==null){
+            return new ArrayList<>();
         }
 
-        return null;
+        return taskRepo.findByEmployee(employee);
     }
 
     public Task addTask(Integer employeeId, Task task) {
@@ -142,11 +138,10 @@ public class BeeService {
     //NOTIFICATIONS:
     public List<Notification> getNotifications(Integer employeeId) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if(employee!=null){
-            return employee.getNotifications();
+        if(employee==null){
+            return new ArrayList<>();
         }
-
-        return null;
+        return notificationRepo.findByEmployee(employee);
     }
 
     public Notification addNotification(Integer employeeId, Notification notification) {
@@ -165,9 +160,12 @@ public class BeeService {
             return "No admins found";
         }
         for(Employee admin: admins){
-            notification.setEmployee(admin);
-            admin.getNotifications().add(notification);
-            employeeRepo.save(admin);
+            Notification newNotification = new Notification();
+            newNotification.setNotificationTitle(notification.getNotificationTitle());
+            newNotification.setDescription(notification.getDescription());
+            newNotification.setFromId(notification.getFromId());
+            newNotification.setEmployee(admin);
+            notificationRepo.save(newNotification);
         }
 
         return "success";
@@ -193,6 +191,19 @@ public class BeeService {
         return "Notification not found.";
     }
 
+    public void searchEmployeesWhoAreEligibleForAppraisal() {
+        List<Employee> employeesEligible = employeeRepo.findByEmployeesWhoAreEligibleForAppraisal(Role.EMPLOYEE, AppraisalStatus.PENDING);
+        for(Employee employee: employeesEligible){
 
+            Notification notification = new Notification();
+            notification.setNotificationTitle("Pending Appraisal");
+            notification.setDescription("Employee "+employee.getEmployeeId()+" is eligible for appraisal.");
+            notification.setFromId(employee.getEmployeeId());
+            notification.setFromId(employee.getEmployeeId());
 
+            employee.setAppraisalStatus(AppraisalStatus.MARKED);
+            employeeRepo.save(employee);
+            addNotificationToAdmin(notification);
+        }
+    }
 }

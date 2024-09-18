@@ -17,16 +17,14 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int notificationId;
 
-    private String notification;
+    private String notificationTitle;
     private String description;
     private boolean read = false;
+    private Integer fromId ;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    public Notification(String notification, String description){
-        this.notification = notification;
-        this.description = description;
-    }
 }
