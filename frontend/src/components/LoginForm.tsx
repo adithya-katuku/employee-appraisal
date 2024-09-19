@@ -15,6 +15,11 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login, RootState } from "../stores/store";
 import { Navigate } from "react-router-dom";
+import { RepeatIcon } from "@chakra-ui/icons";
+
+interface response{
+  message:string;
+}
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -26,20 +31,20 @@ const LoginForm = () => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
 
-  const generateCaptcha = async ()=>{
+  const generateCaptcha = async () => {
     await axios
       .get("http://localhost:8080/captcha/generate-captcha")
       .then(({ data }) => {
-        setUrl(`data:image/png;base64,${data.image}`);
+        setUrl(`data:image/png;base64,${data.captcha}`);
         setCaptchaId(data.captchaId);
       });
-  }
+  };
   useEffect(() => {
     generateCaptcha();
   }, []);
 
-  if(isLoggedIn){
-    return <Navigate to="/home"/>
+  if (isLoggedIn) {
+    return <Navigate to="/home" />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,10 +69,11 @@ const LoginForm = () => {
         setCaptchaAnswer("");
         setUrl("");
       })
-      .catch((err:AxiosError) => {
+      .catch((err: AxiosError<response>) => {
+        console.log(err);
         toast({
           title: "Login Failed",
-          description: err.message,
+          description: err.response ? err.response.data.message : "Login failed",
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -80,7 +86,7 @@ const LoginForm = () => {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Box
-        w="md"
+        minW="md"
         mx="auto"
         mt={10}
         p={6}
@@ -113,9 +119,12 @@ const LoginForm = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
-
-            <Image minH="6.3rem" src={url} alt="Captcha" />
-
+            <Flex alignItems="center">
+              <Image minH="6.3rem" src={url} alt="Captcha" />
+              <Button w="1rem" margin="1" colorScheme="teal" onClick={()=>generateCaptcha()}>
+                <RepeatIcon />
+              </Button>
+            </Flex>
             <FormControl id="captcha" isRequired>
               <FormLabel>Captcha</FormLabel>
               <Input

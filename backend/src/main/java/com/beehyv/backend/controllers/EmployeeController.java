@@ -6,7 +6,7 @@ import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.models.Task;
-import com.beehyv.backend.services.BeeService;
+import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class EmployeeController {
     @Autowired
-    private BeeService beeService;
+    private EmployeeService employeeService;
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
@@ -31,7 +31,7 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.findEmployee(employeeDetails.getEmployeeId());
+        return employeeService.findEmployee(employeeDetails.getEmployeeId());
     }
 
     //ATTRIBUTES:
@@ -41,7 +41,7 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.getAttributes(employeeDetails.getEmployeeId());
+        return employeeService.getAttributes(employeeDetails.getEmployeeId());
     }
 
     //TASKS:
@@ -51,7 +51,7 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.getTasks(employeeDetails.getEmployeeId());
+        return employeeService.getTasks(employeeDetails.getEmployeeId());
     }
 
     @PostMapping("/tasks")
@@ -60,17 +60,17 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.addTask(employeeDetails.getEmployeeId(), task);
+        return employeeService.addTask(employeeDetails.getEmployeeId(), task);
     }
 
     @PutMapping("/tasks/{taskId}")
     public Task rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
-        return beeService.rateTaskBySelf(taskId, taskRating);
+        return employeeService.rateTaskBySelf(taskId, taskRating);
     }
 
     @DeleteMapping("/tasks/{taskId}")
     public String deleteTask(@PathVariable("taskId") Integer taskId){
-        return beeService.deleteTask(taskId);
+        return employeeService.deleteTask(taskId);
     }
 
     //NOTIFICATIONS:
@@ -80,21 +80,21 @@ public class EmployeeController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.getNotifications(employeeDetails.getEmployeeId());
+        return employeeService.getNotifications(employeeDetails.getEmployeeId());
     }
 
     @PostMapping("/notifications")
     public String addNotificationToAdmins(@RequestBody Notification notification){
-        return beeService.addNotificationToAdmin(notification);
+        return employeeService.addNotificationToAdmin(notification);
     }
 
     @PutMapping("/notifications/{notificationId}")
     public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
-        return beeService.readOrUnreadNotification(notificationId);
+        return employeeService.readOrUnreadNotification(notificationId);
     }
 
     @DeleteMapping("/notifications/{notificationId}")
     public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
-        return beeService.deleteNotification(notificationId);
+        return employeeService.deleteNotification(notificationId);
     }
 }

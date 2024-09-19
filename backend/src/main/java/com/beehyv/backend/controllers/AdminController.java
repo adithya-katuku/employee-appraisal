@@ -1,13 +1,14 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
-import com.beehyv.backend.dto.modeldtos.EmployeeDTO;
+import com.beehyv.backend.dto.response.EmployeeDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.models.Task;
-import com.beehyv.backend.services.BeeService;
+import com.beehyv.backend.services.AdminService;
+import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +22,13 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
     @Autowired
-    private BeeService beeService;
+    private EmployeeService beeService;
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
     private JwtFilter jwtFilter;
+    @Autowired
+    private AdminService adminService;
 
     @GetMapping("/info")
     public Employee getInfo(){
@@ -39,7 +42,7 @@ public class AdminController {
 
     @GetMapping("/all-users")
     public List<EmployeeDTO> getAllEmployees(){
-        return beeService.findAllEmployees();
+        return adminService.findAllEmployees();
     }
 
     @GetMapping("/employee/{employeeId}")
@@ -56,7 +59,7 @@ public class AdminController {
 
     @PutMapping("/employee/{employeeId}/attributes")
     public String rateEmployeeAttribute(@PathVariable("employeeId") Integer employeeId, @RequestParam("attributeId") Integer attributeId, @RequestParam("rating") Integer attributeRating){
-        return beeService.rateAttribute(employeeId, attributeId, attributeRating);
+        return adminService.rateAttribute(employeeId, attributeId, attributeRating);
     }
 
     //SELF:
@@ -78,7 +81,7 @@ public class AdminController {
 
     @PutMapping("/employee/tasks/{taskId}")
     public Task rateEmployeeTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
-        return beeService.rateTaskByAdmin(taskId, taskRating);
+        return adminService.rateTaskByAdmin(taskId, taskRating);
     }
 
     //SELF:
@@ -120,7 +123,7 @@ public class AdminController {
                 .getAuthentication()
                 .getPrincipal();
 
-        beeService.searchEmployeesWhoAreEligibleForAppraisal();
+        adminService.searchEmployeesWhoAreEligibleForAppraisal();
         return beeService.getNotifications(employeeDetails.getEmployeeId());
     }
 

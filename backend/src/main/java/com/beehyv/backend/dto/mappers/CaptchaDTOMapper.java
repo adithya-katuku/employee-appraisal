@@ -1,6 +1,6 @@
 package com.beehyv.backend.dto.mappers;
 
-import com.beehyv.backend.dto.modeldtos.CaptchaDTO;
+import com.beehyv.backend.dto.custom.CaptchaDTO;
 import com.beehyv.backend.models.Captcha;
 
 import java.util.function.Function;

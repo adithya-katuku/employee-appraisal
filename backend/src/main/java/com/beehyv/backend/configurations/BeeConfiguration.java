@@ -42,6 +42,7 @@ public class BeeConfiguration{
                 .build();
     }
 
+    //DATABASE TO VERIFY:
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();

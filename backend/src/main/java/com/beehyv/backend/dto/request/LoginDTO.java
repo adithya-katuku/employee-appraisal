@@ -1,6 +1,6 @@
-package com.beehyv.backend.dao;
+package com.beehyv.backend.dto.request;
 
-public record LoginDAO(
+public record LoginDTO(
         String email,
         String password,
         Integer captchaId,

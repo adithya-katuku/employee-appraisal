@@ -1,7 +1,7 @@
 package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeDTOMapper;
-import com.beehyv.backend.dto.modeldtos.EmployeeDTO;
+import com.beehyv.backend.dto.response.EmployeeDTO;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
@@ -12,7 +12,6 @@ import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class AdminService {
     @Autowired
     private NotificationRepo notificationRepo;
     @Autowired
-    BeeService beeService;
+    EmployeeService beeService;
 
     public List<EmployeeDTO> findAllEmployees() {
         List<Employee> employees = employeeRepo.findAll();
@@ -71,6 +70,7 @@ public class AdminService {
         return null;
     }
 
+    //NOTIFICATIONS:
     public void searchEmployeesWhoAreEligibleForAppraisal() {
         List<Employee> employeesEligible = employeeRepo.findByEmployeesWhoAreEligibleForAppraisal(Role.EMPLOYEE, AppraisalStatus.PENDING);
         for(Employee employee: employeesEligible){

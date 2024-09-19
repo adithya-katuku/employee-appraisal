@@ -32,27 +32,20 @@ public class JwtService {
         SECRET_KEY = generateSecretKey();
     }
 
-    public ResponseEntity<?> generateToken(String username){
+    public String generateToken(String username){
         Map<String, Object> claims = new HashMap<>();
         Employee employee = employeeRepo.findByEmail(username);
         claims.put("employee-id", employee.getEmployeeId().toString());
         claims.put("roles", employee.getRoles());
-        String jwt = Jwts.builder()
+        return Jwts.builder()
                 .claims(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis()+1000*60*60))
                 .signWith(getKey())
                 .compact();
-
-        Map<String, String> res = new HashMap<>();
-        res.put("jwt", jwt);
-
-        String role = employee.getRoles().stream().max((r1, r2) -> r1.ordinal() - r2.ordinal()).orElse(Role.EMPLOYEE).name().toLowerCase();
-        res.put("role", role);
-
-        return new ResponseEntity<>(res, HttpStatusCode.valueOf(200));
     }
+
 
     private SecretKey getKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);

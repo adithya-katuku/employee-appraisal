@@ -1,6 +1,6 @@
 package com.beehyv.backend.dto.mappers;
 
-import com.beehyv.backend.dto.modeldtos.EmployeeDTO;
+import com.beehyv.backend.dto.response.EmployeeDTO;
 import com.beehyv.backend.models.Employee;
 
 import java.util.function.Function;

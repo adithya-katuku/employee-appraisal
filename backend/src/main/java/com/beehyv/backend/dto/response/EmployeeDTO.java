@@ -1,4 +1,4 @@
-package com.beehyv.backend.dto.modeldtos;
+package com.beehyv.backend.dto.response;
 
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
