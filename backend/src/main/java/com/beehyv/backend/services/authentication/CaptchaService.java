@@ -1,4 +1,4 @@
-package com.beehyv.backend.services;
+package com.beehyv.backend.services.authentication;
 
 import com.beehyv.backend.dto.custom.CaptchaDTO;
 import com.beehyv.backend.dto.mappers.CaptchaDTOMapper;
@@ -58,7 +58,6 @@ public class CaptchaService {
         } catch (IOException e) {
             throw new IOException("Failed to generate captcha");
         }
-
     }
 
     private Captcha saveCaptcha(String image, String text){

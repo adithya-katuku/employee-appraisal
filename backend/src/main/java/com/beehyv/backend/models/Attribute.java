@@ -1,13 +1,13 @@
 package com.beehyv.backend.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -17,9 +17,5 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attributeId;
     private  String attribute;
-
-    public Attribute(String attribute){
-        this.attribute = attribute;
-    }
 
 }

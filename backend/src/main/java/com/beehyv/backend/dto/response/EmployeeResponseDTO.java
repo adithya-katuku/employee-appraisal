@@ -1,18 +1,16 @@
 package com.beehyv.backend.dto.response;
 
-import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 
 import java.util.Date;
 import java.util.List;
 
-public record EmployeeDTO(
+public record EmployeeResponseDTO(
         Integer employeeId,
         String name,
         String email,
         Date joiningDate,
         List<Role> roles,
-        String designation,
-        AppraisalStatus appraisalStatus
+        String designation
 ) {
 }

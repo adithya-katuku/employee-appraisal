@@ -1,4 +1,4 @@
-package com.beehyv.backend.services;
+package com.beehyv.backend.services.authentication;
 
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
@@ -9,9 +9,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -37,6 +34,8 @@ public class JwtService {
         Employee employee = employeeRepo.findByEmail(username);
         claims.put("employee-id", employee.getEmployeeId().toString());
         claims.put("roles", employee.getRoles());
+        claims.put("prevApp", "null");
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(username)
@@ -79,6 +78,7 @@ public class JwtService {
         Claims claims = extractAllClaims(token);
         return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
     }
+
     public Integer extractEmployeeId(Claims claims){
         Object claimsEmployeeId = claims.get("employee-id");
         return Integer.valueOf(claimsEmployeeId.toString());

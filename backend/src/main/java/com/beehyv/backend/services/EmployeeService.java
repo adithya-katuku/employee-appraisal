@@ -1,9 +1,14 @@
 package com.beehyv.backend.services;
 
+import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
+import com.beehyv.backend.dto.request.TaskRequestDTO;
+import com.beehyv.backend.dto.response.EmployeeResponseDTO;
+import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,12 +23,28 @@ public class EmployeeService {
     @Autowired
     private AttributeRepo attributeRepo;
     @Autowired
-    private TaskRepo taskRepo;
-    @Autowired
     private NotificationRepo notificationRepo;
+    @Autowired
+    private TaskService taskService;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     public Employee findEmployee(Integer employeeId) {
         return employeeRepo.findById(employeeId).orElse(null);
+    }
+
+    public EmployeeResponseDTO saveEmployee(Employee employee){
+        List<Attribute> attributes = attributeRepo.saveOrFindAll(employee.getDesignation().getAttributes());
+        Designation designation = designationRepo.findByDesignation(employee.getDesignation().getDesignation());
+        if(designation==null){
+            employee.getDesignation().setAttributes(attributes);
+            designation = designationRepo.saveOrFind(employee.getDesignation());
+        }
+
+        employee.setDesignation(designation);
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+
+        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
     }
 
     //ATTRIBUTES:
@@ -37,43 +58,24 @@ public class EmployeeService {
     }
 
     //TASKS:
-    public List<Task> getTasks(Integer employeeId){
+    public List<TaskResponseDTO> getTasks(Integer employeeId){
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee==null){
             return new ArrayList<>();
         }
-
-        return taskRepo.findByEmployee(employee);
+        return taskService.getTasks(employee);
     }
 
-    public Task addTask(Integer employeeId, Task task) {
-        Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if(employee!=null){
-            task.setEmployee(employee);
-            return taskRepo.save(task);
-        }
-
-        return null;
+    public TaskResponseDTO addTask(Integer employeeId, TaskRequestDTO taskRequestDTO) {
+        return taskService.addTask(employeeId, taskRequestDTO);
     }
 
-    public Task rateTaskBySelf(Integer taskId, Integer taskRating){
-        Task task = taskRepo.findById(taskId).orElse(null);
-        if(task!=null){
-            task.setSelfRating(taskRating);
-            return taskRepo.save(task);
-        }
-
-        return null;
+    public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
+        return taskService.rateTaskBySelf(taskId, taskRating);
     }
 
     public String deleteTask(Integer taskId) {
-        Task task = taskRepo.findById(taskId).orElse(null);
-        if(task!=null){
-            taskRepo.delete(task);
-            return "success";
-        }
-
-        return "Task not found.";
+        return taskService.deleteTask(taskId);
     }
 
     //NOTIFICATIONS:
@@ -95,7 +97,22 @@ public class EmployeeService {
         return null;
     }
 
-    public String addNotificationToAdmin(Notification notification) {
+    public String addNotificationToAdmin(Integer adminId, Notification notification) {
+        Employee admin = employeeRepo.findById(adminId).orElse(null);
+        if(admin==null){
+            return "No admins found";
+        }
+        Notification newNotification = new Notification();
+        newNotification.setNotificationTitle(notification.getNotificationTitle());
+        newNotification.setDescription(notification.getDescription());
+        newNotification.setFromId(notification.getFromId());
+        newNotification.setEmployee(admin);
+        notificationRepo.save(newNotification);
+
+        return "success";
+    }
+
+    public String addNotificationToAdmins(Notification notification) {
         List<Employee> admins = employeeRepo.findByRole(Role.ADMIN);
         if(admins==null){
             return "No admins found";

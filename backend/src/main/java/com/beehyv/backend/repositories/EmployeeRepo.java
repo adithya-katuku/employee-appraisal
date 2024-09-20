@@ -13,9 +13,9 @@ import java.util.List;
 public interface EmployeeRepo extends JpaRepository<Employee, Integer> {
     Employee findByEmail(String email);
 
-    @Query(value = "select * from employee e where :role = any(e.roles)", nativeQuery = true)
+    @Query(value = "select * from employee e where :role = any(e.roles) and :role >= all(e.roles)", nativeQuery = true)
     List<Employee> findByRole(Role role);
 
-    @Query(value = "select * from employee e where :role >= all(e.roles) and appraisal_status = :appraisalStatus and joining_date < now() - interval '1 year' ", nativeQuery = true)
-    List<Employee> findByEmployeesWhoAreEligibleForAppraisal(Role role, AppraisalStatus appraisalStatus);
+//    @Query(value = "select * from employee e where :role >= all(e.roles) and appraisal_status = :appraisalStatus and joining_date < now() - interval '1 year' ", nativeQuery = true)
+//    List<Employee> findByEmployeesWhoAreEligibleForAppraisal(Role role, AppraisalStatus appraisalStatus);
 }

@@ -1,13 +1,14 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
+import com.beehyv.backend.dto.request.TaskRequestDTO;
+import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
-import com.beehyv.backend.models.Task;
 import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.EmployeeDetailsService;
+import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/user")
 public class EmployeeController {
     @Autowired
@@ -23,7 +25,6 @@ public class EmployeeController {
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
     private JwtFilter jwtFilter;
-
 
     @GetMapping("/info")
     public Employee getEmployee(){
@@ -46,7 +47,7 @@ public class EmployeeController {
 
     //TASKS:
     @GetMapping("/tasks")
-    public List<Task> getTasks(){
+    public List<TaskResponseDTO> getTasks(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -55,16 +56,16 @@ public class EmployeeController {
     }
 
     @PostMapping("/tasks")
-    public Task addTask(@RequestBody Task task){
+    public TaskResponseDTO addTask(@RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.addTask(employeeDetails.getEmployeeId(), task);
+        return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
     }
 
     @PutMapping("/tasks/{taskId}")
-    public Task rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
+    public TaskResponseDTO rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
         return employeeService.rateTaskBySelf(taskId, taskRating);
     }
 
@@ -85,7 +86,7 @@ public class EmployeeController {
 
     @PostMapping("/notifications")
     public String addNotificationToAdmins(@RequestBody Notification notification){
-        return employeeService.addNotificationToAdmin(notification);
+        return employeeService.addNotificationToAdmins(notification);
     }
 
     @PutMapping("/notifications/{notificationId}")

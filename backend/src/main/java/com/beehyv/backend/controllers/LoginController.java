@@ -2,10 +2,9 @@ package com.beehyv.backend.controllers;
 
 
 import com.beehyv.backend.dto.request.LoginDTO;
-import com.beehyv.backend.dto.response.EmployeeDTO;
+import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.models.Employee;
-import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.LoginService;
+import com.beehyv.backend.services.authentication.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +17,6 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:5173")
 public class LoginController {
     @Autowired
-    private EmployeeService beeService;
-    @Autowired
     private LoginService loginService;
 
     @GetMapping("/")
@@ -28,7 +25,7 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public EmployeeDTO saveEmployee(@RequestBody Employee employee){
+    public EmployeeResponseDTO saveEmployee(@RequestBody Employee employee){
         return loginService.saveEmployee(employee);
     }
 

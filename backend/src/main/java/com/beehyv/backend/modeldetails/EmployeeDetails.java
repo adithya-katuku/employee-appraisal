@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,12 +24,14 @@ public class EmployeeDetails implements UserDetails {
     private String username;
     private String password;
     private List<Role> roles;
+    private Date previousAppraisalDate;
 
     public EmployeeDetails(Employee employee){
         this.employeeId = employee.getEmployeeId();
         this.username = employee.getEmail();
         this.password = employee.getPassword();
         this.roles = employee.getRoles();
+        this.previousAppraisalDate = employee.getPreviousAppraisalDate();
     }
 
     public EmployeeDetails(Integer employeeId, String username, List<Role> roles) {

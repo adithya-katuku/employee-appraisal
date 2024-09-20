@@ -1,21 +1,20 @@
 package com.beehyv.backend.dto.mappers;
 
-import com.beehyv.backend.dto.response.EmployeeDTO;
+import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.models.Employee;
 
 import java.util.function.Function;
 
-public class EmployeeDTOMapper implements Function<Employee, EmployeeDTO> {
+public class EmployeeResponseDTOMapper implements Function<Employee, EmployeeResponseDTO> {
     @Override
-    public EmployeeDTO apply(Employee employee) {
-        return new EmployeeDTO(
+    public EmployeeResponseDTO apply(Employee employee) {
+        return new EmployeeResponseDTO(
                 employee.getEmployeeId(),
                 employee.getName(),
                 employee.getEmail(),
                 employee.getJoiningDate(),
                 employee.getRoles(),
-                employee.getDesignation().getDesignation(),
-                employee.getAppraisalStatus()
+                employee.getDesignation().getDesignation()
         );
     }
 }

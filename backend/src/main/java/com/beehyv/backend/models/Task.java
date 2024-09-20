@@ -2,14 +2,14 @@ package com.beehyv.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -17,21 +17,26 @@ import java.util.Date;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int taskId;
+    private Integer taskId;
     private String taskTitle;
     private String description;
     private Date startDate;
     private Date endDate;
-    private boolean appraisable;
-    private int selfRating = 0;
-    private int adminRating = 0;
+    private boolean appraisable=false;
+    private Double selfRating = null;
+    private Double adminRating = null;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JsonIgnore
     @JoinColumn(name = "employee_id")
+    @JsonIgnore
     private Employee employee;
 
-    public Task(String taskTitle, String description, Date startDate, Date endDate, boolean appraisable, int selfRating, int adminRating) {
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "appraisal_id")
+    @JsonIgnore
+    private Appraisal appraisal;
+
+    public Task(String taskTitle, String description, Date startDate, Date endDate, boolean appraisable, Double selfRating, Double adminRating) {
         this.taskTitle = taskTitle;
         this.description = description;
         this.startDate = startDate;

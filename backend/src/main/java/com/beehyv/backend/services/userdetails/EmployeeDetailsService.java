@@ -1,4 +1,4 @@
-package com.beehyv.backend.services;
+package com.beehyv.backend.services.userdetails;
 
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;

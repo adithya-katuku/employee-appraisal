@@ -1,6 +1,6 @@
 package com.beehyv.backend.controllers;
 
-import com.beehyv.backend.services.CaptchaService;
+import com.beehyv.backend.services.authentication.CaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

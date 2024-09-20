@@ -1,15 +1,16 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
-import com.beehyv.backend.dto.response.EmployeeDTO;
+import com.beehyv.backend.dto.request.TaskRequestDTO;
+import com.beehyv.backend.dto.response.EmployeeResponseDTO;
+import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
-import com.beehyv.backend.models.Task;
 import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.EmployeeDetailsService;
+import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
     @Autowired
-    private EmployeeService beeService;
+    private EmployeeService employeeService;
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
@@ -36,86 +38,51 @@ public class AdminController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return beeService.findEmployee(employeeDetails.getEmployeeId());
+        return employeeService.findEmployee(employeeDetails.getEmployeeId());
     }
 
-
     @GetMapping("/all-users")
-    public List<EmployeeDTO> getAllEmployees(){
+    public List<EmployeeResponseDTO> getAllEmployees(){
         return adminService.findAllEmployees();
     }
 
     @GetMapping("/employee/{employeeId}")
     public Employee getEmployee(@PathVariable("employeeId") Integer employeeId){
-        return beeService.findEmployee(employeeId);
+        return employeeService.findEmployee(employeeId);
     }
 
     //ATTRIBUTES:
-    //EMPLOYEES:
     @GetMapping("/employee/{employeeId}/attributes")
     public List<Attribute> getEmployeeAttributes(@PathVariable("employeeId") Integer employeeId){
-        return beeService.getAttributes(employeeId);
+        return employeeService.getAttributes(employeeId);
     }
 
     @PutMapping("/employee/{employeeId}/attributes")
-    public String rateEmployeeAttribute(@PathVariable("employeeId") Integer employeeId, @RequestParam("attributeId") Integer attributeId, @RequestParam("rating") Integer attributeRating){
+    public String rateEmployeeAttribute(@PathVariable("employeeId") Integer employeeId, @RequestParam("attributeId") Integer attributeId, @RequestParam("rating") Double attributeRating){
         return adminService.rateAttribute(employeeId, attributeId, attributeRating);
     }
 
-    //SELF:
-    @GetMapping("/attributes")
-    public List<Attribute> getAttributes(){
-        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return beeService.getAttributes(employeeDetails.getEmployeeId());
-    }
 
     //TASKS:
-    //EMPLOYEES:
     @GetMapping("/employee/{employeeId}/tasks")
-    public List<Task> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
-        return beeService.getTasks(employeeId);
+    public List<TaskResponseDTO> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
+        return employeeService.getTasks(employeeId);
     }
 
     @PutMapping("/employee/tasks/{taskId}")
-    public Task rateEmployeeTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Integer taskRating){
+    public TaskResponseDTO rateEmployeeTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
         return adminService.rateTaskByAdmin(taskId, taskRating);
     }
 
-    //SELF:
-    @GetMapping("/tasks")
-    public List<Task> getTasks(){
-        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return beeService.getTasks(employeeDetails.getEmployeeId());
-    }
-
-    @PostMapping("/tasks")
-    public Task addTask(@RequestBody Task task){
-        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return beeService.addTask(employeeDetails.getEmployeeId(), task);
-    }
-
-    @DeleteMapping("/tasks/{taskId}")
-    public String deleteTask(@PathVariable("taskId") Integer taskId){
-        return beeService.deleteTask(taskId);
-    }
 
     //NOTIFICATIONS:
-    //EMPLOYEE:
     @PostMapping("/employee/{employeeId}/notifications")
     public Notification addNotificationToEmployee(@PathVariable("employeeId") Integer employeeId, @RequestBody Notification notification){
-        return beeService.addNotification(employeeId, notification);
+        return employeeService.addNotification(employeeId, notification);
     }
 
     //SELF:
+    //NOTIFICATIONS:
     @GetMapping("/notifications")
     public List<Notification> getNotifications(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
@@ -123,22 +90,50 @@ public class AdminController {
                 .getAuthentication()
                 .getPrincipal();
 
-        adminService.searchEmployeesWhoAreEligibleForAppraisal();
-        return beeService.getNotifications(employeeDetails.getEmployeeId());
+        return employeeService.getNotifications(employeeDetails.getEmployeeId());
     }
-
-//    @PostMapping("/notifications")
-//    public String addNotificationToAdmins(@RequestBody Notification notification){
-//        return beeService.addNotificationToAdmin(notification);
-//    }
 
     @PutMapping("/notifications/{notificationId}")
     public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
-        return beeService.readOrUnreadNotification(notificationId);
+        return employeeService.readOrUnreadNotification(notificationId);
     }
 
     @DeleteMapping("/notifications/{notificationId}")
     public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
-        return beeService.deleteNotification(notificationId);
+        return employeeService.deleteNotification(notificationId);
+    }
+
+    //ATTRIBUTES:
+    @GetMapping("/attributes")
+    public List<Attribute> getAttributes(){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.getAttributes(employeeDetails.getEmployeeId());
+    }
+
+    //TASKS:
+    @GetMapping("/tasks")
+    public List<TaskResponseDTO> getTasks(){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.getTasks(employeeDetails.getEmployeeId());
+    }
+
+    @PostMapping("/tasks")
+    public TaskResponseDTO addTask(@RequestBody TaskRequestDTO taskRequestDTO){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+    }
+
+    @DeleteMapping("/tasks/{taskId}")
+    public String deleteTask(@PathVariable("taskId") Integer taskId){
+        return employeeService.deleteTask(taskId);
     }
 }
