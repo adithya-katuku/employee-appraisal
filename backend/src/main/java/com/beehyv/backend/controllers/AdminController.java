@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
@@ -41,7 +40,7 @@ public class AdminController {
         return employeeService.findEmployee(employeeDetails.getEmployeeId());
     }
 
-    @GetMapping("/all-users")
+    @GetMapping("/all-employees")
     public List<EmployeeResponseDTO> getAllEmployees(){
         return adminService.findAllEmployees();
     }
@@ -62,7 +61,6 @@ public class AdminController {
         return adminService.rateAttribute(employeeId, attributeId, attributeRating);
     }
 
-
     //TASKS:
     @GetMapping("/employee/{employeeId}/tasks")
     public List<TaskResponseDTO> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
@@ -73,7 +71,6 @@ public class AdminController {
     public TaskResponseDTO rateEmployeeTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
         return adminService.rateTaskByAdmin(taskId, taskRating);
     }
-
 
     //NOTIFICATIONS:
     @PostMapping("/employee/{employeeId}/notifications")

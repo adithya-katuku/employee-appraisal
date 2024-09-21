@@ -5,6 +5,7 @@ import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.repositories.EmployeeRepo;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -57,11 +60,11 @@ public class JwtService {
             Key secretKey = keyGen.generateKey();
             return Base64.getEncoder().encodeToString(secretKey.getEncoded());
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new InternalError(e.getMessage());
         }
     }
 
-    private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) throws JwtException {
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
@@ -69,12 +72,15 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isValid(String token) {
+    public boolean isValid(String token) throws JwtException {
         Claims claims = extractAllClaims(token);
-        return claims.getExpiration().after(new Date());
+        if(claims!=null){
+            return claims.getExpiration().after(new Date());
+        }
+        return false;
     }
 
-    public EmployeeDetails getEmployeeDetails(String token){
+    public EmployeeDetails getEmployeeDetails(String token) throws JwtException {
         Claims claims = extractAllClaims(token);
         return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
     }

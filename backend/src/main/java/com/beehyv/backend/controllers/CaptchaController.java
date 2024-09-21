@@ -8,19 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/captcha")
-@CrossOrigin(originPatterns = "http://localhost:5173")
 public class CaptchaController {
     @Autowired
     CaptchaService captchaService;
 
     @GetMapping("/generate-captcha")
-    public ResponseEntity<?> generateCaptcha() {
-        try {
-            return new ResponseEntity<>(captchaService.generateCaptcha(), HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+    public ResponseEntity<?> generateCaptcha(){
+        return new ResponseEntity<>(captchaService.generateCaptcha(), HttpStatus.OK);
     }
 }

@@ -43,20 +43,19 @@ public class CaptchaService {
         defaultKaptcha.setConfig(config);
     }
 
-    public CaptchaDTO generateCaptcha() throws IOException{
+    public CaptchaDTO generateCaptcha(){
         String text = defaultKaptcha.createText();
         BufferedImage image = defaultKaptcha.createImage(text);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", outputStream);
             String encodedImage = Base64.getEncoder().encodeToString(outputStream.toByteArray());
             CaptchaDTO captchaDTO = new CaptchaDTOMapper().apply(saveCaptcha(encodedImage, text));
             outputStream.close();
-
             return captchaDTO;
         } catch (IOException e) {
-            throw new IOException("Failed to generate captcha");
+            throw new InternalError("Error generating captcha");
         }
     }
 

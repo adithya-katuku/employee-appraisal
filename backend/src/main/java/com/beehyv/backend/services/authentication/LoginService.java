@@ -3,6 +3,7 @@ package com.beehyv.backend.services.authentication;
 import com.beehyv.backend.dto.custom.CaptchaDTO;
 import com.beehyv.backend.dto.request.LoginDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
+import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.enums.Role;
@@ -33,10 +34,6 @@ public class LoginService {
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private DesignationRepo designationRepo;
-    @Autowired
-    private AttributeRepo attributeRepo;
-    @Autowired
     private AppraisalService appraisalService;
 
     public EmployeeResponseDTO saveEmployee(Employee employee){
@@ -44,22 +41,20 @@ public class LoginService {
     }
 
     public Map<String, String> handleLogin(LoginDTO loginDTO){
-        Map<String, String> res = new HashMap<>();
+        if(!captchaService.verifyCaptcha(new CaptchaDTO(loginDTO.captchaId(), loginDTO.captchaAnswer()))){
+            throw new InvalidInputException("Invalid captcha");
+        }
 
-//        if(!captchaService.verifyCaptcha(new CaptchaDTO(loginDTO.captchaId(), loginDTO.captchaAnswer()))){
-//            res.put("message", "Invalid captcha");
-//            return res;
-//        }
-        System.out.println("here");
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.email(), loginDTO.password()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 
+            Map<String, String> res = new HashMap<>();
             res.put("jwt", jwtService.generateToken(loginDTO.email()));
             List<Role> roles = employeeDetails.getRoles();
             Role role = roles.stream().max((r1, r2)->r1.ordinal()-r2.ordinal()).orElse(Role.EMPLOYEE);
-            res.put("role", role.name());
+            res.put("role", role.name().toLowerCase());
 
             if(role.compareTo(Role.ADMIN)!=0){
                 appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails.getPreviousAppraisalDate(), employeeDetails.getEmployeeId());
@@ -68,8 +63,7 @@ public class LoginService {
             return res;
         }
         catch(AuthenticationException e){
-            res.put("message", e.getMessage());
-            return res;
+            throw new InvalidInputException("Invalid credentials");
         }
     }
 
