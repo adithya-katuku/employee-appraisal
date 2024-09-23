@@ -6,11 +6,11 @@ import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
-import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,12 +32,12 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping("/info")
-    public Employee getInfo(){
+    public EmployeeResponseDTO getInfo(){
         EmployeeDetails employeeDetails = (EmployeeDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.findEmployee(employeeDetails.getEmployeeId());
+        return employeeService.getEmployee(employeeDetails.getEmployeeId());
     }
 
     @GetMapping("/all-employees")
@@ -46,8 +46,8 @@ public class AdminController {
     }
 
     @GetMapping("/employee/{employeeId}")
-    public Employee getEmployee(@PathVariable("employeeId") Integer employeeId){
-        return employeeService.findEmployee(employeeId);
+    public EmployeeResponseDTO getEmployee(@PathVariable("employeeId") Integer employeeId){
+        return employeeService.getEmployee(employeeId);
     }
 
     //ATTRIBUTES:
@@ -75,7 +75,7 @@ public class AdminController {
     //NOTIFICATIONS:
     @PostMapping("/employee/{employeeId}/notifications")
     public Notification addNotificationToEmployee(@PathVariable("employeeId") Integer employeeId, @RequestBody Notification notification){
-        return employeeService.addNotification(employeeId, notification);
+        return adminService.addNotification(employeeId, notification);
     }
 
     //SELF:
@@ -121,7 +121,7 @@ public class AdminController {
     }
 
     @PostMapping("/tasks")
-    public TaskResponseDTO addTask(@RequestBody TaskRequestDTO taskRequestDTO){
+    public TaskResponseDTO addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()

@@ -1,5 +1,6 @@
 package com.beehyv.backend.dto.response;
 
+import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.Role;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ public record EmployeeResponseDTO(
         String email,
         Date joiningDate,
         List<Role> roles,
-        String designation
+        String designation,
+        AppraisalEligibility appraisalEligibility
 ) {
 }

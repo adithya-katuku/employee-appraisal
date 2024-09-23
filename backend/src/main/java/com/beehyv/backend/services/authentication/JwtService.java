@@ -4,6 +4,7 @@ import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.repositories.EmployeeRepo;
+import com.beehyv.backend.services.AppraisalService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,6 +26,8 @@ import java.util.*;
 public class JwtService {
     @Autowired
     private EmployeeRepo employeeRepo;
+    @Autowired
+    private AppraisalService appraisalService;
 
     private String SECRET_KEY = "";
 
@@ -32,18 +35,20 @@ public class JwtService {
         SECRET_KEY = generateSecretKey();
     }
 
-    public String generateToken(String username){
+    public String generateToken(EmployeeDetails employeeDetails){
         Map<String, Object> claims = new HashMap<>();
-        Employee employee = employeeRepo.findByEmail(username);
-        claims.put("employee-id", employee.getEmployeeId().toString());
-        claims.put("roles", employee.getRoles());
-        claims.put("prevApp", "null");
+        claims.put("employee-id", employeeDetails.getEmployeeId().toString());
+        claims.put("roles", employeeDetails.getRoles());
+
+        if(!employeeDetails.getRoles().contains(Role.ADMIN)){
+            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails.getPreviousAppraisalDate(), employeeDetails.getEmployeeId());
+        }
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(username)
+                .subject(employeeDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+1000*60*60))
+                .expiration(new Date(System.currentTimeMillis()+1000*60*15))
                 .signWith(getKey())
                 .compact();
     }
@@ -64,7 +69,7 @@ public class JwtService {
         }
     }
 
-    private Claims extractAllClaims(String token) throws JwtException {
+    private Claims extractAllClaims(String token){
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
@@ -72,7 +77,7 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isValid(String token) throws JwtException {
+    public boolean isValid(String token){
         Claims claims = extractAllClaims(token);
         if(claims!=null){
             return claims.getExpiration().after(new Date());
@@ -80,7 +85,7 @@ public class JwtService {
         return false;
     }
 
-    public EmployeeDetails getEmployeeDetails(String token) throws JwtException {
+    public EmployeeDetails getEmployeeDetails(String token){
         Claims claims = extractAllClaims(token);
         return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
     }

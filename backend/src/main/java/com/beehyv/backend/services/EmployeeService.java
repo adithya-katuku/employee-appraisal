@@ -4,6 +4,7 @@ import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
+import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +30,21 @@ public class EmployeeService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     public Employee findEmployee(Integer employeeId) {
-        return employeeRepo.findById(employeeId).orElse(null);
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if(employee==null){
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
+        }
+
+        return employee;
+    }
+
+    public EmployeeResponseDTO getEmployee(Integer employeeId) {
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if(employee==null){
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
+        }
+
+        return new EmployeeResponseDTOMapper().apply(employee);
     }
 
     public EmployeeResponseDTO saveEmployee(Employee employee){
@@ -54,14 +68,14 @@ public class EmployeeService {
             return employee.getDesignation().getAttributes();
         }
 
-        return null;
+        throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
     }
 
     //TASKS:
     public List<TaskResponseDTO> getTasks(Integer employeeId){
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee==null){
-            return new ArrayList<>();
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
         return taskService.getTasks(employee);
     }
@@ -82,40 +96,25 @@ public class EmployeeService {
     public List<Notification> getNotifications(Integer employeeId) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee==null){
-            return new ArrayList<>();
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
         return notificationRepo.findByEmployee(employee);
     }
 
-    public Notification addNotification(Integer employeeId, Notification notification) {
-        Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if(employee!=null){
-            notification.setEmployee(employee);
-            return notificationRepo.save(notification);
-        }
-
-        return null;
-    }
-
-    public String addNotificationToAdmin(Integer adminId, Notification notification) {
-        Employee admin = employeeRepo.findById(adminId).orElse(null);
-        if(admin==null){
-            return "No admins found";
-        }
-        Notification newNotification = new Notification();
-        newNotification.setNotificationTitle(notification.getNotificationTitle());
-        newNotification.setDescription(notification.getDescription());
-        newNotification.setFromId(notification.getFromId());
-        newNotification.setEmployee(admin);
-        notificationRepo.save(newNotification);
-
-        return "success";
-    }
+//    public Notification addNotification(Integer employeeId, Notification notification) {
+//        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+//        if(employee!=null){
+//            notification.setEmployee(employee);
+//            return notificationRepo.save(notification);
+//        }
+//
+//        return null;
+//    }
 
     public String addNotificationToAdmins(Notification notification) {
         List<Employee> admins = employeeRepo.findByRole(Role.ADMIN);
         if(admins==null){
-            return "No admins found";
+            throw  new ResourceNotFoundException("No admins found.");
         }
         for(Employee admin: admins){
             Notification newNotification = new Notification();
@@ -136,7 +135,7 @@ public class EmployeeService {
             return notificationRepo.save(notification);
         }
 
-        return null;
+        throw  new ResourceNotFoundException("Notification  not found.");
     }
 
     public String deleteNotification(Integer notificationId) {
@@ -146,6 +145,6 @@ public class EmployeeService {
             return "success";
         }
 
-        return "Notification not found.";
+        throw  new ResourceNotFoundException("Notification  not found.");
     }
 }

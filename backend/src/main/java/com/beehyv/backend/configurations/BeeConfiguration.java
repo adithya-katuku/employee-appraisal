@@ -1,8 +1,6 @@
 package com.beehyv.backend.configurations;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
-import com.beehyv.backend.exceptionhandlers.securityexceptionhandlers.CustomAccessDeniedHandler;
-import com.beehyv.backend.exceptionhandlers.securityexceptionhandlers.CustomAuthenticationEntryPoint;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,11 +40,8 @@ public class BeeConfiguration{
         return http
                 .cors(customizer->customizer.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(e->e
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler()))
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers("/register", "/login", "/captcha/**").permitAll()
+                        .requestMatchers("/register", "/login", "/captcha/**", "/refresh-refreshToken").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

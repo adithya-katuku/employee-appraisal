@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record LoginDTO(
+public record LoginRequestDTO(
         @NotBlank(message = "Email is required and cannot be empty")
         @Email(message = "Please provide a valid email address")
         String email,

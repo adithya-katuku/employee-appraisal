@@ -3,6 +3,7 @@ package com.beehyv.backend.services;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
+import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.repositories.AppraisalRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ public class AppraisalService {
     private void changePreviousAppraisalDate(Integer employeeId) {
         Employee employee = employeeService.findEmployee(employeeId);
         employee.setPreviousAppraisalDate(new Date());
+        employee.setAppraisalEligibility(AppraisalEligibility.ELIGIBLE);
+
         employeeService.saveEmployee(employee);
     }
 }

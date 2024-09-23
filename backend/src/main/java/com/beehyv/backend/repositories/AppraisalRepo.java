@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AppraisalRepo extends JpaRepository<Appraisal, Integer> {
     Appraisal findByEmployeeIdAndAppraisalStatus(Integer employeeId, AppraisalStatus appraisalStatus);
-
-    Appraisal findByEmployeeIdAndAppraisalYear(Integer employeeId, Integer appraisalYear);
 }

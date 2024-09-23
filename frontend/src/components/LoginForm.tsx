@@ -9,6 +9,7 @@ import {
   useToast,
   Image,
   Flex,
+  AlertStatus,
 } from "@chakra-ui/react";
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -16,10 +17,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, RootState } from "../stores/store";
 import { Navigate } from "react-router-dom";
 import { RepeatIcon } from "@chakra-ui/icons";
+import { z } from "zod";
 
 interface response {
   message: string;
 }
+
+const schema = z.object({
+  
+})
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -60,7 +66,7 @@ const LoginForm = () => {
     }
   }
 
-  const callToast = (title: string, description: string, status) => {
+  const callToast = (title: string, description: string, status: AlertStatus) => {
     toast({
       title: title,
       description: description,

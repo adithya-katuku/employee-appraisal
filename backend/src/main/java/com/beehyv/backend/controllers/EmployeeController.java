@@ -2,6 +2,7 @@ package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
+import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
@@ -9,6 +10,7 @@ import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +28,12 @@ public class EmployeeController {
     private JwtFilter jwtFilter;
 
     @GetMapping("/info")
-    public Employee getEmployee(){
+    public EmployeeResponseDTO getEmployee(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.findEmployee(employeeDetails.getEmployeeId());
+        return employeeService.getEmployee(employeeDetails.getEmployeeId());
     }
 
     //ATTRIBUTES:
@@ -55,7 +57,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/tasks")
-    public TaskResponseDTO addTask(@RequestBody TaskRequestDTO taskRequestDTO){
+    public TaskResponseDTO addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()

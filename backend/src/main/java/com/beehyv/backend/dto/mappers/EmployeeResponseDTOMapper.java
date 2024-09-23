@@ -14,7 +14,8 @@ public class EmployeeResponseDTOMapper implements Function<Employee, EmployeeRes
                 employee.getEmail(),
                 employee.getJoiningDate(),
                 employee.getRoles(),
-                employee.getDesignation().getDesignation()
+                employee.getDesignation().getDesignation(),
+                employee.getAppraisalEligibility()
         );
     }
 }

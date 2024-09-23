@@ -3,6 +3,7 @@ package com.beehyv.backend.services;
 import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
+import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Task;
@@ -28,7 +29,11 @@ public class TaskService {
     private AppraisalRepo appraisalRepo;
 
     public List<TaskResponseDTO> getTasks(Employee employee){
-        return taskRepo.findByEmployee(employee).stream().map(task -> new TaskResponseDTOMapper().apply(task)).toList();
+        List<Task> tasks = taskRepo.findByEmployee(employee);
+        if(tasks==null){
+            throw  new ResourceNotFoundException("No tasks found for employee with id: "+employee.getEmployeeId()+".");
+        }
+        return tasks.stream().map(task -> new TaskResponseDTOMapper().apply(task)).toList();
     }
 
     public TaskResponseDTO addTask(Integer employeeId, TaskRequestDTO taskRequestDTO) {
@@ -53,7 +58,7 @@ public class TaskService {
             return new TaskResponseDTOMapper().apply(taskRepo.save(task)) ;
         }
 
-        return null;
+        throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
     }
 
     public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
@@ -63,7 +68,7 @@ public class TaskService {
             return new TaskResponseDTOMapper().apply(taskRepo.save(task));
         }
 
-        return null;
+        throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
     }
 
     public TaskResponseDTO rateTaskByAdmin(Integer taskId, Double taskRating){
@@ -73,7 +78,7 @@ public class TaskService {
             return new TaskResponseDTOMapper().apply(taskRepo.save(task));
         }
 
-        return null;
+        throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
     }
 
     public String deleteTask(Integer taskId) {
@@ -83,6 +88,6 @@ public class TaskService {
             return "success";
         }
 
-        return "Task not found.";
+        throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
     }
 }
