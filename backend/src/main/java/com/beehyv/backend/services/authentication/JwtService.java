@@ -41,7 +41,7 @@ public class JwtService {
         claims.put("roles", employeeDetails.getRoles());
 
         if(!employeeDetails.getRoles().contains(Role.ADMIN)){
-            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails.getPreviousAppraisalDate(), employeeDetails.getEmployeeId());
+            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails.getPreviousAppraisalDate(), employeeDetails.getAppraisalEligibility(), employeeDetails.getEmployeeId());
         }
 
         return Jwts.builder()

@@ -41,7 +41,7 @@ public class BeeConfiguration{
                 .cors(customizer->customizer.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers("/register", "/login", "/captcha/**", "/refresh-refreshToken").permitAll()
+                        .requestMatchers("/register", "/login", "/captcha/**", "/refresh-token").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

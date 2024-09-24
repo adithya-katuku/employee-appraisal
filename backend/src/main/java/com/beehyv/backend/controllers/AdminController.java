@@ -1,6 +1,7 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
+import com.beehyv.backend.dto.request.AppraisalRequestDTO;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
@@ -12,6 +13,9 @@ import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.ParameterResolutionDelegate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +45,10 @@ public class AdminController {
     }
 
     @GetMapping("/all-employees")
-    public List<EmployeeResponseDTO> getAllEmployees(){
-        return adminService.findAllEmployees();
+    public ResponseEntity<?> getAllEmployees(){
+        System.out.println("here");
+        List<EmployeeResponseDTO> employeeResponseDTOS = adminService.findAllEmployees();
+        return new ResponseEntity<>(employeeResponseDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/employee/{employeeId}")
@@ -132,5 +138,17 @@ public class AdminController {
     @DeleteMapping("/tasks/{taskId}")
     public String deleteTask(@PathVariable("taskId") Integer taskId){
         return employeeService.deleteTask(taskId);
+    }
+
+
+    //APPRAISAL:
+    @PutMapping("/appraisal/{employeeId}")
+    public String startAppraisal(@PathVariable("employeeId") Integer employeeId, @Valid @RequestBody AppraisalRequestDTO appraisalRequestDTO){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return adminService.startAppraisal(employeeDetails.getEmployeeId(), employeeId, appraisalRequestDTO);
     }
 }

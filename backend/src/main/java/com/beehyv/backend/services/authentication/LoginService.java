@@ -1,10 +1,12 @@
 package com.beehyv.backend.services.authentication;
 
+import com.beehyv.backend.dto.custom.CaptchaDTO;
 import com.beehyv.backend.dto.custom.RefreshTokenDTO;
 import com.beehyv.backend.dto.request.LoginRequestDTO;
 import com.beehyv.backend.dto.request.RefreshTokenRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.AuthenticationResponseDTO;
+import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.enums.Role;
@@ -37,9 +39,9 @@ public class LoginService {
     }
 
     public AuthenticationResponseDTO handleLogin(LoginRequestDTO loginRequestDTO){
-//        if(!captchaService.verifyCaptcha(new CaptchaDTO(loginRequestDTO.captchaId(), loginRequestDTO.captchaAnswer()))){
-//            throw new InvalidInputException("Invalid captcha");
-//        }
+        if(!captchaService.verifyCaptcha(new CaptchaDTO(loginRequestDTO.captchaId(), loginRequestDTO.captchaAnswer()))){
+            throw new InvalidInputException("Invalid captcha");
+        }
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.email(), loginRequestDTO.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);

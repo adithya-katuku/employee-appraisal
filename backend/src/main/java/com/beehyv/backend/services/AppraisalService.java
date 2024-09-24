@@ -1,5 +1,6 @@
 package com.beehyv.backend.services;
 
+import com.beehyv.backend.dto.request.AppraisalRequestDTO;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
@@ -19,22 +20,23 @@ public class AppraisalService {
     @Autowired
     EmployeeService employeeService;
 
-    public void checkIfEmployeeEligibleForAppraisal(Date previousAppraisalDate, Integer employeeId) {
+    public void checkIfEmployeeEligibleForAppraisal(Date previousAppraisalDate, AppraisalEligibility appraisalEligibility, Integer employeeId) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.YEAR, -1);
-        if(previousAppraisalDate.before(calendar.getTime())){
-            addAppraisalEntry(employeeId);
+        if(previousAppraisalDate.before(calendar.getTime()) && appraisalEligibility==AppraisalEligibility.NOT_ELIGIBLE){
             notifyAdmins(employeeId);
-            changePreviousAppraisalDate(employeeId);
+            changePreviousAppraisalDateAndEligibility(employeeId, previousAppraisalDate, AppraisalEligibility.ELIGIBLE);
         }
     }
 
-    public void addAppraisalEntry(Integer employeeId){
+    public void addAppraisalEntry(Integer adminId, Integer employeeId, AppraisalRequestDTO appraisalRequestDTO){
         Appraisal appraisal = new Appraisal();
         appraisal.setAppraisalStatus(AppraisalStatus.PENDING);
-        appraisal.setAppraisalYear(Calendar.YEAR);
         appraisal.setEmployeeId(employeeId);
+        appraisal.setAdminId(adminId);
+        appraisal.setStartDate(appraisalRequestDTO.startDate());
+        appraisal.setEndDate(appraisalRequestDTO.endDate());
 
         appraisalRepo.save(appraisal);
     }
@@ -48,10 +50,10 @@ public class AppraisalService {
         employeeService.addNotificationToAdmins(notification);
     }
 
-    private void changePreviousAppraisalDate(Integer employeeId) {
+    public void changePreviousAppraisalDateAndEligibility(Integer employeeId, Date newPreviousAppraisalDate, AppraisalEligibility newEligibility) {
         Employee employee = employeeService.findEmployee(employeeId);
-        employee.setPreviousAppraisalDate(new Date());
-        employee.setAppraisalEligibility(AppraisalEligibility.ELIGIBLE);
+        employee.setPreviousAppraisalDate(newPreviousAppraisalDate);
+        employee.setAppraisalEligibility(newEligibility);
 
         employeeService.saveEmployee(employee);
     }

@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.security.SignatureException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -29,10 +28,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
-        String token = null;
         try {
             if (header != null && header.startsWith("Bearer ")) {
-                token = header.substring(7);
+                String token = header.substring(7);
 
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     if (jwtService.isValid(token)) {
@@ -41,8 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                 = new UsernamePasswordAuthenticationToken(employeeDetails, null, employeeDetails.getAuthorities());
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-                        filterChain.doFilter(request, response);
                     }
                 }
             }

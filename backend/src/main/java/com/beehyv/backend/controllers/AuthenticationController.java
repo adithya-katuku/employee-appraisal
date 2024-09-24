@@ -36,7 +36,7 @@ public class AuthenticationController {
         return new ResponseEntity<>(loginService.handleLogin(loginRequestDTO), HttpStatus.OK);
     }
 
-    @PostMapping("/refresh-refreshToken")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
         return new ResponseEntity<>(refreshTokenService.refreshToken(refreshTokenRequestDTO), HttpStatus.OK);
     }

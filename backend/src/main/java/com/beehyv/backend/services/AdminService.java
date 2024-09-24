@@ -1,13 +1,16 @@
 package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
+import com.beehyv.backend.dto.request.AppraisalRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.*;
+import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,8 @@ public class AdminService {
     private TaskService taskService;
     @Autowired
     private NotificationRepo notificationRepo;
+    @Autowired
+    private AppraisalService appraisalService;
 
     public List<EmployeeResponseDTO> findAllEmployees() {
         List<Employee> employees = employeeRepo.findByRole(Role.EMPLOYEE);
@@ -66,5 +71,30 @@ public class AdminService {
         }
 
         throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
+    }
+
+    //Appraisal:
+    public String startAppraisal(Integer adminId, Integer employeeId, AppraisalRequestDTO appraisalRequestDTO) {
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+
+        if(employee==null){
+            throw new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
+        }
+//        employee.getAppraisalEligibility()!=AppraisalEligibility.PROCESSING
+        if(employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0){
+            appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
+            appraisalService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
+
+            Notification notification = new Notification();
+            notification.setNotificationTitle("Appraisal!");
+            notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
+            notification.setFromId(adminId);
+
+            addNotification(employeeId, notification);
+
+            return "Started appraisal process for the employee with id: "+employeeId;
+        }
+
+        return "An appraisal for this employee already exists for the selected period.";
     }
 }

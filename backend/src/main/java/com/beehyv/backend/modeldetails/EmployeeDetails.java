@@ -1,5 +1,6 @@
 package com.beehyv.backend.modeldetails;
 
+import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.Employee;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class EmployeeDetails implements UserDetails {
     private String password;
     private List<Role> roles;
     private Date previousAppraisalDate;
+    private AppraisalEligibility appraisalEligibility;
 
     public EmployeeDetails(Employee employee){
         this.employeeId = employee.getEmployeeId();
@@ -32,6 +34,7 @@ public class EmployeeDetails implements UserDetails {
         this.password = employee.getPassword();
         this.roles = employee.getRoles();
         this.previousAppraisalDate = employee.getPreviousAppraisalDate();
+        this.appraisalEligibility = employee.getAppraisalEligibility();
     }
 
     public EmployeeDetails(Integer employeeId, String username, List<Role> roles) {

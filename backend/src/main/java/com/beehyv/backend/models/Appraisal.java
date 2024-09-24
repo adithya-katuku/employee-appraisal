@@ -24,7 +24,6 @@ public class Appraisal {
     private Integer adminId;
     private Integer employeeId;
     private AppraisalStatus appraisalStatus = AppraisalStatus.PENDING;
-    private Integer appraisalYear;
     private Double rating = (double) 0;
     private Date startDate;
     private Date endDate;

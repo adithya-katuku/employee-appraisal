@@ -16,8 +16,7 @@ public class TaskResponseDTOMapper implements Function<Task, TaskResponseDTO> {
                 task.getEndDate(),
                 task.isAppraisable(),
                 task.isAppraisable()? task.getSelfRating() : null,
-                task.isAppraisable()? task.getAdminRating() : null,
-                task.isAppraisable()? new AppraisalDTOMapper().apply(task.getAppraisal()):null
+                task.isAppraisable()? task.getAdminRating() : null
         );
     }
 }

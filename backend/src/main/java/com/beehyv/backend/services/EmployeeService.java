@@ -43,7 +43,7 @@ public class EmployeeService {
         if(employee==null){
             throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
-
+        System.out.println(employee);
         return new EmployeeResponseDTOMapper().apply(employee);
     }
 

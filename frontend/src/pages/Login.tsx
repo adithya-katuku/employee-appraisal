@@ -18,27 +18,30 @@ import { login, RootState } from "../stores/store";
 import { Navigate } from "react-router-dom";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { z } from "zod";
+import { FieldValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface response {
-  message: string;
+  detail: string;
 }
 
 const schema = z.object({
-  
+  email:z.string(),
+  password:z.string(),
+  captchaAnswer:z.string()
 })
 
+type validForm = z.infer<typeof schema>;
+
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {register, handleSubmit} = useForm<validForm>({resolver:zodResolver(schema)});
   const [url, setUrl] = useState("");
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
 
   const generateCaptcha = async () => {
-    setCaptchaAnswer("");
     await axios
       .get("http://localhost:8080/captcha/generate-captcha")
       .then(({ data }) => {
@@ -76,29 +79,25 @@ const LoginForm = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data:FieldValues) => {
     await axios
-      .post("http://localhost:8080/login", {
-        email,
-        password,
+      .post("http://localhost:8080/login", {...data,
         captchaId,
-        captchaAnswer,
       })
       .then((res) => {
         console.log(res.data);
-        sessionStorage.setItem("jwt", res.data.jwt);
-        localStorage.setItem("jwt", res.data.jwt);
+        sessionStorage.setItem("jwt", res.data.jwtToken);
+        localStorage.setItem("jwt", res.data.jwtToken);
         localStorage.setItem("role", res.data.role);
         dispatch(login(true));
         generateCaptcha();
         callToast("Login Successful", "You are now logged in.", "success");
       })
       .catch((err: AxiosError<response>) => {
-        console.log(err.message);
+        console.log(err);
         callToast(
           "Login Failed",
-          err.response ? err.response.data.message : "Login failed",
+          err.response ? err.response.data.detail : "Login failed",
           "error"
         );
         generateCaptcha();
@@ -120,15 +119,14 @@ const LoginForm = () => {
         <Heading mb={6} textAlign="center">
           Login
         </Heading>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={4}>
             <FormControl id="email" isRequired>
               <FormLabel>Email</FormLabel>
               <Input
                 type="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
               />
             </FormControl>
 
@@ -137,8 +135,7 @@ const LoginForm = () => {
               <Input
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
               />
             </FormControl>
             <Flex alignItems="center">
@@ -157,8 +154,7 @@ const LoginForm = () => {
               <Input
                 type="text"
                 placeholder="Enter your captcha"
-                value={captchaAnswer}
-                onChange={(e) => setCaptchaAnswer(e.target.value)}
+                {...register("captchaAnswer")}
               />
             </FormControl>
 
