@@ -26,15 +26,17 @@ interface response {
 }
 
 const schema = z.object({
-  email:z.string(),
-  password:z.string(),
-  captchaAnswer:z.string()
-})
+  email: z.string(),
+  password: z.string(),
+  captchaAnswer: z.string(),
+});
 
 type validForm = z.infer<typeof schema>;
 
 const LoginForm = () => {
-  const {register, handleSubmit} = useForm<validForm>({resolver:zodResolver(schema)});
+  const { register, handleSubmit } = useForm<validForm>({
+    resolver: zodResolver(schema),
+  });
   const [url, setUrl] = useState("");
   const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
@@ -53,23 +55,52 @@ const LoginForm = () => {
     generateCaptcha();
   }, []);
 
-  if (sessionStorage.jwt) {
+
+  const refreshJwt = (refreshTokenId: number, refreshToken: string) => {
     axios
-      .get("http://localhost:8080/admin/info", {
+      .post("http://localhost:8080/refresh-token", {
+        refreshTokenId,
+        refreshToken,
+      })
+      .then((res) => {
+        dispatch(login(true));
+        sessionStorage.setItem("jwt", res.data.jwtToken);
+      })
+      .catch((err: AxiosError) => console.log(err));
+  };
+  const loginWIthJwt = (jwt: string) => {
+    axios
+      .get("http://localhost:8080/jwt-login", {
         headers: {
-          Authorization: "Bearer " + localStorage.jwt,
+          Authorization: "Bearer " + jwt,
         },
       })
       .then(() => {
         dispatch(login(true));
       })
-      .catch((err: AxiosError) => console.log(err));
+      .catch((err: AxiosError) => {
+        console.log(err);
+      });
+  };
+  const path = localStorage.page?localStorage.page : "/home";
+  if (sessionStorage.jwt) {
+    loginWIthJwt(sessionStorage.jwt);
     if (isLoggedIn) {
-      return <Navigate to="/home" />;
+      return <Navigate to={path} />;
+    }
+  }
+  if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
+    refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
+    if (isLoggedIn) {
+      return <Navigate to={path} />;
     }
   }
 
-  const callToast = (title: string, description: string, status: AlertStatus) => {
+  const callToast = (
+    title: string,
+    description: string,
+    status: AlertStatus
+  ) => {
     toast({
       title: title,
       description: description,
@@ -79,14 +110,14 @@ const LoginForm = () => {
     });
   };
 
-  const onSubmit = async (data:FieldValues) => {
+  const onSubmit = async (data: FieldValues) => {
     await axios
-      .post("http://localhost:8080/login", {...data,
-        captchaId,
-      })
+      .post("http://localhost:8080/login", { ...data, captchaId })
       .then((res) => {
         console.log(res.data);
         sessionStorage.setItem("jwt", res.data.jwtToken);
+        sessionStorage.setItem("refreshToken", res.data.refreshToken);
+        sessionStorage.setItem("refreshTokenId", res.data.refreshTokenId);
         localStorage.setItem("jwt", res.data.jwtToken);
         localStorage.setItem("role", res.data.role);
         dispatch(login(true));
@@ -102,6 +133,7 @@ const LoginForm = () => {
         );
         generateCaptcha();
       });
+      
   };
 
   return (

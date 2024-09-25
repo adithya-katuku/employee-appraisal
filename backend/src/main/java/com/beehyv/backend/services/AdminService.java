@@ -2,6 +2,7 @@ package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
 import com.beehyv.backend.dto.request.AppraisalRequestDTO;
+import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
@@ -10,13 +11,11 @@ import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AdminService {
@@ -47,9 +46,9 @@ public class AdminService {
         Attribute attribute = attributeRepo.findById(attributeId).orElse(null);
         if(attribute!=null){
             Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.SUBMITTED);
-            Map<String, Double> attributes = appraisal.getAttributes();
-            if(attributes==null) attributes = new HashMap<>();
-            attributes.put(attribute.getAttribute(), attributeRating);
+            List<AttributeDAO> attributes = appraisal.getAttributes();
+            if(attributes==null) attributes = new ArrayList<>();
+            attributes.add(new AttributeDAO(attribute.getAttribute(), attributeRating));
 
             return "Rated successfully";
         }

@@ -7,6 +7,8 @@ import { Box } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import VerticalNavbar from "./components/VerticalNavbar";
 import Wrapper from "./components/Wrapper";
+import Appraisal from "./pages/Appraisal";
+import Tasks from "./pages/Tasks";
 
 function App() {
   const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
@@ -18,7 +20,13 @@ function App() {
         <Wrapper>
           <Routes>
             <Route path="/login" Component={Login}></Route>
-            {isLoggedIn && <Route path="/home" Component={Home}></Route>}
+            {isLoggedIn && (
+              <>
+                <Route path="/home" Component={Home}></Route>
+                <Route path="/appraisal" Component={Appraisal}></Route>
+                <Route path="/tasks" Component={Tasks}></Route>
+              </>
+            )}
             <Route path="/*" Component={() => <Navigate to="/login" />}></Route>
           </Routes>
         </Wrapper>

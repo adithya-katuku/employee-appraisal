@@ -1,31 +1,29 @@
 package com.beehyv.backend.controllers;
 
-import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
-import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
+import com.beehyv.backend.services.AppraisalService;
 import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/employee")
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private EmployeeDetailsService employeeDetailsService;
-    @Autowired
-    private JwtFilter jwtFilter;
+    private AppraisalService appraisalService;
 
     @GetMapping("/info")
     public EmployeeResponseDTO getEmployee(){
@@ -98,5 +96,16 @@ public class EmployeeController {
     @DeleteMapping("/notifications/{notificationId}")
     public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
         return employeeService.deleteNotification(notificationId);
+    }
+
+    //APPRAISALS:
+    @GetMapping("/appraisals")
+    public ResponseEntity<?> getAppraisals(){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return new ResponseEntity<>(appraisalService.getAppraisals(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 }

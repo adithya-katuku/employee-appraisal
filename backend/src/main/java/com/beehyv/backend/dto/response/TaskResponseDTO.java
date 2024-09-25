@@ -11,6 +11,5 @@ public record TaskResponseDTO(
         boolean appraisable,
         Double selfRating,
         Double adminRating
-
 ) {
 }

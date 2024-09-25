@@ -36,6 +36,11 @@ public class AuthenticationController {
         return new ResponseEntity<>(loginService.handleLogin(loginRequestDTO), HttpStatus.OK);
     }
 
+    @GetMapping("/jwt-login")
+    public ResponseEntity<?> jwtLogin(){
+        return new ResponseEntity<>("Authenticated jwt.", HttpStatus.OK);
+    }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
         return new ResponseEntity<>(refreshTokenService.refreshToken(refreshTokenRequestDTO), HttpStatus.OK);

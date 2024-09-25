@@ -1,13 +1,12 @@
 package com.beehyv.backend.models;
 
+import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @ToString
 @Data
@@ -30,5 +29,8 @@ public class Appraisal {
 
     @ElementCollection
     @CollectionTable(name = "appraisal_attributes", joinColumns = @JoinColumn(name = "appraisal_id"))
-    private Map<String, Double> attributes = new HashMap<>();
+    private List<AttributeDAO> attributes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "appraisal", cascade = CascadeType.PERSIST)
+    private List<Task> tasks;
 }
