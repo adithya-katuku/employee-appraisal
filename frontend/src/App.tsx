@@ -4,9 +4,9 @@ import Login from "./pages/Login";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RootState } from "./stores/store";
 import { Box } from "@chakra-ui/react";
-import Navbar from "./components/Navbar";
-import VerticalNavbar from "./components/VerticalNavbar";
-import Wrapper from "./components/Wrapper";
+import Navbar from "./components/navbar/Navbar";
+import VerticalNavbar from "./components/navbar/VerticalNavbar";
+import Wrapper from "./components/navbar/Wrapper";
 import Appraisal from "./pages/Appraisal";
 import Tasks from "./pages/Tasks";
 

@@ -1,6 +1,6 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { RootState } from "../stores/store";
+import { RootState } from "../../stores/store";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,7 +18,9 @@ const VerticalNavbar = () => {
     { name: "Appraisal", path: "/appraisal" },
   ];
 
-  const [selectedWindow, setSelectedWindow] = useState(localStorage.page?.substring(1) || "/home");
+  const [selectedWindow, setSelectedWindow] = useState(
+    localStorage.page?.substring(1) || "home"
+  );
 
   return isLoggedIn ? (
     <Box
@@ -53,7 +55,11 @@ const VerticalNavbar = () => {
                 gap="2"
                 my="0.5"
                 rounded="md"
-                bg={option.name.toLocaleLowerCase() == selectedWindow ? "gray.300" : "white"}
+                bg={
+                  option.name.toLocaleLowerCase() == selectedWindow
+                    ? "gray.300"
+                    : "white"
+                }
                 onClick={() => {
                   setSelectedWindow(option.name.toLocaleLowerCase());
                 }}

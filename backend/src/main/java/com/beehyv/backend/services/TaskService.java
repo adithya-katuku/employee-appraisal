@@ -3,6 +3,8 @@ package com.beehyv.backend.services;
 import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
+import com.beehyv.backend.exceptions.CustomAuthException;
+import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
@@ -12,8 +14,8 @@ import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService {
@@ -29,7 +31,7 @@ public class TaskService {
     private AppraisalRepo appraisalRepo;
 
     public List<TaskResponseDTO> getTasks(Employee employee){
-        List<Task> tasks = taskRepo.findByEmployee(employee);
+        List<Task> tasks = taskRepo.findByEmployeeOrderByTaskIdDesc(employee);
         if(tasks==null){
             throw  new ResourceNotFoundException("No tasks found for employee with id: "+employee.getEmployeeId()+".");
         }
@@ -60,7 +62,37 @@ public class TaskService {
 
         throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
     }
+    public TaskResponseDTO updateTask(Integer employeeId, TaskRequestDTO taskRequestDTO) {
+        if(taskRequestDTO.taskId()==null){
+            throw new InvalidInputException("Invalid taskId.");
+        }
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if(employee==null){
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
+        }
+        Task task = taskRepo.findById(taskRequestDTO.taskId()).orElse(null);
+        if(task==null){
+            throw  new ResourceNotFoundException("Task with id "+taskRequestDTO.taskId()+" is not found.");
+        }
+        if(!Objects.equals(task.getEmployee().getEmployeeId(), employeeId)){
+            throw  new InvalidInputException("Task is not done by the requested employee.");
+        }
+        if(task.getAppraisal()!=null && task.getAppraisal().getAppraisalStatus()!=AppraisalStatus.INITIATED){
+            throw  new InvalidInputException("This task cannot be edited.");
+        }
 
+        task.setTaskTitle(taskRequestDTO.taskTitle());
+        task.setDescription(taskRequestDTO.description());
+        task.setAppraisable(taskRequestDTO.appraisable());
+        task.setStartDate(taskRequestDTO.startDate());
+        task.setEndDate(taskRequestDTO.endDate());
+        if(taskRequestDTO.appraisable()){
+            task.setSelfRating(taskRequestDTO.selfRating());
+            Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.INITIATED);
+            task.setAppraisal(appraisal);
+        }
+        return new TaskResponseDTOMapper().apply(taskRepo.save(task));
+    }
     public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
         Task task = taskRepo.findById(taskId).orElse(null);
         if(task!=null){
@@ -83,11 +115,28 @@ public class TaskService {
 
     public String deleteTask(Integer taskId) {
         Task task = taskRepo.findById(taskId).orElse(null);
-        if(task!=null){
-            taskRepo.delete(task);
-            return "success";
+        if(task==null){
+            throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
         }
-
-        throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
+        if(task.getAppraisal().getAppraisalStatus()!=AppraisalStatus.INITIATED){
+            throw  new InvalidInputException("This task cannot be deleted.");
+        }
+        taskRepo.delete(task);
+        return "success";
     }
+
+    public void addAppraisalIdToAppraisableTasks(Integer employeeId, Appraisal appraisal) {
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if(employee!=null){
+            List<Task> tasks = taskRepo.findByEmployee(employee);
+            for(Task task: tasks){
+                if( task.getAppraisal()==null && task.isAppraisable()){
+                    task.setAppraisal(appraisal);
+                    taskRepo.save(task);
+                }
+            }
+        }
+    }
+
+
 }

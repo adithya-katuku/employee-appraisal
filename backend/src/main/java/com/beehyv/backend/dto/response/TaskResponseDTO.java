@@ -10,6 +10,8 @@ public record TaskResponseDTO(
         Date endDate,
         boolean appraisable,
         Double selfRating,
-        Double adminRating
+        Double adminRating,
+        Integer appraisalId,
+        boolean editable
 ) {
 }

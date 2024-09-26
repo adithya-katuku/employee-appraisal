@@ -63,6 +63,15 @@ public class EmployeeController {
         return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
     }
 
+    @PutMapping("/tasks")
+    public TaskResponseDTO updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+    }
+
     @PutMapping("/tasks/{taskId}")
     public TaskResponseDTO rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
         return employeeService.rateTaskBySelf(taskId, taskRating);

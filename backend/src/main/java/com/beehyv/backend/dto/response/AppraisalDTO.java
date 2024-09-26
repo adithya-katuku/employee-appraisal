@@ -12,7 +12,6 @@ public record AppraisalDTO(
         Double rating,
         Date startDate,
         Date endDate,
-        List<AttributeDAO> attributes,
-        List<TaskResponseDTO> tasks
+        List<AttributeDAO> attributes
 ) {
 }

@@ -1,14 +1,25 @@
-import { Flex } from "@chakra-ui/react";
+import { Button, useDisclosure } from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
+import EditTaskModal from "../../components/task/EditTaskModal";
+import TaskModel from "../../models/TaskModel";
 
-const EditTask = () => {
-  const handleClick = () => {
-    console.log("editing");
-  };
+const EditTask = (task: TaskModel) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
-    <Flex as="button" w="100%" p="1" justifyContent="end" onClick={handleClick}>
-      <FaEdit />
-    </Flex>
+    <>
+      <Button
+        colorScheme="cyan"
+        h="1.25rem"
+        p="0"
+        isDisabled={!task.editable}
+        onClick={onOpen}
+      >
+        <FaEdit fontSize="1.15rem" />
+      </Button>
+
+      <EditTaskModal isOpen={isOpen} onClose={onClose} task={task} />
+    </>
   );
 };
 

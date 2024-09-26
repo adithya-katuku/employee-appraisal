@@ -7,6 +7,7 @@ const LogoutButton = () => {
   const dispatch = useDispatch();
   const handleClick = () => {
     sessionStorage.clear();
+    localStorage.clear();
     dispatch(login(false));
   };
   return (

@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface TaskRepo extends JpaRepository<Task, Integer> {
+    List<Task> findByEmployeeOrderByTaskIdDesc(Employee employee);
+
     List<Task> findByEmployee(Employee employee);
 }

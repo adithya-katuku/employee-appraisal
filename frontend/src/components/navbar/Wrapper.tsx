@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../stores/store";
+import { RootState } from "../../stores/store";
 
 interface Props {
   children: ReactNode;

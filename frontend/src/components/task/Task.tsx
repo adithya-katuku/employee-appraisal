@@ -1,6 +1,6 @@
 import { Box, Checkbox, Flex, Text } from "@chakra-ui/react";
-import TaskModel from "../models/TaskModel";
-import EditTask from "../buttons/task/EditTask";
+import TaskModel from "../../models/TaskModel";
+import ModifyTaskOptions from "./ModifyTaskOptions";
 
 const Task = (task: TaskModel) => {
   return (
@@ -22,7 +22,7 @@ const Task = (task: TaskModel) => {
           </Text>
         </Box>
         <Box>
-          <EditTask />
+          <ModifyTaskOptions {...task}/>
           <Flex mx="2" alignItems="center" fontSize="sm" minW="fit-content">
             <Checkbox isDisabled isChecked={task.appraisable} mx="2" />
             <Text>Marked for appraisal</Text>

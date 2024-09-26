@@ -15,8 +15,7 @@ public class AppraisalDTOMapper implements Function<Appraisal, AppraisalDTO> {
                 appraisal.getRating(),
                 appraisal.getStartDate(),
                 appraisal.getEndDate(),
-                appraisal.getAttributes(),
-                appraisal.getTasks().stream().map(task->new TaskResponseDTOMapper().apply(task)).toList()
+                appraisal.getAttributes()
         );
     }
 }

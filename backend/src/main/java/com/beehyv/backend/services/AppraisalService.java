@@ -33,7 +33,7 @@ public class AppraisalService {
         }
     }
 
-    public void addAppraisalEntry(Integer adminId, Integer employeeId, AppraisalRequestDTO appraisalRequestDTO) {
+    public Appraisal addAppraisalEntry(Integer adminId, Integer employeeId, AppraisalRequestDTO appraisalRequestDTO) {
         Appraisal appraisal = new Appraisal();
         appraisal.setAppraisalStatus(AppraisalStatus.PENDING);
         appraisal.setEmployeeId(employeeId);
@@ -41,7 +41,7 @@ public class AppraisalService {
         appraisal.setStartDate(appraisalRequestDTO.startDate());
         appraisal.setEndDate(appraisalRequestDTO.endDate());
 
-        appraisalRepo.save(appraisal);
+        return appraisalRepo.save(appraisal);
     }
 
     public void notifyAdmins(Integer employeeId) {

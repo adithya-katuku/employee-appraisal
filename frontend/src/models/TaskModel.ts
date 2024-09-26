@@ -1,5 +1,5 @@
 interface TaskModel {
-  taskId?: number;
+  taskId: number;
   taskTitle: string;
   description: string;
   startDate: Date;
@@ -7,6 +7,8 @@ interface TaskModel {
   appraisable: boolean;
   selfRating?: number;
   adminRating?: number;
+  appraisalId?: number;
+  editable?:boolean;
 }
 
 export default TaskModel;

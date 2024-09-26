@@ -9,6 +9,7 @@ import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,10 @@ public class EmployeeService {
         return taskService.addTask(employeeId, taskRequestDTO);
     }
 
+    public TaskResponseDTO updateTask(Integer employeeId, TaskRequestDTO taskRequestDTO) {
+        return taskService.updateTask(employeeId, taskRequestDTO);
+    }
+
     public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
         return taskService.rateTaskBySelf(taskId, taskRating);
     }
@@ -149,4 +154,6 @@ public class EmployeeService {
 
         throw  new ResourceNotFoundException("Notification  not found.");
     }
+
+
 }

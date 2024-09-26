@@ -23,8 +23,8 @@ public class Task {
     private Date startDate;
     private Date endDate;
     private boolean appraisable=false;
-    private Double selfRating = null;
-    private Double adminRating = null;
+    private Double selfRating = (double) 0;
+    private Double adminRating = (double) 0;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "employee_id")

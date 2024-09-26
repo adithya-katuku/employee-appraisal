@@ -1,13 +1,11 @@
 import AttributeModel from "./AttributeModel";
-import TaskModel from "./TaskModel";
 
 interface AppraisalModel{
-    appraisalId:number;
+    id:number;
     startDate:Date;
     endDate:Date;
     attributes:AttributeModel[];
-    tasks:TaskModel[];
-    status:string;
+    appraisalStatus:string;
     totalRating:number;
 }
 

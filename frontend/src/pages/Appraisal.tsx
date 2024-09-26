@@ -1,43 +1,24 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  HStack,
-  Select,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Select, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoHome } from "react-icons/io5";
-import Task from "../components/Task";
-import axios from "axios";
-import AppraisalModel from "../models/AppraisalModel";
+import AddTask from "../buttons/task/AddTask";
+import AttributeTable from "../components/attribute/AttributeTable";
+import { useSelector } from "react-redux";
+import { RootState } from "../stores/store";
+import TaskList from "../components/task/TaskList";
+import useData from "../hooks/useData";
 
 const Appraisal = () => {
-  const [appraisals, setAppraisals] = useState<AppraisalModel[]>();
+  const appraisals = useSelector((state: RootState) => state.store.appraisals);
+  const tasks = useSelector((state: RootState) => state.store.tasks);
+  const {fetchAppraisals, fetchTasks} = useData();
   const [index, setIndex] = useState(0);
-
-  const fetchTasks = async () => {
-    await axios
-      .get("http://localhost:8080/" + localStorage.role + "/appraisals", {
-        headers: {
-          Authorization: "Bearer " + sessionStorage.jwt,
-        },
-      })
-      .then((res) => {
-        setAppraisals(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
 
   useEffect(() => {
     localStorage.page = "/appraisal";
-    fetchTasks();
+    fetchTasks()
+    fetchAppraisals();
   }, []);
 
   return (
@@ -63,48 +44,50 @@ const Appraisal = () => {
             {appraisals &&
               appraisals.map((appraisal, index) => {
                 return (
-                  <option value={index} key={index}>
-                    {new Date(appraisal.startDate).toISOString().split("T")[0] +
-                      "  to " +
-                      new Date(appraisal.endDate).toISOString().split("T")[0]}
-                  </option>
+                    <option value={index} key={index}>
+                      {new Date(appraisal.startDate)
+                        .toISOString()
+                        .split("T")[0] +
+                        "  to " +
+                        new Date(appraisal.endDate).toISOString().split("T")[0]}
+                    </option>
                 );
               })}
           </Select>
+          <Flex my="1" p="2" gap="2" alignItems="center">
+            <Text fontWeight="bold">Status: </Text>
+            <Text color="white" bg="green.500" rounded="md" p="1">
+              {appraisals && appraisals[index].appraisalStatus}
+            </Text>
+          </Flex>
         </Box>
         <Box my="1" p="2" pb="4">
           <Text m="1" fontWeight="bold">
             Attribute rating:
           </Text>
-          <TableContainer>
-            <Table maxW="50rem">
-              <Thead>
-                <Tr>
-                  <Th>Attribute</Th>
-                  <Th>Rating</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {appraisals && appraisals[index].attributes &&
-                  appraisals[index].attributes.map((attribute, index) => (
-                    <Tr key={index}>
-                      <Td>{attribute.name}</Td>
-                      <Td>{attribute.rating}</Td>
-                    </Tr>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          {appraisals && appraisals[index].attributes && (
+            <AttributeTable attributes={appraisals[index].attributes} />
+          )}
         </Box>
         <Box my="1" p="2" pb="4">
+
           <Text m="1" fontWeight="bold">
             Tasks:
           </Text>
-          {appraisals && appraisals[index].tasks &&
-            appraisals[index].tasks.map((task) => {
-              return <Task {...task} key={task.taskId} />;
-            })}
+
+          <AddTask />
+          {appraisals && tasks && (
+            <TaskList tasks={tasks.filter(task=>task.appraisalId===appraisals[index].id)} />
+          )}
         </Box>
+        
+        {appraisals && appraisals[index].appraisalStatus === "INITIATED" && (
+          <Flex my="1" p="2" justifyContent="end">
+            <Box>
+              <Button colorScheme="teal">Submit</Button>
+            </Box>
+          </Flex>
+        )}
       </Box>
     </>
   );
