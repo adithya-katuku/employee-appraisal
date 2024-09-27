@@ -1,14 +1,15 @@
 import { Box } from "@chakra-ui/react";
 import { IoIosLogOut } from "react-icons/io";
-import { useDispatch } from "react-redux";
-import { login } from "../../stores/store";
+import usePaths from "../../hooks/usePaths";
+import useBroadcast from "../../hooks/useBroadcast";
 
 const LogoutButton = () => {
-  const dispatch = useDispatch();
+  const {setSelected} = usePaths();
+  const channel = useBroadcast();
   const handleClick = () => {
-    sessionStorage.clear();
+    setSelected(0);
+    channel.postMessage({type:'LOGOUT'})
     localStorage.clear();
-    dispatch(login(false));
   };
   return (
     <Box as="button" rounded="50%" p="1" onClick={handleClick}>

@@ -1,26 +1,15 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../stores/store";
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import usePaths from "../../hooks/usePaths";
 
 const VerticalNavbar = () => {
-  const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
-
-  const options = [
-    { name: "Home", path: "/home" },
-    { name: "Timings", path: "/home" },
-    { name: "Leaves", path: "/home" },
-    { name: "WFH", path: "/home" },
-    { name: "Tasks", path: "/tasks" },
-    { name: "Teams", path: "/home" },
-    { name: "People", path: "/home" },
-    { name: "Appraisal", path: "/appraisal" },
-  ];
-
-  const [selectedWindow, setSelectedWindow] = useState(
-    localStorage.page?.substring(1) || "home"
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.store.loginState.isLoggedIn
   );
+  const {options, setSelected} = usePaths();
+  
 
   return isLoggedIn ? (
     <Box
@@ -55,13 +44,9 @@ const VerticalNavbar = () => {
                 gap="2"
                 my="0.5"
                 rounded="md"
-                bg={
-                  option.name.toLocaleLowerCase() == selectedWindow
-                    ? "gray.300"
-                    : "white"
-                }
+                bg={option.selected ? "gray.300" : "white"}
                 onClick={() => {
-                  setSelectedWindow(option.name.toLocaleLowerCase());
+                  setSelected(index);
                 }}
               >
                 <Box w="2rem" bg="gray">

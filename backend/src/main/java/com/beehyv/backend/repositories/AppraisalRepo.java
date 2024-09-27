@@ -1,6 +1,5 @@
 package com.beehyv.backend.repositories;
 
-import com.beehyv.backend.dto.response.AppraisalDTO;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +11,7 @@ import java.util.List;
 public interface AppraisalRepo extends JpaRepository<Appraisal, Integer> {
     Appraisal findByEmployeeIdAndAppraisalStatus(Integer employeeId, AppraisalStatus appraisalStatus);
 
-    List<Appraisal> findByEmployeeId(Integer employeeId);
+    List<Appraisal> findByEmployeeIdOrderByEndDateDesc(Integer employeeId);
+
+    List<Appraisal> findByAppraisalStatus(AppraisalStatus appraisalStatus);
 }

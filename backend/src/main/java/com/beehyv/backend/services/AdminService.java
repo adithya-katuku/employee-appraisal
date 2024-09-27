@@ -2,6 +2,7 @@ package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
 import com.beehyv.backend.dto.request.AppraisalRequestDTO;
+import com.beehyv.backend.dto.response.AppraisalFormEntryDTO;
 import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
@@ -12,6 +13,7 @@ import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -83,7 +85,7 @@ public class AdminService {
         if(employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0){
             Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
             appraisalService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
-            taskService.addAppraisalIdToAppraisableTasks(employeeId, appraisal);
+            taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
             Notification notification = new Notification();
             notification.setNotificationTitle("Appraisal!");
             notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
@@ -95,5 +97,9 @@ public class AdminService {
         }
 
         return "An appraisal for this employee already exists for the selected period.";
+    }
+
+    public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {
+        return appraisalService.getPendingAppraisalRequests();
     }
 }

@@ -5,7 +5,7 @@ import { IoHome } from "react-icons/io5";
 
 const Home = () => {
   useEffect(()=>{
-    localStorage.page="/home";
+    localStorage.page=0;
   })
   return (
     <>

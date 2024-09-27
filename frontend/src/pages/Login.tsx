@@ -20,6 +20,7 @@ import { RepeatIcon } from "@chakra-ui/icons";
 import { z } from "zod";
 import { FieldValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import usePaths from "../hooks/usePaths";
 
 interface response {
   detail: string;
@@ -41,7 +42,8 @@ const LoginForm = () => {
   const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
+  const { options, setSelected } = usePaths();
+  const loginState = useSelector((state: RootState) => state.store.loginState);
 
   const generateCaptcha = async () => {
     await axios
@@ -51,10 +53,15 @@ const LoginForm = () => {
         setCaptchaId(data.captchaId);
       });
   };
+  const prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
+  const path = options[prevpage].path;
   useEffect(() => {
+    setSelected(prevpage);
     generateCaptcha();
   }, []);
-
+  if (loginState.isLoggedIn) {
+    return <Navigate to={path} />;
+  }
 
   const refreshJwt = (refreshTokenId: number, refreshToken: string) => {
     axios
@@ -63,8 +70,8 @@ const LoginForm = () => {
         refreshToken,
       })
       .then((res) => {
-        dispatch(login(true));
         sessionStorage.setItem("jwt", res.data.jwtToken);
+        loginWIthJwt(res.data.jwtToken);
       })
       .catch((err: AxiosError) => console.log(err));
   };
@@ -75,25 +82,24 @@ const LoginForm = () => {
           Authorization: "Bearer " + jwt,
         },
       })
-      .then(() => {
-        dispatch(login(true));
+      .then((res) => {
+        localStorage.role = res.data.role;
+        const newLoginState = {
+          isLoggedIn: true,
+          role: res.data.role,
+          token: jwt,
+        };
+        dispatch(login(newLoginState));
       })
       .catch((err: AxiosError) => {
         console.log(err);
       });
   };
-  const path = localStorage.page?localStorage.page : "/home";
-  if (sessionStorage.jwt) {
-    loginWIthJwt(sessionStorage.jwt);
-    if (isLoggedIn) {
-      return <Navigate to={path} />;
-    }
+  if (loginState.token) {
+    loginWIthJwt(loginState.token);
   }
-  if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
+   else if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
     refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
-    if (isLoggedIn) {
-      return <Navigate to={path} />;
-    }
   }
 
   const callToast = (
@@ -115,13 +121,14 @@ const LoginForm = () => {
       .post("http://localhost:8080/login", { ...data, captchaId })
       .then((res) => {
         console.log(res.data);
-        sessionStorage.setItem("jwt", res.data.jwtToken);
         sessionStorage.setItem("refreshToken", res.data.refreshToken);
         sessionStorage.setItem("refreshTokenId", res.data.refreshTokenId);
-        localStorage.setItem("jwt", res.data.jwtToken);
-        localStorage.setItem("role", res.data.role);
-        dispatch(login(true));
-        generateCaptcha();
+        const newLoginState = {
+          isLoggedIn: true,
+          role: res.data.role,
+          token: res.data.jwtToken,
+        };
+        dispatch(login(newLoginState));
         callToast("Login Successful", "You are now logged in.", "success");
       })
       .catch((err: AxiosError<response>) => {
@@ -133,7 +140,6 @@ const LoginForm = () => {
         );
         generateCaptcha();
       });
-      
   };
 
   return (

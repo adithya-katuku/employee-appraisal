@@ -117,4 +117,14 @@ public class EmployeeController {
 
         return new ResponseEntity<>(appraisalService.getAppraisals(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
+
+    @PutMapping("/appraisals/{appraisalId}")
+    public ResponseEntity<?> submitAppraisal(@PathVariable("appraisalId") Integer appraisalId){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return new ResponseEntity<>(appraisalService.submitAppraisal(appraisalId, employeeDetails.getEmployeeId()), HttpStatus.OK);
+    }
 }

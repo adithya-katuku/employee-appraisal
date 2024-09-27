@@ -73,7 +73,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
 
   const onSubmit = async (data: FieldValues) => {
     await axios
-      .post("http://localhost:8080/" + localStorage.role + "/tasks", data, {
+      .put("http://localhost:8080/" + localStorage.role + "/tasks", data, {
         headers: {
           Authorization: "Bearer " + sessionStorage.jwt,
         },
@@ -90,6 +90,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   };
 
   const handleClose = () => {
+    setIsAppraisable(task.appraisable);
     reset();
     onClose();
   };

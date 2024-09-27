@@ -151,4 +151,9 @@ public class AdminController {
 
         return adminService.startAppraisal(employeeDetails.getEmployeeId(), employeeId, appraisalRequestDTO);
     }
+
+    @GetMapping("/appraisal-requests")
+    public ResponseEntity<?> getPendingAppraisalRequests(){
+        return new ResponseEntity<>(adminService.getPendingAppraisalRequests(), HttpStatus.OK);
+    }
 }

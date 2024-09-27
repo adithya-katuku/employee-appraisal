@@ -1,14 +1,15 @@
 import axios from "axios";
-import { setAppraisals, setTasks } from "../stores/store";
-import { useDispatch } from "react-redux";
+import { RootState, setAppraisals, setTasks } from "../stores/store";
+import { useDispatch, useSelector } from "react-redux";
 
 const useData = () => {
+  const loginState = useSelector((state: RootState) => state.store.loginState);
   const dispatch = useDispatch();
   const fetchTasks = async () => {
     await axios
-      .get("http://localhost:8080/" + localStorage.role + "/tasks", {
+      .get("http://localhost:8080/" + loginState.role + "/tasks", {
         headers: {
-          Authorization: "Bearer " + sessionStorage.jwt,
+          Authorization: "Bearer " + loginState.token,
         },
       })
       .then((res) => {
@@ -19,9 +20,9 @@ const useData = () => {
 
   const fetchAppraisals = async () => {
     await axios
-      .get("http://localhost:8080/" + localStorage.role + "/appraisals", {
+      .get("http://localhost:8080/" + loginState.role + "/appraisals", {
         headers: {
-          Authorization: "Bearer " + sessionStorage.jwt,
+          Authorization: "Bearer " + loginState.token,
         },
       })
       .then((res) => {

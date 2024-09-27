@@ -6,7 +6,7 @@ import NotificationsButton from "../../buttons/navbar/NotificationsButton";
 import ProfileButton from "../../buttons/navbar/ProfileButton";
 
 const Navbar = () => {
-  const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
+  const isLoggedIn = useSelector((state: RootState) => state.store.loginState.isLoggedIn);
 
   return isLoggedIn ? (
     <Flex

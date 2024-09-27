@@ -3,7 +3,6 @@ package com.beehyv.backend.services;
 import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
-import com.beehyv.backend.exceptions.CustomAuthException;
 import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.Appraisal;
@@ -91,6 +90,9 @@ public class TaskService {
             Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.INITIATED);
             task.setAppraisal(appraisal);
         }
+        else{
+            task.setAppraisal(null);
+        }
         return new TaskResponseDTOMapper().apply(taskRepo.save(task));
     }
     public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
@@ -125,7 +127,7 @@ public class TaskService {
         return "success";
     }
 
-    public void addAppraisalIdToAppraisableTasks(Integer employeeId, Appraisal appraisal) {
+    public void addAppraisableTasksToAppraisalForm(Integer employeeId, Appraisal appraisal) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee!=null){
             List<Task> tasks = taskRepo.findByEmployee(employee);
@@ -136,6 +138,7 @@ public class TaskService {
                 }
             }
         }
+        throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
     }
 
 

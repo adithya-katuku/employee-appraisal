@@ -4,7 +4,7 @@ interface AppraisalModel{
     id:number;
     startDate:Date;
     endDate:Date;
-    attributes:AttributeModel[];
+    attributes?:AttributeModel[];
     appraisalStatus:string;
     totalRating:number;
 }

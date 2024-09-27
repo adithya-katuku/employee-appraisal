@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Wrapper = ({ children }: Props) => {
-  const isLoggedIn = useSelector((state: RootState) => state.store.isLoggedIn);
+  const isLoggedIn = useSelector((state: RootState) => state.store.loginState.isLoggedIn);
   return isLoggedIn ? (
     <Box
       p="3"
