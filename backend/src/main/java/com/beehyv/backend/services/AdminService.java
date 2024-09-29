@@ -1,8 +1,13 @@
 package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
+import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
 import com.beehyv.backend.dto.request.AppraisalRequestDTO;
+import com.beehyv.backend.dto.request.RateAttributeRequestDTO;
+import com.beehyv.backend.dto.request.RateTaskRequestDTO;
+import com.beehyv.backend.dto.response.AppraisalDetailsDTO;
 import com.beehyv.backend.dto.response.AppraisalFormEntryDTO;
+import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
@@ -13,7 +18,6 @@ import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,23 +48,27 @@ public class AdminService {
     }
 
     //ATTRIBUTES:
-    public String rateAttribute(Integer employeeId, Integer attributeId, Double attributeRating) {
-        Attribute attribute = attributeRepo.findById(attributeId).orElse(null);
-        if(attribute!=null){
-            Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.SUBMITTED);
-            List<AttributeDAO> attributes = appraisal.getAttributes();
-            if(attributes==null) attributes = new ArrayList<>();
-            attributes.add(new AttributeDAO(attribute.getAttribute(), attributeRating));
-
-            return "Rated successfully";
+    public String rateAttribute(Integer appraisalId, RateAttributeRequestDTO rateAttributeRequestDTO) {
+        Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
+        if(appraisal==null){
+            throw  new ResourceNotFoundException("Appraisal with id "+appraisalId+" is not found.");
         }
+        if(appraisal.getAppraisalStatus()!=AppraisalStatus.SUBMITTED){
+            throw new InvalidInputException("Appraisal with id "+appraisalId+" is already rated.");
+        }
+        List<AttributeDAO> attributes = new ArrayList<>();
+        for(AttributeDAO attributeDAO: rateAttributeRequestDTO.attributes()){
+            attributes.add(new AttributeDAO(attributeDAO.getName(), attributeDAO.getRating()));
+        }
+        appraisal.setAttributes(attributes);
+        appraisalRepo.save(appraisal);
 
-        throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
+        return "Rated successfully";
     }
 
     //TASKS:
-    public TaskResponseDTO rateTaskByAdmin(Integer taskId, Double taskRating){
-        return taskService.rateTaskByAdmin(taskId, taskRating);
+    public TaskResponseDTO rateTaskByAdmin(RateTaskRequestDTO rateTaskRequestDTO){
+        return taskService.rateTaskByAdmin(rateTaskRequestDTO.taskId(), rateTaskRequestDTO.rating());
     }
 
     //NOTIFICATIONS:
@@ -101,5 +109,29 @@ public class AdminService {
 
     public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {
         return appraisalService.getPendingAppraisalRequests();
+    }
+
+    public AppraisalDetailsDTO getAppraisal(Integer appraisalId) {
+        Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
+        if(appraisal==null){
+            throw  new ResourceNotFoundException("Appraisal with id "+appraisalId+" is not found.");
+        }
+        if(appraisal.getAppraisalStatus()!=AppraisalStatus.SUBMITTED){
+            throw new InvalidInputException("Appraisal with id "+appraisalId+" is already rated.");
+        }
+
+        Employee employee = employeeRepo.findById(appraisal.getEmployeeId()).orElse(null);
+        if(employee==null){
+            throw  new ResourceNotFoundException("Employee with id "+appraisal.getEmployeeId()+" is not found.");
+        }
+
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTOMapper().apply(employee);
+        List<AttributeDAO> attributes = appraisal.getAttributes();
+        List<TaskResponseDTO> taskResponseDTOs = appraisal.getTasks().stream()
+                .map(task -> new TaskResponseDTOMapper().apply(task))
+                .sorted((t1, t2)->t1.taskId()-t2.taskId())
+                .toList();
+
+        return new AppraisalDetailsDTO(employeeResponseDTO, attributes, taskResponseDTOs);
     }
 }

@@ -1,8 +1,9 @@
 package com.beehyv.backend.models.embeddable;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 @Data
 @Getter
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Embeddable
 public class AttributeDAO {
+    @NotEmpty
     private String name;
+    @NotNull
     private Double rating;
 }

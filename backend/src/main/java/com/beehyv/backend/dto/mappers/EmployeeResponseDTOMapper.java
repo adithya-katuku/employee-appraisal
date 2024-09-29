@@ -13,7 +13,6 @@ public class EmployeeResponseDTOMapper implements Function<Employee, EmployeeRes
                 employee.getName(),
                 employee.getEmail(),
                 employee.getJoiningDate(),
-                employee.getRoles(),
                 employee.getDesignation().getDesignation(),
                 employee.getAppraisalEligibility()
         );

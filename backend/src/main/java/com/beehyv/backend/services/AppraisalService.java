@@ -10,6 +10,7 @@ import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
+import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.repositories.AppraisalRepo;
@@ -93,7 +94,14 @@ public class AppraisalService {
         String description = "Employee " + employeeId + " has submitted his appraisal form. Please review the same";
         notifyAdmins(employeeId, title, description);
 
-        return new AppraisalDTOMapper().apply(appraisalRepo.save(appraisal));
+        AppraisalDTO appraisalDTO = new AppraisalDTOMapper().apply(appraisal);
+
+        List<AttributeDAO> attributeDAOs = employeeService.getAttributes(employeeId).stream()
+                        .map(attribute -> new AttributeDAO(attribute.getAttribute(), (double) -1))
+                        .toList();
+        appraisalRepo.save(appraisal);
+
+        return appraisalDTO;
     }
 
     public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {

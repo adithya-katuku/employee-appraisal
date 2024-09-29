@@ -3,6 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import TaskModel from "../models/TaskModel";
 import AppraisalModel from "../models/AppraisalModel";
+import AppraisalRequestsFormEntry from "../models/admin/AppraisalRequestsFormEntry";
+import AppraisalRequestDetails from "../models/admin/AppraisalRequestDetails";
 
 interface LoginState {
   isLoggedIn: boolean;
@@ -11,14 +13,16 @@ interface LoginState {
 }
 
 interface Store {
-  employeeId:number|undefined;
+  employeeId: number | undefined;
   loginState: LoginState;
   tasks: TaskModel[] | undefined;
   appraisals: AppraisalModel[] | undefined;
+  appraisalRequests: AppraisalRequestsFormEntry[] | undefined;
+  appraisalRequestDetails: AppraisalRequestDetails | undefined;
 }
 
 const initialState: Store = {
-  employeeId:undefined,
+  employeeId: undefined,
   loginState: {
     isLoggedIn: false,
     role: "",
@@ -26,6 +30,8 @@ const initialState: Store = {
   },
   tasks: undefined,
   appraisals: undefined,
+  appraisalRequests: undefined,
+  appraisalRequestDetails: undefined,
 };
 
 export const slice = createSlice({
@@ -58,6 +64,18 @@ export const slice = createSlice({
     setAppraisals: (state, action: PayloadAction<AppraisalModel[]>) => {
       state.appraisals = action.payload;
     },
+    setAppraisalRequests: (
+      state,
+      action: PayloadAction<AppraisalRequestsFormEntry[]>
+    ) => {
+      state.appraisalRequests = action.payload;
+    },
+    setAppraisalRequestDetails: (
+      state,
+      action: PayloadAction<AppraisalRequestDetails>
+    ) => {
+      state.appraisalRequestDetails = action.payload;
+    },
   },
 });
 
@@ -68,6 +86,8 @@ export const {
   updateTask,
   deleteTask,
   setAppraisals,
+  setAppraisalRequests,
+  setAppraisalRequestDetails,
 } = slice.actions;
 
 export const store = configureStore({

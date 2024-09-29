@@ -2,6 +2,8 @@ package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.dto.request.AppraisalRequestDTO;
+import com.beehyv.backend.dto.request.RateAttributeRequestDTO;
+import com.beehyv.backend.dto.request.RateTaskRequestDTO;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
@@ -13,7 +15,6 @@ import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.ParameterResolutionDelegate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,10 +63,7 @@ public class AdminController {
         return employeeService.getAttributes(employeeId);
     }
 
-    @PutMapping("/employee/{employeeId}/attributes")
-    public String rateEmployeeAttribute(@PathVariable("employeeId") Integer employeeId, @RequestParam("attributeId") Integer attributeId, @RequestParam("rating") Double attributeRating){
-        return adminService.rateAttribute(employeeId, attributeId, attributeRating);
-    }
+
 
     //TASKS:
     @GetMapping("/employee/{employeeId}/tasks")
@@ -73,10 +71,7 @@ public class AdminController {
         return employeeService.getTasks(employeeId);
     }
 
-    @PutMapping("/employee/tasks/{taskId}")
-    public TaskResponseDTO rateEmployeeTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
-        return adminService.rateTaskByAdmin(taskId, taskRating);
-    }
+
 
     //NOTIFICATIONS:
     @PostMapping("/employee/{employeeId}/notifications")
@@ -134,6 +129,14 @@ public class AdminController {
                 .getPrincipal();
         return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
     }
+    @PutMapping("/tasks")
+    public TaskResponseDTO updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+    }
 
     @DeleteMapping("/tasks/{taskId}")
     public String deleteTask(@PathVariable("taskId") Integer taskId){
@@ -155,5 +158,20 @@ public class AdminController {
     @GetMapping("/appraisal-requests")
     public ResponseEntity<?> getPendingAppraisalRequests(){
         return new ResponseEntity<>(adminService.getPendingAppraisalRequests(), HttpStatus.OK);
+    }
+
+    @GetMapping("/appraisal-requests/{appraisalId}")
+    public ResponseEntity<?> getAppraisal(@PathVariable("appraisalId") Integer appraisalId){
+        return new ResponseEntity<>(adminService.getAppraisal(appraisalId), HttpStatus.OK);
+    }
+
+    @PutMapping("/appraisal-requests/tasks")
+    public TaskResponseDTO rateTask(@Valid @RequestBody RateTaskRequestDTO rateTaskRequestDTO){
+        return adminService.rateTaskByAdmin(rateTaskRequestDTO);
+    }
+
+    @PutMapping("/appraisal-requests/{appraisalId}/attributes")
+    public String rateEmployeeAttribute(@PathVariable("appraisalId") Integer appraisalId, @Valid @RequestBody RateAttributeRequestDTO rateAttributeRequestDTO) {
+        return adminService.rateAttribute(appraisalId, rateAttributeRequestDTO);
     }
 }

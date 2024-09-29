@@ -11,7 +11,6 @@ public record EmployeeResponseDTO(
         String name,
         String email,
         Date joiningDate,
-        List<Role> roles,
         String designation,
         AppraisalEligibility appraisalEligibility
 ) {

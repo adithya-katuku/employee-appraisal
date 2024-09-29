@@ -19,6 +19,8 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer taskId;
     private String taskTitle;
+
+    @Column(length = 1000)
     private String description;
     private Date startDate;
     private Date endDate;

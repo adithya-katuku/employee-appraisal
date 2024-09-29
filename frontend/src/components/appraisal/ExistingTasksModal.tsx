@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ExistingTasksModal = ({ isOpen, onClose}: Props) => {
-    const tasks = useSelector((state: RootState) => state.store.tasks);
+  const tasks = useSelector((state: RootState) => state.store.tasks);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

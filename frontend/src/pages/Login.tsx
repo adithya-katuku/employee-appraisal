@@ -93,12 +93,13 @@ const LoginForm = () => {
       })
       .catch((err: AxiosError) => {
         console.log(err);
+        refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
       });
   };
   if (loginState.token) {
     loginWIthJwt(loginState.token);
   }
-   else if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
+  if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
     refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
   }
 
