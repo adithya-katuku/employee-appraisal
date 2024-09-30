@@ -9,17 +9,17 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../stores/store";
-import EmployeeDetails from "../employee/EmployeeDetails";
-import AppraisalRequestTaskList from "./tasks/AppraisalRequestTaskList";
-import AppraisalRequestAttributes from "./attributes/AppraisalRequestAttributes";
+import { RootState } from "../../../../stores/store";
+import EmployeeDetails from "../../../employee/EmployeeDetails";
+import AppraisalRequestTaskList from "../tasks/AppraisalRequestTaskList";
+import AppraisalRequestAttributes from "../attributes/AppraisalRequestAttributes";
+import SubmitRating from "../buttons/SubmitRating";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   appraisalId: number;
 }
-
 const AppraisalRequestModal = ({ isOpen, onClose, appraisalId }: Props) => {
   const appraisalRequestDetails = useSelector(
     (state: RootState) => state.store.appraisalRequestDetails
@@ -36,8 +36,8 @@ const AppraisalRequestModal = ({ isOpen, onClose, appraisalId }: Props) => {
             employeeDetails={appraisalRequestDetails.employeeDetails}
           />
           <AppraisalRequestTaskList
-            tasks={appraisalRequestDetails.tasks}
             appraisalId={appraisalId}
+            tasks={appraisalRequestDetails.tasks}
           />
 
           <AppraisalRequestAttributes
@@ -49,7 +49,7 @@ const AppraisalRequestModal = ({ isOpen, onClose, appraisalId }: Props) => {
           <Button variant="outline" colorScheme="red" mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="green">Submit</Button>
+          <SubmitRating appraisalId={appraisalId} onClose={onClose} />
         </ModalFooter>
       </ModalContent>
     </Modal>

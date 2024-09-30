@@ -12,7 +12,7 @@ const usePaths = () => {
     { name: "WFH", path: `/${loginState.role}/home`, selected: selectedOption===3 },
     { name: "Tasks", path: `/${loginState.role}/tasks`, selected: selectedOption===4 },
     { name: "Teams", path: `/${loginState.role}/home`, selected: selectedOption===5 },
-    { name: "People", path: `/${loginState.role}/home`, selected: selectedOption===6 },
+    { name: "People", path: `/${loginState.role}/people`, selected: selectedOption===6 },
     loginState.role === "admin"
       ? {
           name: "Appraisal Requests",

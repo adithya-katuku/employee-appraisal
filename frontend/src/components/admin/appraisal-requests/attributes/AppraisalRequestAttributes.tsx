@@ -8,12 +8,12 @@ import {
   InputLeftAddon,
   Text,
 } from "@chakra-ui/react";
-import AttributeModel from "../../../models/AttributeModel";
+import AttributeModel from "../../../../models/AttributeModel";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import useData from "../../../hooks/useData";
+import useData from "../../../../hooks/useData";
 
 interface Props {
   appraisalId: number;
@@ -31,11 +31,7 @@ const attributesSchema = z.object({
 type validForm = z.infer<typeof attributesSchema>;
 
 const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-  } = useForm<validForm>({
+  const { register, handleSubmit, setValue } = useForm<validForm>({
     resolver: zodResolver(attributesSchema),
   });
 
@@ -43,18 +39,17 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
 
   const onSubmit = (data: validForm) => {
     console.log("here", data);
-    rateAttributes(
-      {appraisalId: appraisalId,
-        attributes: data.attributes
-      }
-    )
+    rateAttributes({ appraisalId: appraisalId, attributes: data.attributes });
   };
 
   useEffect(() => {
     if (attributes) {
       attributes.forEach((attribute, index) => {
         setValue(`attributes.${index}.name`, attribute.name);
-        setValue(`attributes.${index}.rating`, attribute.rating>=0?attribute.rating:0);
+        setValue(
+          `attributes.${index}.rating`,
+          attribute.rating >= 0 ? attribute.rating : 0
+        );
       });
     }
   }, [attributes, setValue]);
@@ -65,9 +60,7 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
         Attributes:
       </Text>
       <Box border="1px" borderColor="gray.200" p="2" rounded="md">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           {attributes.map((attribute, index) => (
             <FormControl key={attribute.name} m="1">
               <InputGroup>
@@ -75,7 +68,11 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
                 <Input
                   type="number"
                   isRequired
-                  {...register(`attributes.${index}.rating`, {valueAsNumber: true, min:0, max:10})}
+                  {...register(`attributes.${index}.rating`, {
+                    valueAsNumber: true,
+                    min: 0,
+                    max: 10,
+                  })}
                 />
               </InputGroup>
             </FormControl>

@@ -14,6 +14,7 @@ import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,6 @@ public class AdminController {
 
     @GetMapping("/all-employees")
     public ResponseEntity<?> getAllEmployees(){
-        System.out.println("here");
         List<EmployeeResponseDTO> employeeResponseDTOS = adminService.findAllEmployees();
         return new ResponseEntity<>(employeeResponseDTOS, HttpStatus.OK);
     }
@@ -58,11 +58,10 @@ public class AdminController {
     }
 
     //ATTRIBUTES:
-    @GetMapping("/employee/{employeeId}/attributes")
-    public List<Attribute> getEmployeeAttributes(@PathVariable("employeeId") Integer employeeId){
-        return employeeService.getAttributes(employeeId);
+    @GetMapping("/employee/{employeeId}/appraisals")
+    public ResponseEntity<?> getPrevious(@PathVariable("employeeId") Integer employeeId){
+        return new ResponseEntity<>(adminService.getPreviousAppraisals(employeeId), HttpStatus.OK);
     }
-
 
 
     //TASKS:
@@ -70,7 +69,6 @@ public class AdminController {
     public List<TaskResponseDTO> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
         return employeeService.getTasks(employeeId);
     }
-
 
 
     //NOTIFICATIONS:
@@ -173,5 +171,16 @@ public class AdminController {
     @PutMapping("/appraisal-requests/{appraisalId}/attributes")
     public String rateEmployeeAttribute(@PathVariable("appraisalId") Integer appraisalId, @Valid @RequestBody RateAttributeRequestDTO rateAttributeRequestDTO) {
         return adminService.rateAttribute(appraisalId, rateAttributeRequestDTO);
+    }
+
+    @PutMapping("/appraisal-requests/{appraisalId}")
+    public ResponseEntity<?> submitRatingOfAppraisal(@PathVariable("appraisalId") Integer appraisalId){
+        return new ResponseEntity<>(adminService.submitRatingOfAppraisal(appraisalId), HttpStatus.OK);
+    }
+
+    //PEOPLE:
+    @GetMapping("/people/{name}")
+    public ResponseEntity<?> findPeople(@PathVariable("name") @NotEmpty String name){
+        return new ResponseEntity<>(employeeService.findPeople(name), HttpStatus.OK);
     }
 }

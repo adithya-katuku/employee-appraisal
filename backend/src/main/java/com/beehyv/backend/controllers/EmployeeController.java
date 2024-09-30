@@ -127,4 +127,10 @@ public class EmployeeController {
 
         return new ResponseEntity<>(appraisalService.submitAppraisal(appraisalId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
+
+    //PEOPLE:
+    @GetMapping("/people/{name}")
+    public ResponseEntity<?> findPeople(@PathVariable("name") String name){
+        return new ResponseEntity<>(employeeService.findPeople(name), HttpStatus.OK);
+    }
 }

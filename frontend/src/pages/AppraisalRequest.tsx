@@ -5,7 +5,7 @@ import { IoHome } from "react-icons/io5";
 import useData from "../hooks/useData";
 import { useSelector } from "react-redux";
 import { RootState } from "../stores/store";
-import AppraisalTable from "../components/appraisalrequests/AppraisalRequestsTable";
+import AppraisalTable from "../components/admin/appraisal-requests/requests-table/AppraisalRequestsTable";
 
 const AppraisalRequest = () => {
   const apprasialRequests = useSelector(

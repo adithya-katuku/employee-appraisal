@@ -1,10 +1,10 @@
 import { Box, Text } from "@chakra-ui/react";
-import TaskModel from "../../../models/TaskModel";
+import TaskModel from "../../../../models/TaskModel";
 import AppraisalRequestTask from "./AppraisalRequestTask";
 
 interface Props {
   tasks: TaskModel[];
-  appraisalId:number;
+  appraisalId: number;
 }
 
 const AppraisalRequestTaskList = ({ tasks, appraisalId }: Props) => {
@@ -15,7 +15,13 @@ const AppraisalRequestTaskList = ({ tasks, appraisalId }: Props) => {
       </Text>
       {tasks &&
         tasks.map((task, index) => {
-          return <AppraisalRequestTask task={task} appraisalId={appraisalId} key={index} />;
+          return (
+            <AppraisalRequestTask
+              task={task}
+              appraisalId={appraisalId}
+              key={index}
+            />
+          );
         })}
     </Box>
   );

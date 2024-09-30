@@ -1,16 +1,14 @@
 package com.beehyv.backend.services;
 
+import com.beehyv.backend.dto.mappers.AppraisalDTOMapper;
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
 import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
 import com.beehyv.backend.dto.request.AppraisalRequestDTO;
 import com.beehyv.backend.dto.request.RateAttributeRequestDTO;
 import com.beehyv.backend.dto.request.RateTaskRequestDTO;
-import com.beehyv.backend.dto.response.AppraisalDetailsDTO;
-import com.beehyv.backend.dto.response.AppraisalFormEntryDTO;
+import com.beehyv.backend.dto.response.*;
 import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.models.embeddable.AttributeDAO;
-import com.beehyv.backend.dto.response.EmployeeResponseDTO;
-import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.models.enums.AppraisalEligibility;
@@ -18,6 +16,7 @@ import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -90,7 +89,8 @@ public class AdminService {
             throw new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
 //        employee.getAppraisalEligibility()!=AppraisalEligibility.PROCESSING
-        if(employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0){
+//        employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0
+        if(employee.getAppraisalEligibility()!=AppraisalEligibility.PROCESSING){
             Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
             appraisalService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
             taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
@@ -104,7 +104,7 @@ public class AdminService {
             return "Started appraisal process for the employee with id: "+employeeId;
         }
 
-        return "An appraisal for this employee already exists for the selected period.";
+        return "An appraisal for this employee ais already under process.";
     }
 
     public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {
@@ -133,5 +133,25 @@ public class AdminService {
                 .toList();
 
         return new AppraisalDetailsDTO(employeeResponseDTO, attributes, taskResponseDTOs);
+    }
+
+    public String submitRatingOfAppraisal(Integer appraisalId) {
+        Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
+        if(appraisal==null){
+            throw  new ResourceNotFoundException("Appraisal with id "+appraisalId+" is not found.");
+        }
+        if(appraisal.getAppraisalStatus()!=AppraisalStatus.SUBMITTED){
+            throw new InvalidInputException("Appraisal with id "+appraisalId+" is already rated.");
+        }
+        appraisalService.changePreviousAppraisalDateAndEligibility(appraisal.getEmployeeId(), appraisal.getEndDate(), AppraisalEligibility.NOT_ELIGIBLE);
+        appraisal.setAppraisalStatus(AppraisalStatus.APPROVED);
+
+        appraisalRepo.save(appraisal);
+
+        return "Successfully submitted rating.";
+    }
+
+    public List<AppraisalDTO> getPreviousAppraisals(Integer employeeId) {
+        return appraisalService.getAppraisals(employeeId);
     }
 }

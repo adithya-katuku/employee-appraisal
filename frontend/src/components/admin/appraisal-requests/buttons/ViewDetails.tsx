@@ -1,6 +1,6 @@
 import { Box, Button, useDisclosure } from "@chakra-ui/react";
-import AppraisalRequestModal from "../../components/appraisalrequests/AppraisalRequestModal";
-import useData from "../../hooks/useData";
+import AppraisalRequestModal from "../details-modal/AppraisalRequestModal";
+import useData from "../../../../hooks/useData";
 
 interface Props {
   appriasalId: number;
@@ -26,7 +26,11 @@ const ViewDetails = ({ appriasalId }: Props) => {
         View Details
       </Button>
 
-      <AppraisalRequestModal isOpen={isOpen} onClose={onClose} appraisalId={appriasalId} />
+      <AppraisalRequestModal
+        isOpen={isOpen}
+        onClose={onClose}
+        appraisalId={appriasalId}
+      />
     </Box>
   );
 };

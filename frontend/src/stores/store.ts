@@ -5,6 +5,7 @@ import TaskModel from "../models/TaskModel";
 import AppraisalModel from "../models/AppraisalModel";
 import AppraisalRequestsFormEntry from "../models/admin/AppraisalRequestsFormEntry";
 import AppraisalRequestDetails from "../models/admin/AppraisalRequestDetails";
+import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
 
 interface LoginState {
   isLoggedIn: boolean;
@@ -19,6 +20,8 @@ interface Store {
   appraisals: AppraisalModel[] | undefined;
   appraisalRequests: AppraisalRequestsFormEntry[] | undefined;
   appraisalRequestDetails: AppraisalRequestDetails | undefined;
+  searchedEmployees:EmployeeDetailsModel[]|undefined;
+  searchedEmployeeDetails:EmployeeDetailsModel|undefined;
 }
 
 const initialState: Store = {
@@ -32,6 +35,8 @@ const initialState: Store = {
   appraisals: undefined,
   appraisalRequests: undefined,
   appraisalRequestDetails: undefined,
+  searchedEmployees:undefined,
+  searchedEmployeeDetails:undefined,
 };
 
 export const slice = createSlice({
@@ -76,6 +81,23 @@ export const slice = createSlice({
     ) => {
       state.appraisalRequestDetails = action.payload;
     },
+    setSearchedEmployees: (
+      state,
+      action: PayloadAction<EmployeeDetailsModel[]>
+    ) => {
+      state.searchedEmployees = action.payload;
+    },
+    clearSearchedEmployees: (
+      state
+    ) => {
+      state.searchedEmployees = undefined;
+    },
+    setEmployeeDetails: (
+      state,
+      action: PayloadAction<EmployeeDetailsModel>
+    ) => {
+      state.searchedEmployeeDetails = action.payload;
+    },
   },
 });
 
@@ -88,6 +110,9 @@ export const {
   setAppraisals,
   setAppraisalRequests,
   setAppraisalRequestDetails,
+  setSearchedEmployees,
+  setEmployeeDetails,
+  clearSearchedEmployees
 } = slice.actions;
 
 export const store = configureStore({

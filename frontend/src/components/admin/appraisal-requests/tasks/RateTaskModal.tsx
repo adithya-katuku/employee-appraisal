@@ -17,8 +17,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
-import TaskModel from "../../../models/TaskModel";
-import useData from "../../../hooks/useData";
+import TaskModel from "../../../../models/TaskModel";
+import useData from "../../../../hooks/useData";
 
 interface Props {
   isOpen: boolean;

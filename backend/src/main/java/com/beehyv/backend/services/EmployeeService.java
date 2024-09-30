@@ -2,14 +2,12 @@ package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
-import com.beehyv.backend.dto.response.AppraisalDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -155,5 +153,11 @@ public class EmployeeService {
         throw  new ResourceNotFoundException("Notification  not found.");
     }
 
-
+    //People
+    public List<EmployeeResponseDTO> findPeople(String name) {
+        return employeeRepo.findByNameContainingIgnoreCase(name).stream()
+                .filter(employee -> !employee.getRoles().contains(Role.ADMIN))
+                .map(employee -> new EmployeeResponseDTOMapper().apply(employee))
+                .toList();
+    }
 }
