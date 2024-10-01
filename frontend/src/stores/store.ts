@@ -6,6 +6,7 @@ import AppraisalModel from "../models/AppraisalModel";
 import AppraisalRequestsFormEntry from "../models/admin/AppraisalRequestsFormEntry";
 import AppraisalRequestDetails from "../models/admin/AppraisalRequestDetails";
 import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
+import NotificationModel from "../models/NotificationModel";
 
 interface LoginState {
   isLoggedIn: boolean;
@@ -20,8 +21,11 @@ interface Store {
   appraisals: AppraisalModel[] | undefined;
   appraisalRequests: AppraisalRequestsFormEntry[] | undefined;
   appraisalRequestDetails: AppraisalRequestDetails | undefined;
-  searchedEmployees:EmployeeDetailsModel[]|undefined;
-  searchedEmployeeDetails:EmployeeDetailsModel|undefined;
+  searchedEmployees: EmployeeDetailsModel[] | undefined;
+  searchedEmployeeDetails: EmployeeDetailsModel | undefined;
+  notifications: NotificationModel[] | undefined;
+  selectedPage:number;
+  searchedName:string|undefined;
 }
 
 const initialState: Store = {
@@ -35,8 +39,11 @@ const initialState: Store = {
   appraisals: undefined,
   appraisalRequests: undefined,
   appraisalRequestDetails: undefined,
-  searchedEmployees:undefined,
-  searchedEmployeeDetails:undefined,
+  searchedEmployees: undefined,
+  searchedEmployeeDetails: undefined,
+  notifications: undefined,
+  selectedPage:localStorage.page?JSON.parse(localStorage.page):0,
+  searchedName:undefined
 };
 
 export const slice = createSlice({
@@ -87,9 +94,7 @@ export const slice = createSlice({
     ) => {
       state.searchedEmployees = action.payload;
     },
-    clearSearchedEmployees: (
-      state
-    ) => {
+    clearSearchedEmployees: (state) => {
       state.searchedEmployees = undefined;
     },
     setEmployeeDetails: (
@@ -97,6 +102,15 @@ export const slice = createSlice({
       action: PayloadAction<EmployeeDetailsModel>
     ) => {
       state.searchedEmployeeDetails = action.payload;
+    },
+    setNotifications: (state, action: PayloadAction<NotificationModel[]>) => {
+      state.notifications = action.payload;
+    },
+    setSelectedPage: (state, action: PayloadAction<number>) => {
+      state.selectedPage = action.payload;
+    },
+    setSearchedName: (state, action: PayloadAction<string|undefined>) => {
+      state.searchedName = action.payload;
     },
   },
 });
@@ -112,7 +126,10 @@ export const {
   setAppraisalRequestDetails,
   setSearchedEmployees,
   setEmployeeDetails,
-  clearSearchedEmployees
+  clearSearchedEmployees,
+  setNotifications,
+  setSelectedPage,
+  setSearchedName
 } = slice.actions;
 
 export const store = configureStore({

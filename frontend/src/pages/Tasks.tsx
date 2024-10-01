@@ -2,18 +2,18 @@ import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { IoHome } from "react-icons/io5";
 import { useEffect } from "react";
-import AddTask from "../buttons/task/CreateTask";
 import { useSelector } from "react-redux";
 import { RootState } from "../stores/store";
 import TaskList from "../components/task/TaskList";
 import useData from "../hooks/useData";
+import AddTask from "../components/task/buttons/CreateTask";
 
 const Tasks = () => {
   const tasks = useSelector((state: RootState) => state.store.tasks);
   const { fetchTasks } = useData();
 
   useEffect(() => {
-    localStorage.page = 4;
+    localStorage.page = 1;
     fetchTasks();
   }, []);
 

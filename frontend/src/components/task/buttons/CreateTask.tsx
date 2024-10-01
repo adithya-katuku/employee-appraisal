@@ -1,5 +1,5 @@
 import { Box, Button, useDisclosure } from "@chakra-ui/react";
-import NewTaskModal from "../../components/task/NewTaskModal";
+import NewTaskModal from "../modals/NewTaskModal";
 
 const AddTask = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();

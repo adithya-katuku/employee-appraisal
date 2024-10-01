@@ -7,15 +7,16 @@ import useAdmin from "../../../../hooks/useAdmin";
 const PreviousAppraisalsButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { employeeId } = useContext(EmployeeDetailsContext);
-  const {fetchEmployeeAppraisals} = useAdmin();
+  const {fetchEmployeeTasks , fetchEmployeeAppraisals} = useAdmin();
   const handleClick = ()=>{
+    fetchEmployeeTasks(employeeId);
     fetchEmployeeAppraisals(employeeId);
     onOpen();
   }
 
   return (
     <Box>
-      <Button colorScheme="teal" onClick={handleClick} >Previous Appraisals: </Button>
+      <Button colorScheme="teal" onClick={handleClick} >Previous Appraisals</Button>
       <PreviousAppriaisalsModal isOpen={isOpen} onClose={onClose} />
     </Box>
   )

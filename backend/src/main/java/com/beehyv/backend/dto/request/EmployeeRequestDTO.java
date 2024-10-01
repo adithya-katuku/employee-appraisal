@@ -1,6 +1,7 @@
 package com.beehyv.backend.dto.request;
 
 import com.beehyv.backend.models.enums.Role;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.util.Date;
@@ -13,6 +14,10 @@ public record EmployeeRequestDTO(
         @NotBlank(message = "Name is required.")
         @Size(min = 3, message = "Name must be at least 3 characters long.")
         String name,
+
+        @Valid
+        @NotNull
+        DesignationRequestDTO designation,
 
         @NotBlank(message = "Email is required.")
         @Email(message = "Please provide a valid email address.")

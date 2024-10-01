@@ -1,5 +1,5 @@
 import { Box, Button, useDisclosure } from "@chakra-ui/react";
-import ExistingTasksModal from "../../components/appraisal/ExistingTasksModal";
+import ExistingTasksModal from "../modals/ExistingTasksModal";
 
 const AddExistingTasks = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -17,7 +17,7 @@ const AddExistingTasks = () => {
         Add Existing
       </Button>
 
-      <ExistingTasksModal isOpen={isOpen} onClose={onClose}  />
+      <ExistingTasksModal isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 };

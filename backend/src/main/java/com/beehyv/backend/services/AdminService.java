@@ -94,10 +94,10 @@ public class AdminService {
             Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
             appraisalService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
             taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
+
             Notification notification = new Notification();
             notification.setNotificationTitle("Appraisal!");
             notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
-            notification.setFromId(adminId);
 
             addNotification(employeeId, notification);
 

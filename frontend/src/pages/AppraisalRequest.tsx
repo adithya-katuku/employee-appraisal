@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { Box, HStack, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { IoHome } from "react-icons/io5";
 import useData from "../hooks/useData";
@@ -14,7 +14,7 @@ const AppraisalRequest = () => {
   const { fetchAppraisalRequests } = useData();
 
   useEffect(() => {
-    localStorage.page = 7;
+    localStorage.page = 3;
     fetchAppraisalRequests();
   }, []);
   return (
@@ -25,8 +25,14 @@ const AppraisalRequest = () => {
         <Text>Appraisal Requests</Text>
       </HStack>
       <Box>
-        {apprasialRequests && (
+        {apprasialRequests && apprasialRequests.length > 0 ? (
           <AppraisalTable appraisalRequests={apprasialRequests} />
+        ) : (
+          <Flex justifyContent="center">
+            <Text mx="4" p="2" fontSize="1.5rem">
+              No pending appraisals
+            </Text>
+          </Flex>
         )}
       </Box>
     </>

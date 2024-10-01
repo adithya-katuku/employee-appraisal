@@ -7,6 +7,7 @@ import {
   setAppraisals,
   setEmployeeDetails,
   setSearchedEmployees,
+  setSearchedName,
   setTasks,
 } from "../stores/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,23 @@ const useData = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const fetchInfo = async () => {
+    await axios
+      .get("http://localhost:8080/" + loginState.role + "/info", {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+      })
+      .then((res) => {
+        dispatch(setEmployeeDetails(res.data));
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  };
+
   const fetchTasks = async () => {
     await axios
       .get("http://localhost:8080/" + loginState.role + "/tasks", {
@@ -186,9 +204,11 @@ const useData = () => {
     dispatch(setEmployeeDetails(employee));
   };
   const clearEmployees = () => {
+    dispatch(setSearchedName(undefined));
     dispatch(clearSearchedEmployees());
   };
   return {
+    fetchInfo,
     fetchTasks,
     fetchAppraisals,
     fetchAppraisalRequests,
@@ -198,7 +218,7 @@ const useData = () => {
     submitRating,
     searchEmployees,
     setSearchedEmployeeDetails,
-    clearEmployees
+    clearEmployees,
   };
 };
 

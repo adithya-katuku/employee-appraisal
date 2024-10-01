@@ -1,6 +1,6 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../stores/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, setSelectedPage } from "../../stores/store";
 import { Link } from "react-router-dom";
 import usePaths from "../../hooks/usePaths";
 
@@ -8,7 +8,11 @@ const VerticalNavbar = () => {
   const isLoggedIn = useSelector(
     (state: RootState) => state.store.loginState.isLoggedIn
   );
-  const {options, setSelected} = usePaths();
+  const selectedPage = useSelector(
+    (state: RootState) => state.store.selectedPage
+  );
+  const dispatch = useDispatch();
+  const {options} = usePaths();
   
 
   return isLoggedIn ? (
@@ -44,14 +48,14 @@ const VerticalNavbar = () => {
                 gap="2"
                 my="0.5"
                 rounded="md"
-                bg={option.selected ? "gray.300" : "white"}
+                bg={index===selectedPage ? "gray.300" : "white"}
                 onClick={() => {
-                  setSelected(index);
+                  dispatch(setSelectedPage(index));
                 }}
               >
-                <Box w="2rem" bg="gray">
-                  I
-                </Box>
+                <Flex w="2rem" justifyContent="center" >
+                  {option.icon }
+                </Flex>
                 <Text>{option.name}</Text>
               </Flex>
             </Link>

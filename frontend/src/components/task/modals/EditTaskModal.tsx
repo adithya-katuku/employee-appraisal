@@ -19,13 +19,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { z } from "zod";
-import { addTask } from "../../stores/store";
+import TaskModel from "../../../models/TaskModel";
+import { useDispatch } from "react-redux";
+import { updateTask } from "../../../stores/store";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  task: TaskModel;
 }
 
 const schema = z.object({
@@ -38,21 +40,21 @@ const schema = z.object({
   selfRating: z
     .preprocess(
       (value) => (typeof value === "string" ? parseFloat(value) : value),
-      z.number().positive().max(10)
+      z.number().positive().max(10).nullable()
     )
     .optional(),
 });
 
 type validForm = z.infer<typeof schema>;
 
-const NewTaskModal = ({ isOpen, onClose }: Props) => {
-  const [isAppraisable, setIsAppraisable] = useState(false);
-
+const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
+  const [isAppraisable, setIsAppraisable] = useState(task.appraisable);
   const dispatch = useDispatch();
 
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm<validForm>({ resolver: zodResolver(schema) });
@@ -61,37 +63,43 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
     setIsAppraisable(!isAppraisable);
   };
 
-  
+  setValue("taskId", task.taskId);
+  setValue("taskTitle", task.taskTitle);
+  setValue("description", task.description);
+  setValue("startDate", new Date(task.startDate).toISOString().split("T")[0]);
+  setValue("endDate", new Date(task.endDate).toISOString().split("T")[0]);
+  setValue("appraisable", task.appraisable);
+  setValue("selfRating", task.selfRating);
+
   const onSubmit = async (data: FieldValues) => {
-    await axios.post("http://localhost:8080/"+localStorage.role+"/tasks", data, {
-      headers:{
-        Authorization: "Bearer "+sessionStorage.jwt
-      }
-    })
-    .then(res=>{
-      console.log(res.data);
-      dispatch(addTask(res.data));
-    })
-    .catch(err=>{
-      console.log(err);
-    })
+    await axios
+      .put("http://localhost:8080/" + localStorage.role + "/tasks", data, {
+        headers: {
+          Authorization: "Bearer " + sessionStorage.jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        dispatch(updateTask(res.data));
+        setIsAppraisable(res.data.appraisable);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     handleClose();
   };
-  // console.log();
+
   const handleClose = () => {
-    setIsAppraisable(false);
+    setIsAppraisable(task.appraisable);
     reset();
     onClose();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-    >
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add Task</ModalHeader>
+        <ModalHeader>Edit Task</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>
@@ -154,4 +162,4 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
   );
 };
 
-export default NewTaskModal;
+export default EditTaskModal;

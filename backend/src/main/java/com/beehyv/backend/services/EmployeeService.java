@@ -1,13 +1,17 @@
 package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
+import com.beehyv.backend.dto.request.EmployeeRequestDTO;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
+import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
+import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,6 +66,30 @@ public class EmployeeService {
         return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
     }
 
+    public EmployeeResponseDTO registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
+        Employee employee = new Employee();
+        employee.setEmployeeId(employeeRequestDTO.employeeId());
+        employee.setName(employeeRequestDTO.name());
+        employee.setEmail(employeeRequestDTO.email());
+        employee.setAppraisalEligibility(AppraisalEligibility.NOT_ELIGIBLE);
+        employee.setJoiningDate(employeeRequestDTO.joiningDate());
+        employee.setPassword(passwordEncoder.encode(employeeRequestDTO.password()));
+        employee.setRoles(employeeRequestDTO.roles());
+        employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
+        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation().name());
+        if(designation==null){
+            if(employeeRequestDTO.designation().attributes()==null ||
+                    employeeRequestDTO.designation().attributes().isEmpty()){
+                throw new InvalidInputException("Designation "+employeeRequestDTO.designation().name()+"does not exist. Attributes needs to be entered.");
+            }
+            designation = new Designation();
+            designation.setAttributes(employeeRequestDTO.designation().attributes());
+            designation = designationRepo.saveOrFind(designation);
+        }
+
+        employee.setDesignation(designation);
+        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
+    }
     //ATTRIBUTES:
     public List<Attribute> getAttributes(Integer employeeId){
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
@@ -103,7 +131,7 @@ public class EmployeeService {
         if(employee==null){
             throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
-        return notificationRepo.findByEmployee(employee);
+        return notificationRepo.findByEmployeeOrderByNotificationIdDesc(employee);
     }
 
 //    public Notification addNotification(Integer employeeId, Notification notification) {
@@ -160,4 +188,5 @@ public class EmployeeService {
                 .map(employee -> new EmployeeResponseDTOMapper().apply(employee))
                 .toList();
     }
+
 }

@@ -1,14 +1,12 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
-import com.beehyv.backend.dto.request.AppraisalRequestDTO;
-import com.beehyv.backend.dto.request.RateAttributeRequestDTO;
-import com.beehyv.backend.dto.request.RateTaskRequestDTO;
-import com.beehyv.backend.dto.request.TaskRequestDTO;
+import com.beehyv.backend.dto.request.*;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
+import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
@@ -22,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -57,12 +57,10 @@ public class AdminController {
         return employeeService.getEmployee(employeeId);
     }
 
-    //ATTRIBUTES:
-    @GetMapping("/employee/{employeeId}/appraisals")
-    public ResponseEntity<?> getPrevious(@PathVariable("employeeId") Integer employeeId){
-        return new ResponseEntity<>(adminService.getPreviousAppraisals(employeeId), HttpStatus.OK);
+    @PostMapping("/register")
+    public EmployeeResponseDTO saveEmployee(@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO){
+        return employeeService.registerEmployee(employeeRequestDTO);
     }
-
 
     //TASKS:
     @GetMapping("/employee/{employeeId}/tasks")
@@ -178,9 +176,21 @@ public class AdminController {
         return new ResponseEntity<>(adminService.submitRatingOfAppraisal(appraisalId), HttpStatus.OK);
     }
 
+    @GetMapping("/employee/{employeeId}/appraisals")
+    public ResponseEntity<?> getPrevious(@PathVariable("employeeId") Integer employeeId){
+        return new ResponseEntity<>(adminService.getPreviousAppraisals(employeeId), HttpStatus.OK);
+    }
+
     //PEOPLE:
     @GetMapping("/people/{name}")
     public ResponseEntity<?> findPeople(@PathVariable("name") @NotEmpty String name){
-        return new ResponseEntity<>(employeeService.findPeople(name), HttpStatus.OK);
+        try{
+            Integer employeeId = Integer.valueOf(name);
+            return new ResponseEntity<>(Collections.singletonList(employeeService.getEmployee(employeeId)), HttpStatus.OK);
+        }
+        catch (NumberFormatException e){
+            return new ResponseEntity<>(employeeService.findPeople(name), HttpStatus.OK);
+        }
+
     }
 }

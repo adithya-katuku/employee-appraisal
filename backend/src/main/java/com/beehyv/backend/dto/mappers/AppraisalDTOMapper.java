@@ -4,6 +4,7 @@ package com.beehyv.backend.dto.mappers;
 import com.beehyv.backend.dto.response.AppraisalDTO;
 import com.beehyv.backend.models.Appraisal;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 public class AppraisalDTOMapper implements Function<Appraisal, AppraisalDTO> {
@@ -15,7 +16,7 @@ public class AppraisalDTOMapper implements Function<Appraisal, AppraisalDTO> {
                 appraisal.getRating(),
                 appraisal.getStartDate(),
                 appraisal.getEndDate(),
-                appraisal.getAttributes()
+                appraisal.getAppraisalStatus().ordinal()>=3?appraisal.getAttributes():new ArrayList<>()
         );
     }
 }

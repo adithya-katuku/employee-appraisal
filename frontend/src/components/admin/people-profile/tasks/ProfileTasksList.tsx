@@ -1,10 +1,11 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../../../stores/store";
 import { Box } from "@chakra-ui/react";
 import ProfileTask from "./ProfileTask";
+import TaskModel from "../../../../models/TaskModel";
 
-const ProfileTasksList = () => {
-  const tasks = useSelector((state: RootState) => state.store.tasks);
+interface Props{
+  tasks:TaskModel[] |undefined
+}
+const ProfileTasksList = ({tasks}:Props) => {
   return tasks ? (
     <Box>
       {tasks.map((task, index) => {

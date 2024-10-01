@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepo extends JpaRepository<Notification, Integer> {
-    List<Notification> findByEmployee(Employee employee);
+    List<Notification> findByEmployeeOrderByNotificationIdDesc(Employee employee);
 }

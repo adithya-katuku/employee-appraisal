@@ -9,6 +9,8 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import ProfileTasksList from "../tasks/ProfileTasksList";
+import { RootState } from "../../../../stores/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   isOpen: boolean;
@@ -16,6 +18,7 @@ interface Props {
 }
 
 const ViewTasksModal = ({ isOpen, onClose }: Props) => {
+  const tasks = useSelector((state: RootState) => state.store.tasks);
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalOverlay />
@@ -25,7 +28,7 @@ const ViewTasksModal = ({ isOpen, onClose }: Props) => {
           <ModalCloseButton />
         </ModalHeader>
         <ModalBody>
-          <ProfileTasksList />
+          <ProfileTasksList tasks={tasks} />
         </ModalBody>
         <ModalFooter>
           <Button variant="outline" colorScheme="red" mr={3} onClick={onClose}>

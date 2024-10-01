@@ -1,5 +1,5 @@
 import { Box, Button } from "@chakra-ui/react";
-import useData from "../../hooks/useData";
+import useData from "../../../hooks/useData";
 import axios from "axios";
 
 interface Props {

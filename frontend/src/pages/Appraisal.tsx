@@ -2,14 +2,14 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Flex, HStack, Select, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoHome } from "react-icons/io5";
-import CreateTask from "../buttons/task/CreateTask";
 import AttributeTable from "../components/attribute/AttributeTable";
 import { useSelector } from "react-redux";
 import { RootState } from "../stores/store";
 import TaskList from "../components/task/TaskList";
 import useData from "../hooks/useData";
-import SubmitAppraisal from "../buttons/appraisal/SubmitAppraisal";
-import AddExistingTasks from "../buttons/appraisal/AddExistingTasks";
+import SubmitAppraisal from "../components/appraisal/buttons/SubmitAppraisal";
+import AddExistingTasks from "../components/appraisal/buttons/AddExistingTasks";
+import CreateTask from "../components/task/buttons/CreateTask";
 
 const Appraisal = () => {
   const appraisals = useSelector((state: RootState) => state.store.appraisals);
@@ -18,7 +18,7 @@ const Appraisal = () => {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    localStorage.page = 7;
+    localStorage.page = 3;
     fetchTasks();
     fetchAppraisals();
   }, []);

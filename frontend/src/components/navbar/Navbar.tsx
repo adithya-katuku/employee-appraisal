@@ -1,12 +1,14 @@
 import { Flex, Heading, HStack } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../stores/store";
-import LogoutButton from "../../buttons/navbar/LogoutButton";
-import NotificationsButton from "../../buttons/navbar/NotificationsButton";
-import ProfileButton from "../../buttons/navbar/ProfileButton";
+import LogoutButton from "./buttons/LogoutButton";
+import NotificationsButton from "./buttons/NotificationsButton";
+import ProfileButton from "./buttons/ProfileButton";
 
 const Navbar = () => {
-  const isLoggedIn = useSelector((state: RootState) => state.store.loginState.isLoggedIn);
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.store.loginState.isLoggedIn
+  );
 
   return isLoggedIn ? (
     <Flex
@@ -22,7 +24,7 @@ const Navbar = () => {
       zIndex="2"
     >
       <Heading display={{ sm: "none" }}>O</Heading>
-      <Heading>Beesheets</Heading>
+      <Heading>BeeSheets</Heading>
 
       <HStack gap="3" mx="2">
         <NotificationsButton />

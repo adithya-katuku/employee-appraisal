@@ -32,10 +32,6 @@ public class AuthenticationController {
         return "Home page";
     }
 
-    @PostMapping("/register")
-    public EmployeeResponseDTO saveEmployee(@RequestBody Employee employee){
-        return loginService.saveEmployee(employee);
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){

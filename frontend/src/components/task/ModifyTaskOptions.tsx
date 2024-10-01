@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/react"
-import EditTask from "../../buttons/task/EditTask"
 import TaskModel from "../../models/TaskModel"
-import DeleteTask from "../../buttons/task/DeleteTask"
+import DeleteTask from "./buttons/DeleteTask"
+import EditTask from "./buttons/EditTask"
 
 const ModifyTaskOptions = (task:TaskModel) => {
   return (

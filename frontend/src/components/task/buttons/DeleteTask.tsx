@@ -2,7 +2,7 @@ import { Button } from "@chakra-ui/react";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
-import { deleteTask } from "../../stores/store";
+import { deleteTask } from "../../../stores/store";
 
 interface Props{
     taskId:number;

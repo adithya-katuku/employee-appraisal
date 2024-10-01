@@ -9,15 +9,15 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../stores/store";
-import TaskList from "../task/TaskList";
+import { RootState } from "../../../stores/store";
+import TaskList from "../../task/TaskList";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ExistingTasksModal = ({ isOpen, onClose}: Props) => {
+const ExistingTasksModal = ({ isOpen, onClose }: Props) => {
   const tasks = useSelector((state: RootState) => state.store.tasks);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -26,7 +26,9 @@ const ExistingTasksModal = ({ isOpen, onClose}: Props) => {
         <ModalHeader>Add Existing Tasks</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-            {tasks && <TaskList tasks={tasks.filter(task=>!task.appraisable)}/>}
+          {tasks && (
+            <TaskList tasks={tasks.filter((task) => !task.appraisable)} />
+          )}
         </ModalBody>
 
         <ModalFooter>

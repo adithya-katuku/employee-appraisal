@@ -14,7 +14,7 @@ import {
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, RootState } from "../stores/store";
+import { login, RootState, setSelectedPage } from "../stores/store";
 import { Navigate } from "react-router-dom";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { z } from "zod";
@@ -42,7 +42,7 @@ const LoginForm = () => {
   const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
   const dispatch = useDispatch();
-  const { options, setSelected } = usePaths();
+  const { options} = usePaths();
   const loginState = useSelector((state: RootState) => state.store.loginState);
 
   const generateCaptcha = async () => {
@@ -54,11 +54,13 @@ const LoginForm = () => {
       });
   };
   const prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
-  const path = options[prevpage].path;
+
+  const path = prevpage>=0?options[prevpage].path:options[0].path;
   useEffect(() => {
-    setSelected(prevpage);
+    dispatch(setSelectedPage(prevpage));
     generateCaptcha();
   }, []);
+  
   if (loginState.isLoggedIn) {
     return <Navigate to={path} />;
   }
@@ -70,11 +72,11 @@ const LoginForm = () => {
         refreshToken,
       })
       .then((res) => {
-        sessionStorage.setItem("jwt", res.data.jwtToken);
         loginWIthJwt(res.data.jwtToken);
       })
       .catch((err: AxiosError) => console.log(err));
   };
+
   const loginWIthJwt = (jwt: string) => {
     axios
       .get("http://localhost:8080/jwt-login", {

@@ -30,13 +30,8 @@ public class LoginService {
     @Autowired
     private CaptchaService captchaService;
     @Autowired
-    private EmployeeService employeeService;
-    @Autowired
     private RefreshTokenService refreshTokenService;
 
-    public EmployeeResponseDTO saveEmployee(Employee employee){
-        return employeeService.saveEmployee(employee);
-    }
 
     public AuthenticationResponseDTO handleLogin(LoginRequestDTO loginRequestDTO){
         if(!captchaService.verifyCaptcha(new CaptchaDTO(loginRequestDTO.captchaId(), loginRequestDTO.captchaAnswer()))){

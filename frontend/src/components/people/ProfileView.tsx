@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import EmployeeDetailsModel from "../../models/EmployeeDetailsModel";
 import { RootState } from "../../stores/store";
-import AdminEmployeeProfileView from "../admin/profile/AdminEmployeeProfileView";
+import AdminEmployeeProfileView from "../admin/people-profile/AdminEmployeeProfileView";
 import EmployeeDetails from "../employee/EmployeeDetails";
 
 interface Props {

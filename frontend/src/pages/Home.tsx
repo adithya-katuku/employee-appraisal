@@ -12,7 +12,7 @@ const Home = () => {
       <HStack mb="2">
         <IoHome />
         <ChevronRightIcon />
-        <Text>Home</Text>
+        <Text>Dashboard</Text>
       </HStack>
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, libero
       accusamus aperiam facilis nostrum quibusdam sed provident sequi deserunt

@@ -2,7 +2,7 @@ import { Box, Text, VStack } from "@chakra-ui/react";
 import EmployeeDetailsModel from "../../models/EmployeeDetailsModel";
 
 interface Props {
-  employeeDetails: EmployeeDetailsModel;
+  employeeDetails: EmployeeDetailsModel | undefined;
 }
 const EmployeeDetails = ({ employeeDetails }: Props) => {
   return employeeDetails ? (

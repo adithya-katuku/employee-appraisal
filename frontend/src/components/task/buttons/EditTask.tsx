@@ -1,7 +1,7 @@
 import { Button, useDisclosure } from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
-import EditTaskModal from "../../components/task/EditTaskModal";
-import TaskModel from "../../models/TaskModel";
+import TaskModel from "../../../models/TaskModel";
+import EditTaskModal from "../modals/EditTaskModal";
 
 const EditTask = (task: TaskModel) => {
   const { isOpen, onOpen, onClose } = useDisclosure();

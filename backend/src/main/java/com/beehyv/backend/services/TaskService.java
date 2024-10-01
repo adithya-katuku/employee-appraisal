@@ -129,16 +129,16 @@ public class TaskService {
 
     public void addAppraisableTasksToAppraisalForm(Integer employeeId, Appraisal appraisal) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if(employee!=null){
-            List<Task> tasks = taskRepo.findByEmployee(employee);
-            for(Task task: tasks){
-                if( task.getAppraisal()==null && task.isAppraisable()){
-                    task.setAppraisal(appraisal);
-                    taskRepo.save(task);
-                }
+        if(employee==null){
+            throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
+        }
+        List<Task> tasks = taskRepo.findByEmployee(employee);
+        for(Task task: tasks){
+            if( task.getAppraisal()==null && task.isAppraisable()){
+                task.setAppraisal(appraisal);
+                taskRepo.save(task);
             }
         }
-        throw  new ResourceNotFoundException("Employee with id "+employeeId+" is not found.");
     }
 
 

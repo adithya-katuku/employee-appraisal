@@ -74,6 +74,7 @@ public class AppraisalService {
     public List<AppraisalDTO> getAppraisals(Integer employeeId) {
         return appraisalRepo.findByEmployeeIdOrderByEndDateDesc(employeeId)
                 .stream()
+                .filter(appraisal -> appraisal.getAppraisalStatus()==AppraisalStatus.APPROVED)
                 .map(appraisal -> new AppraisalDTOMapper().apply(appraisal))
                 .toList();
     }
