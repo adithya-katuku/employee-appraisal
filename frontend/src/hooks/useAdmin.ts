@@ -7,7 +7,7 @@ import {
   setTasks,
 } from "../stores/store";
 import axios from "axios";
-import StartAppraisalModal from "../models/admin/StartAppraisalModal";
+import StartAppraisalModel from "../models/admin/StartAppraisalModel";
 
 const useAdmin = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
@@ -16,7 +16,7 @@ const useAdmin = () => {
 
   const startAppraisal = async (
     employeeId: number,
-    startAppraisal: StartAppraisalModal
+    startAppraisal: StartAppraisalModel
   ) => {
     await axios
       .put(

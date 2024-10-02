@@ -83,7 +83,8 @@ public class EmployeeService {
                 throw new InvalidInputException("Designation "+employeeRequestDTO.designation().name()+"does not exist. Attributes needs to be entered.");
             }
             designation = new Designation();
-            designation.setAttributes(employeeRequestDTO.designation().attributes());
+            List<Attribute> attributes = attributeRepo.saveOrFindAll(employeeRequestDTO.designation().attributes());
+            designation.setAttributes(attributes);
             designation = designationRepo.saveOrFind(designation);
         }
 
