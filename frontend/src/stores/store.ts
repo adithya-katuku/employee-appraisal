@@ -24,8 +24,10 @@ interface Store {
   searchedEmployees: EmployeeDetailsModel[] | undefined;
   searchedEmployeeDetails: EmployeeDetailsModel | undefined;
   notifications: NotificationModel[] | undefined;
-  selectedPage:number;
-  searchedName:string|undefined;
+  selectedPage: number;
+  searchedName: string | undefined;
+  attributes: string[];
+  designations: string[];
 }
 
 const initialState: Store = {
@@ -42,8 +44,10 @@ const initialState: Store = {
   searchedEmployees: undefined,
   searchedEmployeeDetails: undefined,
   notifications: undefined,
-  selectedPage:localStorage.page?JSON.parse(localStorage.page):0,
-  searchedName:undefined
+  selectedPage: localStorage.page ? JSON.parse(localStorage.page) : 0,
+  searchedName: undefined,
+  attributes: [],
+  designations: [],
 };
 
 export const slice = createSlice({
@@ -109,8 +113,14 @@ export const slice = createSlice({
     setSelectedPage: (state, action: PayloadAction<number>) => {
       state.selectedPage = action.payload;
     },
-    setSearchedName: (state, action: PayloadAction<string|undefined>) => {
+    setSearchedName: (state, action: PayloadAction<string | undefined>) => {
       state.searchedName = action.payload;
+    },
+    setAttributes: (state, action: PayloadAction<string[]>) => {
+      state.attributes = action.payload;
+    },
+    setDesignations: (state, action: PayloadAction<string[]>) => {
+      state.designations = action.payload;
     },
   },
 });
@@ -129,7 +139,9 @@ export const {
   clearSearchedEmployees,
   setNotifications,
   setSelectedPage,
-  setSearchedName
+  setSearchedName,
+  setAttributes,
+  setDesignations,
 } = slice.actions;
 
 export const store = configureStore({

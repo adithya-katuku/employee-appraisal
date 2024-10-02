@@ -30,7 +30,7 @@ const Appraisal = () => {
         <ChevronRightIcon />
         <Text>Appraisal</Text>
       </HStack>
-      {appraisals ? (
+      {appraisals && appraisals.length>0 ? (
         <Box>
           <Box my="1" p="2" pb="4" borderBottom="1px" borderColor="gray.500">
             <Text m="1" fontWeight="bold">
@@ -60,11 +60,11 @@ const Appraisal = () => {
             <Flex my="1" p="2" gap="2" alignItems="center">
               <Text fontWeight="bold">Status: </Text>
               <Text color="white" bg="green.500" rounded="md" p="1">
-                {appraisals && appraisals[index].appraisalStatus}
+                {appraisals && appraisals[index] && appraisals[index].appraisalStatus}
               </Text>
             </Flex>
           </Box>
-          {appraisals &&
+          {appraisals && appraisals[index] &&
             (appraisals[index].appraisalStatus === "APPROVED" ||
               appraisals[index].appraisalStatus === "REJECTED") && (
               <Box my="1" p="2" pb="4">
@@ -80,14 +80,14 @@ const Appraisal = () => {
             <Text m="1" fontWeight="bold">
               Tasks:
             </Text>
-            {appraisals &&
+            {appraisals && appraisals[index] &&
               appraisals[index].appraisalStatus === "INITIATED" && (
                 <Flex>
                   <CreateTask />
                   <AddExistingTasks />
                 </Flex>
               )}
-            {appraisals && tasks && (
+            {appraisals && appraisals[index] && tasks && (
               <TaskList
                 tasks={tasks.filter(
                   (task) => task.appraisalId === appraisals[index].id
@@ -96,7 +96,7 @@ const Appraisal = () => {
             )}
           </Box>
 
-          {appraisals && appraisals[index].appraisalStatus === "INITIATED" && (
+          {appraisals && appraisals[index] && appraisals[index].appraisalStatus === "INITIATED" && (
             <Flex
               my="1"
               p="2"

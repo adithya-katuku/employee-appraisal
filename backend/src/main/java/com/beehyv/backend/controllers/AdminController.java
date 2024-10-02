@@ -57,9 +57,22 @@ public class AdminController {
         return employeeService.getEmployee(employeeId);
     }
 
+    //CREATE EMPLOYEE:
     @PostMapping("/register")
     public EmployeeResponseDTO saveEmployee(@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO){
         return employeeService.registerEmployee(employeeRequestDTO);
+    }
+    @GetMapping("/all-designations")
+    public ResponseEntity<?> getAllDesignations(){
+        return new ResponseEntity<>(adminService.getAllDesignations(), HttpStatus.OK);
+    }
+    @PostMapping("/all-designations")
+    public ResponseEntity<?> saveDesignation(@Valid @RequestBody DesignationRequestDTO designationRequestDTO){
+        return new ResponseEntity<>(adminService.saveDesignation(designationRequestDTO), HttpStatus.OK);
+    }
+    @GetMapping("/all-attributes")
+    public ResponseEntity<?> getAllAttributes(){
+        return new ResponseEntity<>(adminService.getAllAttributes(), HttpStatus.OK);
     }
 
     //TASKS:
@@ -67,7 +80,6 @@ public class AdminController {
     public List<TaskResponseDTO> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
         return employeeService.getTasks(employeeId);
     }
-
 
     //NOTIFICATIONS:
     @PostMapping("/employee/{employeeId}/notifications")

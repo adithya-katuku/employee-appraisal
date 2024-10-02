@@ -15,7 +15,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MultiSelect,  SelectOnChange, useMultiSelect } from "chakra-multiselect";
 import {  useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { z } from "zod";
+import { RootState } from "../../../../stores/store";
+import useRegister from "../../../../hooks/useRegister";
 
 interface Props {
   isOpen: boolean;
@@ -30,21 +33,20 @@ const schema = z.object({
 type validForm = z.infer<typeof schema>;
 
 const NewDesignationModal = ({ isOpen, onClose }: Props) => {
-
-  const defaultAttributeOptions = [
-    { label: "Option1", value: "Option 1", key: "1" },
-    { label: "Option2", value: "Option 2", key: "2" },
-  ];
-
+  const existingAttributes = useSelector((state:RootState)=>state.store.attributes);
+  const defaultAttributeOptions = existingAttributes.map((attribute)=>{
+    return {
+      label:attribute,
+      value:attribute
+    }
+  });
   const { handleSubmit, setValue, reset, setError, formState:{errors}, register } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
-
   const { value, options, onChange } = useMultiSelect({
     value: [],
     options: defaultAttributeOptions,
   });
-
   const handleAttributeChange:SelectOnChange = (options)=>{
     onChange(options);
     const selectedAttributes = Array.isArray(options)?options.map(option=>option.value.toString()):[options.value.toString()];
@@ -60,8 +62,11 @@ const NewDesignationModal = ({ isOpen, onClose }: Props) => {
     }
   }
 
+  const {saveDesignation} = useRegister();
   const onSubmit = (data:validForm) => {
     console.log(data);
+    saveDesignation(data);
+    handleClose();
   };
   const handleClose = () => {
     onChange([]);
@@ -80,18 +85,17 @@ const NewDesignationModal = ({ isOpen, onClose }: Props) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>
             <FormControl maxW="50rem" isRequired my="3">
-              <FormLabel>Name:</FormLabel>
+              <FormLabel>Designation name:</FormLabel>
               <Input type="text" {...register("name")} />
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
-              <FormLabel>Select attributes:</FormLabel>
+              <FormLabel>Attributes:</FormLabel>
               <MultiSelect
+              placeholder="Select attributes"
                 options={options}
                 value={value}
-                onChange={handleAttributeChange}
+                onChange={handleAttributeChange} 
                 create
-                my="3"
-                maxH="2rem"
               />
             {errors.attributes && <Text color="red.400" >{errors.attributes.message}</Text>}
             </FormControl>

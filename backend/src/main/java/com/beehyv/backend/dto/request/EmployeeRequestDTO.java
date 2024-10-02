@@ -15,9 +15,8 @@ public record EmployeeRequestDTO(
         @Size(min = 3, message = "Name must be at least 3 characters long.")
         String name,
 
-        @Valid
-        @NotNull
-        DesignationRequestDTO designation,
+        @NotBlank
+        String designation,
 
         @NotBlank(message = "Email is required.")
         @Email(message = "Please provide a valid email address.")

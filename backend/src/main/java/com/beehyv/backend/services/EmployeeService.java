@@ -76,17 +76,17 @@ public class EmployeeService {
         employee.setPassword(passwordEncoder.encode(employeeRequestDTO.password()));
         employee.setRoles(employeeRequestDTO.roles());
         employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
-        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation().name());
-        if(designation==null){
-            if(employeeRequestDTO.designation().attributes()==null ||
-                    employeeRequestDTO.designation().attributes().isEmpty()){
-                throw new InvalidInputException("Designation "+employeeRequestDTO.designation().name()+"does not exist. Attributes needs to be entered.");
-            }
-            designation = new Designation();
-            List<Attribute> attributes = attributeRepo.saveOrFindAll(employeeRequestDTO.designation().attributes());
-            designation.setAttributes(attributes);
-            designation = designationRepo.saveOrFind(designation);
-        }
+        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
+//        if(designation==null){
+//            if(employeeRequestDTO.designation().attributes()==null ||
+//                    employeeRequestDTO.designation().attributes().isEmpty()){
+//                throw new InvalidInputException("Designation "+employeeRequestDTO.designation().name()+"does not exist. Attributes needs to be entered.");
+//            }
+//            designation = new Designation();
+//            List<Attribute> attributes = attributeRepo.saveOrFindAll(employeeRequestDTO.designation().attributes());
+//            designation.setAttributes(attributes);
+//            designation = designationRepo.saveOrFind(designation);
+//        }
 
         employee.setDesignation(designation);
         return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));

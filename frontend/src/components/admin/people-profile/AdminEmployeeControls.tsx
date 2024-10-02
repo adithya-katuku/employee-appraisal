@@ -5,7 +5,7 @@ import PreviousAppraisalsButton from "./buttons/PreviousAppraisalsButton";
 
 const AdminEmployeeControls = () => {
   return (
-    <Flex justifyContent="space-around">
+    <Flex justifyContent="space-around" gap="2">
       <PreviousAppraisalsButton />
       <ViewTasksButton />
 
