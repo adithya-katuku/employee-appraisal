@@ -1,5 +1,5 @@
 import { BellIcon } from "@chakra-ui/icons";
-import { Box, Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Flex, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import NotificationsModal from "../../notifications/NotificationsModal";
 import useNotifications from "../../../hooks/useNotifications";
 import { useEffect } from "react";
@@ -25,16 +25,35 @@ const NotificationsButton = () => {
       // fetchNotifications();
     }, 5000);
 
-    return () => clearInterval(intervalId); 
+    return () => clearInterval(intervalId);
   }, []);
   return (
-    <Box as="button" p="1" onClick={handleClick}>
-      <Flex border="1px" borderColor="gray.200" rounded= "md" >
-        <BellIcon fontSize="1.5rem" />
-        <Text mx="1" color={count>0?"red":"black"} >{count}</Text>
+    <VStack 
+      as="button"
+      onClick={handleClick}
+      rounded="50%"
+      h="3rem"
+      gap="0" 
+    >
+      <Flex h="0.8rem" justify="end" w="1.5rem" position="relative" overflow="visible">
+        {count>0 &&
+          <Text
+            fontSize="1rem"
+            h="1rem"
+            rounded="50%"
+            w="1rem"
+            color="red"
+            fontWeight="bold"
+            bg="white"
+            position="absolute"
+            top="0.3rem"
+          >
+            {count}
+          </Text> }
       </Flex>
+      <BellIcon fontSize="1.5rem" />
       <NotificationsModal isOpen={isOpen} onClose={onClose} />
-    </Box>
+    </VStack>
   );
 };
 

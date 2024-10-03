@@ -2,13 +2,9 @@ package com.beehyv.backend.controllers;
 
 
 import com.beehyv.backend.dto.request.LoginRequestDTO;
-import com.beehyv.backend.dto.request.RefreshTokenRequestDTO;
-import com.beehyv.backend.dto.response.EmployeeResponseDTO;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
-import com.beehyv.backend.models.Employee;
-import com.beehyv.backend.models.enums.Role;
-import com.beehyv.backend.services.authentication.LoginService;
-import com.beehyv.backend.services.authentication.RefreshTokenService;
+import com.beehyv.backend.userdetails.EmployeeDetails;
+import com.beehyv.backend.services.authentication.AuthenticationService;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,9 +20,7 @@ import java.util.Map;
 @RestController
 public class AuthenticationController {
     @Autowired
-    private LoginService loginService;
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private AuthenticationService authenticationService;
 
     @GetMapping("/home")
     public String home(){
@@ -34,8 +29,8 @@ public class AuthenticationController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
-        return new ResponseEntity<>(loginService.handleLogin(loginRequestDTO), HttpStatus.OK);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response){
+        return new ResponseEntity<>(authenticationService.handleLogin(loginRequestDTO, response), HttpStatus.OK);
     }
 
     @GetMapping("/jwt-login")
@@ -51,7 +46,21 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
-        return new ResponseEntity<>(refreshTokenService.refreshToken(refreshTokenRequestDTO), HttpStatus.OK);
+    public ResponseEntity<?> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response){
+        return new ResponseEntity<>(authenticationService.refreshToken(refreshToken, response), HttpStatus.OK);
+    }
+
+    @PostMapping("/log-out")
+    public ResponseEntity<?> logout(HttpServletResponse response){
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/refresh-token");
+        refreshCookie.setDomain("localhost");
+        refreshCookie.setMaxAge(0);
+
+        response.addCookie(refreshCookie);
+
+        return new ResponseEntity<>("Logged out", HttpStatus.OK);
     }
 }

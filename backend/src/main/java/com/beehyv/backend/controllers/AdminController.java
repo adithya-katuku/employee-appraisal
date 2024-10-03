@@ -4,13 +4,12 @@ import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.dto.request.*;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
-import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
+import com.beehyv.backend.services.userdetailsservice.EmployeeDetailsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

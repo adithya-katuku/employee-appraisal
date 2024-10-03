@@ -1,6 +1,6 @@
 package com.beehyv.backend.configurations.filters;
 
-import com.beehyv.backend.modeldetails.EmployeeDetails;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.services.authentication.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

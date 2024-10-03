@@ -3,7 +3,7 @@ package com.beehyv.backend.controllers;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.models.Attribute;
 import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AppraisalService;

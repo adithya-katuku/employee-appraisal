@@ -1,7 +1,7 @@
 package com.beehyv.backend.configurations;
 
 import com.beehyv.backend.configurations.filters.JwtFilter;
-import com.beehyv.backend.services.userdetails.EmployeeDetailsService;
+import com.beehyv.backend.services.userdetailsservice.EmployeeDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +41,7 @@ public class BeeConfiguration{
                 .cors(customizer->customizer.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers( "/login", "/captcha/**", "/refresh-token").permitAll()
+                        .requestMatchers( "/login", "/captcha/**", "/refresh-token", "/log-out").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

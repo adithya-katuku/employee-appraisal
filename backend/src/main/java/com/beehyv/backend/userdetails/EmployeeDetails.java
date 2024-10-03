@@ -1,4 +1,4 @@
-package com.beehyv.backend.modeldetails;
+package com.beehyv.backend.userdetails;
 
 import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.Role;

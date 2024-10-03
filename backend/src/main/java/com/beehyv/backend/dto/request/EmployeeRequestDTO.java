@@ -1,7 +1,6 @@
 package com.beehyv.backend.dto.request;
 
 import com.beehyv.backend.models.enums.Role;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.util.Date;

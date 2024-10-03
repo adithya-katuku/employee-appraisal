@@ -1,7 +1,7 @@
-package com.beehyv.backend.services.userdetails;
+package com.beehyv.backend.services.userdetailsservice;
 
 import com.beehyv.backend.exceptions.CustomAuthException;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.repositories.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;

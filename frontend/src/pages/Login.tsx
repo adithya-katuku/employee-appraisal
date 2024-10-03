@@ -42,7 +42,7 @@ const LoginForm = () => {
   const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
   const dispatch = useDispatch();
-  const { options} = usePaths();
+  const { options } = usePaths();
   const loginState = useSelector((state: RootState) => state.store.loginState);
 
   const generateCaptcha = async () => {
@@ -55,24 +55,17 @@ const LoginForm = () => {
   };
   const prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
 
-  const path = prevpage>=0?options[prevpage].path:options[0].path;
-  useEffect(() => {
-    dispatch(setSelectedPage(prevpage));
-    generateCaptcha();
-  }, []);
-  
-  if (loginState.isLoggedIn) {
-    return <Navigate to={path} />;
-  }
+  const path = prevpage >= 0 ? options[prevpage].path : options[0].path;
 
-  const refreshJwt = (refreshTokenId: number, refreshToken: string) => {
+  const refreshJwt = () => {
     axios
-      .post("http://localhost:8080/refresh-token", {
-        refreshTokenId,
-        refreshToken,
-      })
+      .post(
+        "http://localhost:8080/refresh-token",
+        {},
+        { withCredentials: true }
+      )
       .then((res) => {
-        loginWIthJwt(res.data.jwtToken);
+        loginWIthJwt(res.data.accessToken);
       })
       .catch((err: AxiosError) => console.log(err));
   };
@@ -95,16 +88,8 @@ const LoginForm = () => {
       })
       .catch((err: AxiosError) => {
         console.log(err);
-        refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
       });
   };
-  if (loginState.token) {
-    loginWIthJwt(loginState.token);
-  }
-  if (sessionStorage.refreshToken && sessionStorage.refreshTokenId) {
-    refreshJwt(sessionStorage.refreshTokenId, sessionStorage.refreshToken);
-  }
-
   const callToast = (
     title: string,
     description: string,
@@ -118,10 +103,22 @@ const LoginForm = () => {
       isClosable: true,
     });
   };
+  useEffect(() => {
+    dispatch(setSelectedPage(prevpage));
+    refreshJwt()
+    generateCaptcha();
+  }, []);
 
+  if (loginState.isLoggedIn) {
+    return <Navigate to={path} />;
+  }
   const onSubmit = async (data: FieldValues) => {
     await axios
-      .post("http://localhost:8080/login", { ...data, captchaId })
+      .post(
+        "http://localhost:8080/login",
+        { ...data, captchaId },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res.data);
         sessionStorage.setItem("refreshToken", res.data.refreshToken);

@@ -5,9 +5,11 @@ import useRegister from "../../../../hooks/useRegister";
 const NewDesignationButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {fetchAttributes}= useRegister();
-  const handleClick = () => {
-    fetchAttributes();
-    onOpen();
+  const handleClick = async() => {
+    await fetchAttributes().then(()=>{
+
+      onOpen();
+    });
   };
   return (
     <Box>

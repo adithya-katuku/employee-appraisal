@@ -7,7 +7,6 @@ import {
   FormLabel,
   HStack,
   Input,
-  Select,
   Text,
 } from "@chakra-ui/react";
 import { IoHome } from "react-icons/io5";
@@ -19,12 +18,8 @@ import { RootState } from "../stores/store";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  MultiSelect,
-  SelectOnChange,
-  useMultiSelect,
-} from "chakra-multiselect";
-
+import { MultiValue, SingleValue } from "react-select";
+import Select from "react-select";
 const schema = z.object({
   employeeId: z.number(),
   name: z.string(),
@@ -35,31 +30,43 @@ const schema = z.object({
   password: z.string(),
 });
 type validForm = z.infer<typeof schema>;
+
+interface Option {
+  label: string;
+  value: string;
+}
+
 const CreateUser = () => {
-  const designations = useSelector(
+  const existingDesignations = useSelector(
     (state: RootState) => state.store.designations
   );
-  const { register, setValue, handleSubmit, setError, reset,formState:{errors} } =
-    useForm<validForm>({ resolver: zodResolver(schema) });
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { errors },
+  } = useForm<validForm>({ resolver: zodResolver(schema) });
+
   const { fetchDesignations, saveUser } = useRegister();
   const existingRoles = ["ADMIN", "EMPLOYEE"];
-  const defaultAttributeOptions = existingRoles.map((role) => {
+  const roleOptions = existingRoles.map((role) => {
     return {
       label: role,
       value: role,
     };
   });
-  const { value, options, onChange } = useMultiSelect({
-    value: [],
-    options: defaultAttributeOptions,
+  const designationOptions = existingDesignations.map((designation) => {
+    return {
+      label: designation,
+      value: designation,
+    };
   });
-  const handleRoleChange: SelectOnChange = (options) => {
-    onChange(options);
-    const selectedRoles = Array.isArray(options)
-      ? options.map((option) => option.value.toString())
-      : [options.value.toString()];
-    setError("roles", {});
 
+  const handleRoleChange = (options: MultiValue<Option>) => {
+    const selectedRoles = options.map((option) => option.value);
+    setError("roles", {});
     if (selectedRoles.length > 0) {
       setValue("roles", [selectedRoles[0], ...selectedRoles.slice(1)]);
     } else {
@@ -68,14 +75,29 @@ const CreateUser = () => {
       });
     }
   };
+
+  const handleDesignationChange = (option: SingleValue<Option>) => {
+    if (option) {
+      setValue("designation", option.value);
+    } else {
+      reset({
+        designation: undefined,
+      });
+    }
+  };
   setValue("joiningDate", new Date().toISOString().split("T")[0]);
   useEffect(() => {
     // localStorage.page=4;
     fetchDesignations();
   }, []);
-  const onSubmit = (data: validForm) => {
-    saveUser(data);
+  const onSubmit = async (data: validForm) => {
     console.log(data);
+    await saveUser(data).then(()=>{
+      reset();
+    })
+    .catch(err=>{
+      console.log(err);
+    });
   };
   return (
     <Box>
@@ -88,7 +110,10 @@ const CreateUser = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl maxW="50rem" isRequired my="3">
             <FormLabel>Employee ID:</FormLabel>
-            <Input type="number" {...register("employeeId" , {valueAsNumber:true})} />
+            <Input
+              type="number"
+              {...register("employeeId", { valueAsNumber: true })}
+            />
           </FormControl>
           <FormControl maxW="50rem" isRequired my="3">
             <FormLabel>Full Name:</FormLabel>
@@ -106,26 +131,18 @@ const CreateUser = () => {
               <NewDesignationButton />
             </Flex>
             <Select
+              options={designationOptions}
+              onChange={handleDesignationChange}
               placeholder="Select designation"
-              {...register("designation")}
-            >
-              {designations.map((designation, index) => {
-                return (
-                  <option value={designation} key={index}>
-                    {designation}
-                  </option>
-                );
-              })}
-            </Select>
+            />
           </FormControl>
           <FormControl maxW="50rem" isRequired my="3">
             <FormLabel>Roles:</FormLabel>
-            <MultiSelect
-              placeholder="Select roles"
-              options={options}
-              value={value}
+            <Select
+              options={roleOptions}
+              isMulti
               onChange={handleRoleChange}
-              create
+              placeholder="Select roles"
             />
           </FormControl>
           <FormControl maxW="50rem" isRequired my="3">
@@ -136,7 +153,9 @@ const CreateUser = () => {
             <FormLabel>Password:</FormLabel>
             <Input type="password" {...register("password")} />
           </FormControl>
-          {errors.designation && <Text color="red" >{errors.designation.message}</Text>}
+          {errors.designation && (
+            <Text color="red">{errors.designation.message}</Text>
+          )}
           <Flex maxW="50rem" justify="center">
             <Button type="submit" mt="2">
               Save

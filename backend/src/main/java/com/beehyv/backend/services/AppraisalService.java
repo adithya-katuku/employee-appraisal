@@ -6,7 +6,6 @@ import com.beehyv.backend.dto.response.AppraisalDTO;
 import com.beehyv.backend.dto.response.AppraisalFormEntryDTO;
 import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
 import com.beehyv.backend.models.Appraisal;
 import com.beehyv.backend.models.Employee;
 import com.beehyv.backend.models.Notification;

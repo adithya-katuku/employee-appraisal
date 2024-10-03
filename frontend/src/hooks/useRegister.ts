@@ -67,10 +67,6 @@ const useRegister = () => {
       .then(() => {
         fetchDesignations();
       })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
-      });
   };
 
   return {fetchDesignations, fetchAttributes, saveDesignation, saveUser};

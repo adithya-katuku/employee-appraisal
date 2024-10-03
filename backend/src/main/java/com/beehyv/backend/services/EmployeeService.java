@@ -67,6 +67,9 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
+        if(employeeRepo.findByEmail(employeeRequestDTO.email())!=null){
+            throw  new InvalidInputException("Email is already in use. Try with a different email.");
+        }
         Employee employee = new Employee();
         employee.setEmployeeId(employeeRequestDTO.employeeId());
         employee.setName(employeeRequestDTO.name());
@@ -77,16 +80,9 @@ public class EmployeeService {
         employee.setRoles(employeeRequestDTO.roles());
         employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
         Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
-//        if(designation==null){
-//            if(employeeRequestDTO.designation().attributes()==null ||
-//                    employeeRequestDTO.designation().attributes().isEmpty()){
-//                throw new InvalidInputException("Designation "+employeeRequestDTO.designation().name()+"does not exist. Attributes needs to be entered.");
-//            }
-//            designation = new Designation();
-//            List<Attribute> attributes = attributeRepo.saveOrFindAll(employeeRequestDTO.designation().attributes());
-//            designation.setAttributes(attributes);
-//            designation = designationRepo.saveOrFind(designation);
-//        }
+        if(designation==null){
+            throw  new InvalidInputException("Designation is not saved yet. Kindly create designation with respective attributes first.");
+        }
 
         employee.setDesignation(designation);
         return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));

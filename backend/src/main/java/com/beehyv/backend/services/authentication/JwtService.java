@@ -1,12 +1,10 @@
 package com.beehyv.backend.services.authentication;
 
+import com.beehyv.backend.dto.custom.RefreshTokenDTO;
 import com.beehyv.backend.models.enums.Role;
-import com.beehyv.backend.modeldetails.EmployeeDetails;
-import com.beehyv.backend.models.Employee;
-import com.beehyv.backend.repositories.EmployeeRepo;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.services.AppraisalService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -24,8 +20,6 @@ import java.util.*;
 
 @Service
 public class JwtService {
-    @Autowired
-    private EmployeeRepo employeeRepo;
     @Autowired
     private AppraisalService appraisalService;
 
@@ -35,7 +29,7 @@ public class JwtService {
         SECRET_KEY = generateSecretKey();
     }
 
-    public String generateToken(EmployeeDetails employeeDetails){
+    public String generateAccessToken(EmployeeDetails employeeDetails){
         Map<String, Object> claims = new HashMap<>();
         claims.put("employee-id", employeeDetails.getEmployeeId().toString());
         claims.put("roles", employeeDetails.getRoles());
@@ -52,7 +46,14 @@ public class JwtService {
                 .signWith(getKey())
                 .compact();
     }
-
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis()+1000*60*15))
+                .signWith(getKey())
+                .compact();
+    }
 
     private SecretKey getKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -87,7 +88,7 @@ public class JwtService {
 
     public EmployeeDetails getEmployeeDetails(String token){
         Claims claims = extractAllClaims(token);
-        return new EmployeeDetails(extractEmployeeId(claims), extractUsername(claims), extractRoles(claims));
+        return new EmployeeDetails(extractEmployeeId(claims), extractUsername(token), extractRoles(claims));
     }
 
     public Integer extractEmployeeId(Claims claims){
@@ -95,7 +96,8 @@ public class JwtService {
         return Integer.valueOf(claimsEmployeeId.toString());
     }
 
-    public String extractUsername(Claims claims) {
+    public String extractUsername(String token) {
+        Claims claims = extractAllClaims(token);
         return claims.getSubject();
     }
 
