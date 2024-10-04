@@ -14,9 +14,6 @@ import java.util.Date;
 @Component
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer refreshTokenId;
-    private String token;
-    private Date expiry;
     private Integer employeeId;
+    private String token;
 }

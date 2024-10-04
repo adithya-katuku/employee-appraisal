@@ -13,8 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
@@ -39,10 +37,8 @@ public class AuthenticationController {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        Map<String, String> res = new HashMap<>();
 
-        res.put("role", employeeDetails.getRoles().stream().max((r1, r2)->r1.ordinal()-r2.ordinal()).get().toString().toLowerCase());
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(authenticationService.handleJwtLogin(employeeDetails), HttpStatus.OK);
     }
 
     @PostMapping("/refresh-token")
@@ -52,14 +48,11 @@ public class AuthenticationController {
 
     @PostMapping("/log-out")
     public ResponseEntity<?> logout(HttpServletResponse response){
-        Cookie refreshCookie = new Cookie("refreshToken", null);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/refresh-token");
-        refreshCookie.setDomain("localhost");
-        refreshCookie.setMaxAge(0);
-
-        response.addCookie(refreshCookie);
+        EmployeeDetails employeeDetails = (EmployeeDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        authenticationService.handleLogout(response, employeeDetails.getEmployeeId());
 
         return new ResponseEntity<>("Logged out", HttpStatus.OK);
     }

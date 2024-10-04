@@ -23,9 +23,13 @@ const Navbar = () => {
       bg="white"
       zIndex="2"
     >
-      <Heading display={{ sm: "none" }}>O</Heading>
-      <Heading>BeeSheets</Heading>
+      {/* <Heading display={{ sm: "none" }}>O</Heading> */}
 
+      <Flex>
+        <Heading color="blue.600">Bee</Heading>
+        <Heading color="green.600">Hyv</Heading>
+      </Flex>
+      
       <HStack gap="3" mx="2">
         <NotificationsButton />
 

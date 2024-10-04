@@ -34,6 +34,8 @@ public class BeeConfiguration{
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
     private JwtFilter jwtFilter;
+    @Autowired
+    private CustomLogoutHandler customLogoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,11 +43,12 @@ public class BeeConfiguration{
                 .cors(customizer->customizer.configurationSource(configurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers( "/login", "/captcha/**", "/refresh-token", "/log-out").permitAll()
+                        .requestMatchers( "/login", "/captcha/**", "/refresh-token").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 

@@ -1,10 +1,10 @@
 interface TaskModel {
-  taskId: number;
+  taskId?: number;
   taskTitle: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
-  appraisable: boolean;
+  startDate: string;
+  endDate: string;
+  appraisable?: boolean;
   selfRating?: number;
   adminRating?: number;
   appraisalId?: number;

@@ -35,7 +35,7 @@ const NotificationsButton = () => {
       h="3rem"
       gap="0" 
     >
-      <Flex h="0.8rem" justify="end" w="1.5rem" position="relative" overflow="visible">
+      <Flex h="0.8rem" justify="end" w="2rem" position="relative" overflow="visible">
         {count>0 &&
           <Text
             fontSize="1rem"

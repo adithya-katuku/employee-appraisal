@@ -16,13 +16,11 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import TaskModel from "../../../models/TaskModel";
-import { useDispatch } from "react-redux";
-import { updateTask } from "../../../stores/store";
+import useTasks from "../../../hooks/useTasks";
 
 interface Props {
   isOpen: boolean;
@@ -40,7 +38,7 @@ const schema = z.object({
   selfRating: z
     .preprocess(
       (value) => (typeof value === "string" ? parseFloat(value) : value),
-      z.number().positive().max(10).nullable()
+      z.number().positive().max(10)
     )
     .optional(),
 });
@@ -48,9 +46,10 @@ const schema = z.object({
 type validForm = z.infer<typeof schema>;
 
 const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
-  const [isAppraisable, setIsAppraisable] = useState(task.appraisable);
-  const dispatch = useDispatch();
-
+  const [isAppraisable, setIsAppraisable] = useState<boolean | undefined>(
+    false
+  );
+  const { editTask } = useTasks();
   const {
     register,
     handleSubmit,
@@ -63,29 +62,29 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
     setIsAppraisable(!isAppraisable);
   };
 
-  setValue("taskId", task.taskId);
-  setValue("taskTitle", task.taskTitle);
-  setValue("description", task.description);
-  setValue("startDate", new Date(task.startDate).toISOString().split("T")[0]);
-  setValue("endDate", new Date(task.endDate).toISOString().split("T")[0]);
-  setValue("appraisable", task.appraisable);
-  setValue("selfRating", task.selfRating);
+  useEffect(() => {
+    setIsAppraisable(task.appraisable);
+    setValue("taskId", task.taskId);
+    setValue("taskTitle", task.taskTitle);
+    setValue("description", task.description);
+    setValue("startDate", new Date(task.startDate).toISOString().split("T")[0]);
+    setValue("endDate", new Date(task.endDate).toISOString().split("T")[0]);
+    setValue("appraisable", task.appraisable);
+    setValue("selfRating", task.selfRating);
+  }, [
+    isOpen,
+    setValue,
+    task.appraisable,
+    task.description,
+    task.endDate,
+    task.selfRating,
+    task.startDate,
+    task.taskId,
+    task.taskTitle,
+  ]);
 
-  const onSubmit = async (data: FieldValues) => {
-    await axios
-      .put("http://localhost:8080/" + localStorage.role + "/tasks", data, {
-        headers: {
-          Authorization: "Bearer " + sessionStorage.jwt,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        dispatch(updateTask(res.data));
-        setIsAppraisable(res.data.appraisable);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const onSubmit = async (data: validForm) => {
+    editTask(data);
     handleClose();
   };
 

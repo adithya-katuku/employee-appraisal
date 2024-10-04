@@ -1,7 +1,9 @@
 package com.beehyv.backend.services.authentication;
 
-import com.beehyv.backend.dto.custom.RefreshTokenDTO;
+import com.beehyv.backend.exceptions.CustomAuthException;
+import com.beehyv.backend.models.RefreshToken;
 import com.beehyv.backend.models.enums.Role;
+import com.beehyv.backend.repositories.RefreshTokenRepo;
 import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.services.AppraisalService;
 import io.jsonwebtoken.Claims;
@@ -9,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -22,6 +25,10 @@ import java.util.*;
 public class JwtService {
     @Autowired
     private AppraisalService appraisalService;
+    @Autowired
+    private RefreshTokenRepo refreshTokenRepo;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
     private String SECRET_KEY = "";
 
@@ -35,7 +42,7 @@ public class JwtService {
         claims.put("roles", employeeDetails.getRoles());
 
         if(!employeeDetails.getRoles().contains(Role.ADMIN)){
-            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails.getPreviousAppraisalDate(), employeeDetails.getAppraisalEligibility(), employeeDetails.getEmployeeId());
+            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails);
         }
 
         return Jwts.builder()
@@ -46,13 +53,36 @@ public class JwtService {
                 .signWith(getKey())
                 .compact();
     }
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(EmployeeDetails employeeDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("employee-id", employeeDetails.getEmployeeId().toString());
+        Date issueTime = new Date(System.currentTimeMillis());
+        Date expiryTime = new Date(System.currentTimeMillis()+1000*60*60*24);
+        storeRefreshToken(employeeDetails, issueTime, expiryTime);
+
         return Jwts.builder()
-                .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+1000*60*15))
+                .claims(claims)
+                .subject(employeeDetails.getUsername())
+                .issuedAt(issueTime)
+                .expiration(expiryTime)
                 .signWith(getKey())
                 .compact();
+    }
+
+    public void storeRefreshToken(EmployeeDetails employeeDetails, Date issueTime, Date expiryTime){
+        String refreshToken = Jwts.builder()
+                .subject(employeeDetails.getUsername())
+                .issuedAt(issueTime)
+                .expiration(expiryTime)
+                .signWith(getKey())
+                .compact();
+        RefreshToken token = refreshTokenRepo.findById(employeeDetails.getEmployeeId()).orElse(null);
+        if(token==null){
+            token = new RefreshToken();
+            token.setEmployeeId(employeeDetails.getEmployeeId());
+        }
+        token.setToken(bCryptPasswordEncoder.encode(refreshToken));
+        refreshTokenRepo.save(token);
     }
 
     private SecretKey getKey() {
@@ -78,14 +108,38 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isValid(String token){
-        Claims claims = extractAllClaims(token);
+    public boolean isValidAccessToken(String accessToken){
+        Claims claims = extractAllClaims(accessToken);
+
         if(claims!=null){
             return claims.getExpiration().after(new Date());
         }
         return false;
     }
-
+    public boolean isValidRefreshToken(String refreshToken){
+        Claims claims = extractAllClaims(refreshToken);
+        if(claims==null){
+           throw new CustomAuthException("Refresh token is not valid.");
+        }
+        Integer employeeId = extractEmployeeId(claims);
+        RefreshToken token = refreshTokenRepo.findById(employeeId).orElse(null);
+        if(token == null){
+            throw new CustomAuthException("Refresh token is not found. Please login again to continue.");
+        }
+        String storedToken = Jwts.builder()
+                .subject(claims.getSubject())
+                .issuedAt(claims.getIssuedAt())
+                .expiration(claims.getExpiration())
+                .signWith(getKey())
+                .compact();
+        if(!bCryptPasswordEncoder.matches(storedToken, token.getToken())){
+            throw new CustomAuthException("Refresh token is not valid.");
+        }
+        return claims.getExpiration().after(new Date());
+    }
+    public void deleteRefreshToken(Integer employeeId) {
+        refreshTokenRepo.findById(employeeId).ifPresent(refreshToken -> refreshTokenRepo.delete(refreshToken));
+    }
     public EmployeeDetails getEmployeeDetails(String token){
         Claims claims = extractAllClaims(token);
         return new EmployeeDetails(extractEmployeeId(claims), extractUsername(token), extractRoles(claims));
@@ -111,5 +165,6 @@ public class JwtService {
         }
         return roles;
     }
+
 
 }

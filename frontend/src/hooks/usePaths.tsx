@@ -7,45 +7,63 @@ import { IoMdPersonAdd } from "react-icons/io";
 
 const usePaths = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
-  const options = [
+  const employeeRoutes = [
     {
       name: "Dashboard",
-      path: `/${loginState.role}/home`,
+      path: `/employee/home`,
       icon: <MdDashboard color="rgb(0, 50, 200)" />,
     },
     {
       name: "Tasks",
-      path: `/${loginState.role}/tasks`,
+      path: `/employee/tasks`,
       icon: <FaTasks color="rgb(0, 50, 200)" />,
     },
     {
       name: "People",
-      path: `/${loginState.role}/people`,
+      path: `/employee/people`,
       icon: <FaUserGroup color="rgb(0, 50, 200)" />,
     },
-    loginState.role === "admin"
-      ? {
-          name: "Appraisal Requests",
-          path: `/${loginState.role}/appraisal-requests`,
-          icon: <MdRateReview color="rgb(0, 50, 200)" />,
-        }
-      : {
-          name: "Appraisal",
-          path: `/${loginState.role}/appraisal`,
-          icon: <MdRateReview color="rgb(0, 50, 200)" />,
-        },
+    {
+      name: "Appraisals",
+      path: `/employee/appraisals`,
+      icon: <MdRateReview color="rgb(0, 50, 200)" />,
+    },
   ];
 
-  if(loginState.role === "admin"){
-    options.push(
-      {
-        name: "Create User",
-        path: `/${loginState.role}/create-user`,
-        icon: <IoMdPersonAdd color="rgb(0, 50, 200)" />,
-      }
-    )
+  const adminRoutes = [
+    {
+      name: "Dashboard",
+      path: `/admin/home`,
+      icon: <MdDashboard color="rgb(0, 50, 200)" />,
+    },
+    {
+      name: "Tasks",
+      path: `/admin/tasks`,
+      icon: <FaTasks color="rgb(0, 50, 200)" />,
+    },
+    {
+      name: "People",
+      path: `/admin/people`,
+      icon: <FaUserGroup color="rgb(0, 50, 200)" />,
+    },
+    {
+      name: "Appraisal Requests",
+      path: `/admin/appraisal-requests`,
+      icon: <MdRateReview color="rgb(0, 50, 200)" />,
+    },
+    {
+      name: "Create User",
+      path: `/admin/create-user`,
+      icon: <IoMdPersonAdd color="rgb(0, 50, 200)" />,
+    }
+  ];
+  let options = [];
+  if(loginState.role==="admin"){
+    options = adminRoutes;
   }
-
+  else{
+    options = employeeRoutes;
+  }
   return { options };
 };
 

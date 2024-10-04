@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String token = header.substring(7);
 
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                    if (jwtService.isValid(token)) {
+                    if (jwtService.isValidAccessToken(token)) {
                         EmployeeDetails employeeDetails = jwtService.getEmployeeDetails(token);
                         UsernamePasswordAuthenticationToken authenticationToken
                                 = new UsernamePasswordAuthenticationToken(employeeDetails, null, employeeDetails.getAuthorities());

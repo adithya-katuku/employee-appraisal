@@ -16,6 +16,8 @@ interface LoginState {
 
 interface Store {
   employeeId: number | undefined;
+  url: string;
+  captchaId: number;
   loginState: LoginState;
   tasks: TaskModel[] | undefined;
   appraisals: AppraisalModel[] | undefined;
@@ -32,6 +34,8 @@ interface Store {
 
 const initialState: Store = {
   employeeId: undefined,
+  url: "",
+  captchaId: 0,
   loginState: {
     isLoggedIn: false,
     role: "",
@@ -54,6 +58,12 @@ export const slice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    setCaptchaId: (state, action: PayloadAction<number>) => {
+      state.captchaId = action.payload;
+    },
+    setUrl: (state, action: PayloadAction<string>) => {
+      state.url = action.payload;
+    },
     login: (state, action: PayloadAction<LoginState>) => {
       state.loginState.isLoggedIn = action.payload.isLoggedIn;
       state.loginState.role = action.payload.role;
@@ -62,7 +72,10 @@ export const slice = createSlice({
     setTasks: (state, action: PayloadAction<TaskModel[]>) => {
       state.tasks = action.payload;
     },
-    addTask: (state, action: PayloadAction<TaskModel>) => {
+    setEmployeeId: (state, action: PayloadAction<number>) => {
+      state.employeeId = action.payload;
+    },
+    appendTask: (state, action: PayloadAction<TaskModel>) => {
       state.tasks = state.tasks
         ? [action.payload, ...state.tasks]
         : [action.payload];
@@ -126,9 +139,12 @@ export const slice = createSlice({
 });
 
 export const {
+  setCaptchaId,
+  setUrl,
   login,
+  setEmployeeId,
   setTasks,
-  addTask,
+  appendTask,
   updateTask,
   deleteTask,
   setAppraisals,

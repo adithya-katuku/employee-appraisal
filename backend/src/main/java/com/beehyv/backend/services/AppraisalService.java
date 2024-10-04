@@ -13,6 +13,7 @@ import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.models.enums.AppraisalEligibility;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.repositories.AppraisalRepo;
+import com.beehyv.backend.userdetails.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,14 @@ public class AppraisalService {
     @Autowired
     EmployeeService employeeService;
 
-    public void checkIfEmployeeEligibleForAppraisal(Date previousAppraisalDate, AppraisalEligibility appraisalEligibility, Integer employeeId) {
+    public void checkIfEmployeeEligibleForAppraisal(EmployeeDetails employeeDetails) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.YEAR, -1);
-        if (previousAppraisalDate.before(calendar.getTime()) && appraisalEligibility == AppraisalEligibility.NOT_ELIGIBLE) {
+        Integer employeeId = employeeDetails.getEmployeeId();
+        Date previousAppraisalDate = employeeDetails.getPreviousAppraisalDate();
 
+        if (previousAppraisalDate.before(calendar.getTime()) && employeeDetails.getAppraisalEligibility() == AppraisalEligibility.NOT_ELIGIBLE) {
             String title = "Pending Appraisal";
             String description = "Employee " + employeeId + " is eligible for appraisal.";
             notifyAdmins(employeeId, title, description);

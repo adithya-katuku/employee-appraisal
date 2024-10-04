@@ -11,16 +11,14 @@ import {
   Flex,
   AlertStatus,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { login, RootState, setSelectedPage } from "../stores/store";
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import {  RootState } from "../stores/store";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { z } from "zod";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import usePaths from "../hooks/usePaths";
+import useAuth from "../hooks/useAuth";
 
 interface response {
   detail: string;
@@ -38,58 +36,12 @@ const LoginForm = () => {
   const { register, handleSubmit } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
-  const [url, setUrl] = useState("");
-  const [captchaId, setCaptchaId] = useState(0);
   const toast = useToast();
-  const dispatch = useDispatch();
-  const { options } = usePaths();
+  const { refreshJwt, redirect, generateCaptcha, loginWithCredentials } =
+    useAuth();
   const loginState = useSelector((state: RootState) => state.store.loginState);
+  const url = useSelector((state: RootState) => state.store.url);
 
-  const generateCaptcha = async () => {
-    await axios
-      .get("http://localhost:8080/captcha/generate-captcha")
-      .then(({ data }) => {
-        setUrl(`data:image/png;base64,${data.captcha}`);
-        setCaptchaId(data.captchaId);
-      });
-  };
-  const prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
-
-  const path = prevpage >= 0 ? options[prevpage].path : options[0].path;
-
-  const refreshJwt = () => {
-    axios
-      .post(
-        "http://localhost:8080/refresh-token",
-        {},
-        { withCredentials: true }
-      )
-      .then((res) => {
-        loginWIthJwt(res.data.accessToken);
-      })
-      .catch((err: AxiosError) => console.log(err));
-  };
-
-  const loginWIthJwt = (jwt: string) => {
-    axios
-      .get("http://localhost:8080/jwt-login", {
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      })
-      .then((res) => {
-        localStorage.role = res.data.role;
-        const newLoginState = {
-          isLoggedIn: true,
-          role: res.data.role,
-          token: jwt,
-        };
-        dispatch(login(newLoginState));
-      })
-      .catch((err: AxiosError) => {
-        console.log(err);
-      });
-  };
   const callToast = (
     title: string,
     description: string,
@@ -104,42 +56,57 @@ const LoginForm = () => {
     });
   };
   useEffect(() => {
-    dispatch(setSelectedPage(prevpage));
-    refreshJwt()
-    generateCaptcha();
+    const authFun = async () => {
+      try {
+        await refreshJwt();
+      } catch {
+        generateCaptcha();
+      }
+    };
+
+    if (loginState.isLoggedIn) {
+      redirect();
+    } else {
+      authFun();
+    }
   }, []);
 
-  if (loginState.isLoggedIn) {
-    return <Navigate to={path} />;
-  }
-  const onSubmit = async (data: FieldValues) => {
-    await axios
-      .post(
-        "http://localhost:8080/login",
-        { ...data, captchaId },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res.data);
-        sessionStorage.setItem("refreshToken", res.data.refreshToken);
-        sessionStorage.setItem("refreshTokenId", res.data.refreshTokenId);
-        const newLoginState = {
-          isLoggedIn: true,
-          role: res.data.role,
-          token: res.data.jwtToken,
-        };
-        dispatch(login(newLoginState));
-        callToast("Login Successful", "You are now logged in.", "success");
-      })
-      .catch((err: AxiosError<response>) => {
-        console.log(err);
-        callToast(
-          "Login Failed",
-          err.response ? err.response.data.detail : "Login failed",
-          "error"
-        );
-        generateCaptcha();
-      });
+  const onSubmit = async (data: validForm) => {
+    try {
+      loginWithCredentials(data);
+    } catch (err:response) {
+      callToast(
+        "Login Failed",
+        err.message,
+        "error"
+      );
+      generateCaptcha();
+    }
+    // await axios
+    //   .post(
+    //     "http://localhost:8080/login",
+    //     { ...data, captchaId },
+    //     { withCredentials: true }
+    //   )
+    //   .then((res) => {
+    //     const newLoginState = {
+    //       isLoggedIn: true,
+    //       role: res.data.role,
+    //       token: res.data.accessToken,
+    //     };
+    //     dispatch(login(newLoginState));
+    //     callToast("Login Successful", "You are now logged in.", "success");
+    //     redirect();
+    //   })
+    //   .catch((err: AxiosError<response>) => {
+    //     console.log(err);
+    //     callToast(
+    //       "Login Failed",
+    //       err.response ? err.response.data.detail : "Login failed",
+    //       "error"
+    //     );
+    //     generateCaptcha();
+    //   });
   };
 
   return (

@@ -87,9 +87,10 @@ const CreateUser = () => {
   };
   setValue("joiningDate", new Date().toISOString().split("T")[0]);
   useEffect(() => {
-    // localStorage.page=4;
+    localStorage.page=4;
     fetchDesignations();
   }, []);
+  
   const onSubmit = async (data: validForm) => {
     console.log(data);
     await saveUser(data).then(()=>{
@@ -99,6 +100,7 @@ const CreateUser = () => {
       console.log(err);
     });
   };
+
   return (
     <Box>
       <HStack mb="2">

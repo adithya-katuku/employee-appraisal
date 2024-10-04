@@ -17,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Service
 public class AuthenticationService {
@@ -43,7 +46,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponseDTO refreshToken(String refreshToken, HttpServletResponse response) {
-        if(!jwtService.isValid(refreshToken)){
+        if(!jwtService.isValidRefreshToken(refreshToken)){
             throw new CustomAuthException("Refresh token has expired!");
         }
         String username = jwtService.extractUsername(refreshToken);
@@ -59,15 +62,40 @@ public class AuthenticationService {
                 .orElse(Role.EMPLOYEE)
                 .name()
                 .toLowerCase();
-        String refreshToken = jwtService.generateRefreshToken(employeeDetails.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(employeeDetails);
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         refreshCookie.setPath("/refresh-token");
-        refreshCookie.setMaxAge(7 * 24 * 60 * 60);
+        refreshCookie.setMaxAge(24 * 60 * 60);
         refreshCookie.setDomain("localhost");
         response.addCookie(refreshCookie);
         return new AuthenticationResponseDTO(accessToken, role);
     }
 
+    public Object handleJwtLogin(EmployeeDetails employeeDetails) {
+        Map<String, String> res = new HashMap<>();
+
+        res.put("role", employeeDetails.getRoles().stream()
+                .max((r1, r2)->r1.ordinal()-r2.ordinal())
+                .get()
+                .toString()
+                .toLowerCase());
+        res.put("employeeId", employeeDetails.getEmployeeId().toString());
+
+        return res;
+    }
+
+    public void handleLogout(HttpServletResponse response, Integer employeeId) {
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/refresh-token");
+        refreshCookie.setDomain("localhost");
+        refreshCookie.setMaxAge(0);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        jwtService.deleteRefreshToken(employeeId);
+        response.addCookie(refreshCookie);
+    }
 }

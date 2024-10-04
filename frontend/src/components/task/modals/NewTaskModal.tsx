@@ -16,12 +16,10 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import {  useForm } from "react-hook-form";
 import { z } from "zod";
-import { addTask } from "../../../stores/store";
+import useTasks from "../../../hooks/useTasks";
 
 interface Props {
   isOpen: boolean;
@@ -47,8 +45,7 @@ type validForm = z.infer<typeof schema>;
 
 const NewTaskModal = ({ isOpen, onClose }: Props) => {
   const [isAppraisable, setIsAppraisable] = useState(false);
-
-  const dispatch = useDispatch();
+  const {addTask} = useTasks();
 
   const {
     register,
@@ -61,20 +58,8 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
     setIsAppraisable(!isAppraisable);
   };
 
-  const onSubmit = async (data: FieldValues) => {
-    await axios
-      .post("http://localhost:8080/" + localStorage.role + "/tasks", data, {
-        headers: {
-          Authorization: "Bearer " + sessionStorage.jwt,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        dispatch(addTask(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const onSubmit = async (data: validForm) => {
+    addTask(data)
     handleClose();
   };
   // console.log();
