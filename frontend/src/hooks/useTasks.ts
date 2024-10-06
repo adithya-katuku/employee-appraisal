@@ -32,7 +32,7 @@ const useTasks = () => {
 
   const addTask = async (task:TaskModel) => {
     await axios
-      .post("http://localhost:8080/" + localStorage.role + "/tasks", task, {
+      .post("http://localhost:8080/" + loginState.role + "/tasks", task, {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -47,7 +47,7 @@ const useTasks = () => {
 
   const editTask = async (task:TaskModel) => {
     await axios
-      .put("http://localhost:8080/" + localStorage.role + "/tasks", task, {
+      .put("http://localhost:8080/" + loginState.role + "/tasks", task, {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },

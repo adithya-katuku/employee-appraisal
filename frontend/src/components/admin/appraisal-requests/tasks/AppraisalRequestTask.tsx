@@ -32,7 +32,7 @@ const AppraisalRequestTask = ({ task, appraisalId }: Props) => {
         {task.description}
       </Text>
       <Text fontSize="sm">Self Rating: {task.selfRating} / 10</Text>
-      {task.adminRating && task.adminRating >= 0 && (
+      {task.adminRating && (
         <Text fontSize="sm">Admin Rating: {task.adminRating} / 10</Text>
       )}
     </Box>

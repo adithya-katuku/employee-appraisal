@@ -5,4 +5,5 @@ export default interface EmployeeDetailsModel{
     email: string;
     joiningDate: Date;
     appraisalEligibility: string;
+    previousAppraisalDate?: string;
 }

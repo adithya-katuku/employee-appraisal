@@ -28,14 +28,6 @@ public class Designation {
     @JsonIgnore
     private List<Employee> employees = new ArrayList<>();
 
-    public Designation(String designation){
-        this.designation = designation;
-    }
-
-    public Designation(String designation, List<Attribute> attributes){
-        this.designation = designation;
-        this.attributes = attributes;
-    }
 
     @Override
     public String toString() {

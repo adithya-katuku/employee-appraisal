@@ -4,6 +4,7 @@ import com.beehyv.backend.models.embeddable.AttributeDAO;
 import com.beehyv.backend.models.enums.AppraisalStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -23,7 +24,7 @@ public class Appraisal {
     private Integer adminId;
     private Integer employeeId;
     private AppraisalStatus appraisalStatus = AppraisalStatus.PENDING;
-    private Double rating = (double) 0;
+    private Double rating;
     private Date startDate;
     private Date endDate;
 

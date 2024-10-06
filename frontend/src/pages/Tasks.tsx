@@ -24,7 +24,7 @@ const Tasks = () => {
         <ChevronRightIcon />
         <Text>Tasks</Text>
       </HStack>
-      <Box>{tasks && <TaskList tasks={tasks} />}</Box>
+      <Flex justifyContent="center">{tasks && <TaskList tasks={tasks} />}</Flex>
 
       <Flex justifyContent="end" position="sticky" bottom="3">
         <AddTask />

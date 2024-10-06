@@ -50,7 +50,7 @@ public class TaskService {
             task.setAppraisable(taskRequestDTO.appraisable());
             task.setStartDate(taskRequestDTO.startDate());
             task.setEndDate(taskRequestDTO.endDate());
-
+            task.setAdminRating(null);
             if(taskRequestDTO.appraisable()){
                 task.setSelfRating(taskRequestDTO.selfRating());
                 Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.INITIATED);
@@ -85,16 +85,21 @@ public class TaskService {
         task.setAppraisable(taskRequestDTO.appraisable());
         task.setStartDate(taskRequestDTO.startDate());
         task.setEndDate(taskRequestDTO.endDate());
+
         if(taskRequestDTO.appraisable()){
             task.setSelfRating(taskRequestDTO.selfRating());
-            Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.INITIATED);
-            task.setAppraisal(appraisal);
+            if(task.getAppraisal()==null){
+                Appraisal appraisal = appraisalRepo.findByEmployeeIdAndAppraisalStatus(employeeId, AppraisalStatus.INITIATED);
+                task.setAppraisal(appraisal);
+            }
         }
         else{
+            task.setSelfRating(null);
             task.setAppraisal(null);
         }
         return new TaskResponseDTOMapper().apply(taskRepo.save(task));
     }
+
     public TaskResponseDTO rateTaskBySelf(Integer taskId, Double taskRating){
         Task task = taskRepo.findById(taskId).orElse(null);
         if(task!=null){

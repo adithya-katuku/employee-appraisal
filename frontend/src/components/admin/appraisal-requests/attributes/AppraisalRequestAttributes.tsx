@@ -13,7 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import useData from "../../../../hooks/useData";
+import useAdmin from "../../../../hooks/useAdmin";
 
 interface Props {
   appraisalId: number;
@@ -35,11 +35,11 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
     resolver: zodResolver(attributesSchema),
   });
 
-  const { rateAttributes } = useData();
+  const { rateAttributes, fetchAppraisalRequestDetails } = useAdmin();
 
-  const onSubmit = (data: validForm) => {
-    console.log("here", data);
-    rateAttributes({ appraisalId: appraisalId, attributes: data.attributes });
+  const onSubmit = async(data: validForm) => {
+    await rateAttributes({ appraisalId: appraisalId, attributes: data.attributes });
+    fetchAppraisalRequestDetails(appraisalId);
   };
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
         setValue(`attributes.${index}.name`, attribute.name);
         setValue(
           `attributes.${index}.rating`,
-          attribute.rating >= 0 ? attribute.rating : 0
+          attribute.rating ? attribute.rating : 0
         );
       });
     }

@@ -10,11 +10,15 @@ import {
 } from "../stores/store";
 import { useNavigate } from "react-router-dom";
 import usePaths from "./usePaths";
+import { AlertStatus, useToast } from "@chakra-ui/react";
 
 interface loginForm {
   email: string;
   password: string;
   captchaAnswer: string;
+}
+interface errorResponse {
+  detail: string;
 }
 const useAuth = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
@@ -23,6 +27,20 @@ const useAuth = () => {
   const channel = useBroadcast();
   const dispatch = useDispatch();
   const { options } = usePaths();
+  const toast = useToast();
+  const callToast = (
+    title: string,
+    description: string,
+    status: AlertStatus
+  ) => {
+    toast({
+      title: title,
+      description: description,
+      status: status,
+      duration: 3000,
+      isClosable: true,
+    });
+  };
 
   const refreshJwt = async () => {
     const res = await axios.post(
@@ -61,25 +79,35 @@ const useAuth = () => {
         dispatch(setCaptchaId(data.captchaId));
       });
   };
-  const loginWithCredentials = async ({email, password, captchaAnswer}: loginForm) => {
-    try{
-
-        const res = await axios.post(
-          "http://localhost:8080/login",
-          { email, password, captchaAnswer, captchaId },
-          { withCredentials: true }
-        );
+  const loginWithCredentials = async ({
+    email,
+    password,
+    captchaAnswer,
+  }: loginForm) => {
+    await axios
+      .post(
+        "http://localhost:8080/login",
+        { email, password, captchaAnswer, captchaId },
+        { withCredentials: true }
+      )
+      .then((res) => {
         const newLoginState = {
           isLoggedIn: true,
           role: res.data.role,
           token: res.data.accessToken,
         };
         dispatch(login(newLoginState));
+        callToast("Login Successful", "You are now logged in.", "success");
         redirect();
-    }
-    catch (err:AxiosError<string>){
-        throw {name:"Login Failed", message:err.response.data.detail};
-    }
+      })
+      .catch((err: AxiosError<errorResponse>) => {
+        callToast(
+          "Login Failed",
+          err.response ? err.response.data.detail : "Login failed",
+          "error"
+        );
+        generateCaptcha();
+      });
   };
 
   const redirect = () => {
@@ -113,7 +141,13 @@ const useAuth = () => {
     channel.postMessage({ type: "LOGOUT" });
   };
 
-  return { logout, refreshJwt, redirect, loginWithCredentials, generateCaptcha };
+  return {
+    logout,
+    refreshJwt,
+    redirect,
+    loginWithCredentials,
+    generateCaptcha,
+  };
 };
 
 export default useAuth;

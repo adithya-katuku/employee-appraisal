@@ -49,7 +49,7 @@ const AppraisalRequestModal = ({ isOpen, onClose, appraisalId }: Props) => {
           <Button variant="outline" colorScheme="red" mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <SubmitRating appraisalId={appraisalId} onClose={onClose} />
+          <SubmitRating appraisalId={appraisalId} onClose={onClose} disabled={!appraisalRequestDetails.fullyRated} />
         </ModalFooter>
       </ModalContent>
     </Modal>

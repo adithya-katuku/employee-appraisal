@@ -17,7 +17,8 @@ const Wrapper = ({ children }: Props) => {
       m="1"
       rounded="md"
       flexGrow="1"
-      ml="18rem"
+      ml="17rem"
+      minH="80vh"
     >
       {children}
     </Box>

@@ -16,7 +16,6 @@ import { RootState } from "../../../../stores/store";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import ProfileTasksList from "../tasks/ProfileTasksList";
-import SubmitAppraisal from "../../../appraisal/buttons/SubmitAppraisal";
 import AttributeTable from "../../../attribute/AttributeTable";
 
 interface Props {
@@ -106,19 +105,6 @@ const PreviousAppriaisalsModal = ({ isOpen, onClose }: Props) => {
                   />
                 )}
               </Box>
-
-              {appraisals &&
-                appraisals[index].appraisalStatus === "INITIATED" && (
-                  <Flex
-                    my="1"
-                    p="2"
-                    justifyContent="end"
-                    position="sticky"
-                    bottom="3"
-                  >
-                    <SubmitAppraisal appraisalId={appraisals[index].id} />
-                  </Flex>
-                )}
             </Box>
           ) : (
             <Text>No appraisals yet :)</Text>

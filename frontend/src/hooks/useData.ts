@@ -2,8 +2,6 @@ import axios from "axios";
 import {
   clearSearchedEmployees,
   RootState,
-  setAppraisalRequestDetails,
-  setAppraisalRequests,
   setAppraisals,
   setEmployeeDetails,
   setSearchedEmployees,
@@ -12,8 +10,6 @@ import {
 } from "../stores/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import RateTaskModel from "../models/admin/RateTaskModel";
-import RateAttributeModel from "../models/admin/RateAttributesModel";
 import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
 
 const useData = () => {
@@ -68,108 +64,12 @@ const useData = () => {
         navigate("/login");
       });
   };
-
-  const fetchAppraisalRequests = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/appraisal-requests", {
-        headers: {
-          Authorization: "Bearer " + loginState.token,
-        },
-      })
-      .then((res) => {
-        dispatch(setAppraisalRequests(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
-      });
-  };
-
-  const fetchAppraisalRequestDetails = async (appraisalId: number) => {
-    await axios
-      .get(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
-          appraisalId,
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
-      .then((res) => {
-        const employeeDetails = res.data.employeeResponseDTO;
-        const attributes = res.data.attributes;
-        const tasks = res.data.tasks;
-        dispatch(
-          setAppraisalRequestDetails({
-            employeeDetails: employeeDetails,
-            attributes: attributes,
-            tasks: tasks,
-          })
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
-      });
-  };
-
-  const rateTask = async (rateTask: RateTaskModel) => {
+  const submitAppraisal = async (appraisalId: number) => {
     await axios
       .put(
         "http://localhost:8080/" +
           loginState.role +
-          "/appraisal-requests/tasks",
-        { ...rateTask },
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
-      .then(() => {
-        // fetchAppraisalRequests()
-      })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
-      });
-  };
-
-  const rateAttributes = async ({
-    appraisalId,
-    attributes,
-  }: RateAttributeModel) => {
-    await axios
-      .put(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
-          appraisalId +
-          "/attributes",
-        { attributes: [...attributes] },
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
-      .then(() => {
-        // fetchAppraisalRequests()
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const submitRating = async (appraisalId: number) => {
-    await axios
-      .put(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
+          "/appraisals/" +
           appraisalId,
         {},
         {
@@ -179,7 +79,8 @@ const useData = () => {
         }
       )
       .then(() => {
-        fetchAppraisalRequests();
+        fetchTasks();
+        fetchAppraisals();
       })
       .catch((err) => {
         console.log(err);
@@ -211,14 +112,10 @@ const useData = () => {
     fetchInfo,
     fetchTasks,
     fetchAppraisals,
-    fetchAppraisalRequests,
-    fetchAppraisalRequestDetails,
-    rateTask,
-    rateAttributes,
-    submitRating,
     searchEmployees,
     setSearchedEmployeeDetails,
     clearEmployees,
+    submitAppraisal,
   };
 };
 

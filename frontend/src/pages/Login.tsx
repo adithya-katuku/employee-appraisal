@@ -6,10 +6,8 @@ import {
   Input,
   Stack,
   Heading,
-  useToast,
   Image,
   Flex,
-  AlertStatus,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -20,9 +18,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useAuth from "../hooks/useAuth";
 
-interface response {
-  detail: string;
-}
 
 const schema = z.object({
   email: z.string(),
@@ -36,25 +31,11 @@ const LoginForm = () => {
   const { register, handleSubmit } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
-  const toast = useToast();
   const { refreshJwt, redirect, generateCaptcha, loginWithCredentials } =
     useAuth();
   const loginState = useSelector((state: RootState) => state.store.loginState);
   const url = useSelector((state: RootState) => state.store.url);
 
-  const callToast = (
-    title: string,
-    description: string,
-    status: AlertStatus
-  ) => {
-    toast({
-      title: title,
-      description: description,
-      status: status,
-      duration: 3000,
-      isClosable: true,
-    });
-  };
   useEffect(() => {
     const authFun = async () => {
       try {
@@ -72,41 +53,7 @@ const LoginForm = () => {
   }, []);
 
   const onSubmit = async (data: validForm) => {
-    try {
-      loginWithCredentials(data);
-    } catch (err:response) {
-      callToast(
-        "Login Failed",
-        err.message,
-        "error"
-      );
-      generateCaptcha();
-    }
-    // await axios
-    //   .post(
-    //     "http://localhost:8080/login",
-    //     { ...data, captchaId },
-    //     { withCredentials: true }
-    //   )
-    //   .then((res) => {
-    //     const newLoginState = {
-    //       isLoggedIn: true,
-    //       role: res.data.role,
-    //       token: res.data.accessToken,
-    //     };
-    //     dispatch(login(newLoginState));
-    //     callToast("Login Successful", "You are now logged in.", "success");
-    //     redirect();
-    //   })
-    //   .catch((err: AxiosError<response>) => {
-    //     console.log(err);
-    //     callToast(
-    //       "Login Failed",
-    //       err.response ? err.response.data.detail : "Login failed",
-    //       "error"
-    //     );
-    //     generateCaptcha();
-    //   });
+    loginWithCredentials(data);
   };
 
   return (

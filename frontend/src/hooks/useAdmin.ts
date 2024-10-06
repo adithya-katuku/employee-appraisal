@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import {
   RootState,
   setAppraisalRequestDetails,
+  setAppraisalRequests,
   setAppraisals,
   setTasks,
 } from "../stores/store";
 import axios from "axios";
-import StartAppraisalModel from "../models/admin/StartAppraisalModel";
+import StartAppraisalModel from "../models/admin/appraisal-requests/StartAppraisalModel";
+import RateAttributeModel from "../models/admin/appraisal-requests/RateAttributesModel";
+import RateTaskModel from "../models/admin/appraisal-requests/RateTaskModel";
 
 const useAdmin = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
@@ -80,7 +83,23 @@ const useAdmin = () => {
         navigate("/login");
       });
   };
-  
+
+  const fetchAppraisalRequests = async () => {
+    await axios
+      .get("http://localhost:8080/" + loginState.role + "/appraisal-requests", {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+      })
+      .then((res) => {
+        dispatch(setAppraisalRequests(res.data));
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  };
+
   const fetchAppraisalRequestDetails = async (appraisalId: number) => {
     await axios
       .get(
@@ -98,11 +117,13 @@ const useAdmin = () => {
         const employeeDetails = res.data.employeeResponseDTO;
         const attributes = res.data.attributes;
         const tasks = res.data.tasks;
+        const fullyRated = res.data.fullyRated;
         dispatch(
           setAppraisalRequestDetails({
             employeeDetails: employeeDetails,
             attributes: attributes,
             tasks: tasks,
+            fullyRated:fullyRated,
           })
         );
       })
@@ -112,11 +133,84 @@ const useAdmin = () => {
       });
   };
 
+  const rateTask = async (rateTask: RateTaskModel) => {
+    await axios
+      .put(
+        "http://localhost:8080/" +
+          loginState.role +
+          "/appraisal-requests/tasks",
+        { ...rateTask },
+        {
+          headers: {
+            Authorization: "Bearer " + loginState.token,
+          },
+        }
+      )
+      .then(() => {
+        // fetchAppraisalRequests()
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  };
+
+  const rateAttributes = async ({
+    appraisalId,
+    attributes,
+  }: RateAttributeModel) => {
+    await axios
+      .put(
+        "http://localhost:8080/" +
+          loginState.role +
+          "/appraisal-requests/" +
+          appraisalId +
+          "/attributes",
+        { attributes: [...attributes] },
+        {
+          headers: {
+            Authorization: "Bearer " + loginState.token,
+          },
+        }
+      )
+      .then(() => {
+        // fetchAppraisalRequests()
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const submitRating = async (appraisalId: number) => {
+    await axios
+      .put(
+        "http://localhost:8080/" +
+          loginState.role +
+          "/appraisal-requests/" +
+          appraisalId,
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + loginState.token,
+          },
+        }
+      )
+      .then(() => {
+        fetchAppraisalRequests();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return {
     startAppraisal,
     fetchEmployeeTasks,
     fetchEmployeeAppraisals,
     fetchAppraisalRequestDetails,
+    fetchAppraisalRequests,
+    rateTask,
+    rateAttributes,
+    submitRating,
   };
 };
 

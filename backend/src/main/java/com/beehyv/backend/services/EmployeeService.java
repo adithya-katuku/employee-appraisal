@@ -1,9 +1,13 @@
 package com.beehyv.backend.services;
 
 import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
+import com.beehyv.backend.dto.mappers.FullEmployeeDetailsMapper;
+import com.beehyv.backend.dto.mappers.PartialEmployeeResponseMapper;
 import com.beehyv.backend.dto.request.EmployeeRequestDTO;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.EmployeeResponseDTO;
+import com.beehyv.backend.dto.response.FullEmployeeResponseDTO;
+import com.beehyv.backend.dto.response.PartialEmployeeResponseDTO;
 import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.exceptions.ResourceNotFoundException;
@@ -17,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EmployeeService {
@@ -43,16 +48,15 @@ public class EmployeeService {
         return employee;
     }
 
-    public EmployeeResponseDTO getEmployee(Integer employeeId) {
+    public FullEmployeeResponseDTO getEmployee(Integer employeeId) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee==null){
             throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
-        System.out.println(employee);
-        return new EmployeeResponseDTOMapper().apply(employee);
+        return new FullEmployeeDetailsMapper().apply(employee);
     }
 
-    public EmployeeResponseDTO saveEmployee(Employee employee){
+    public void saveEmployee(Employee employee){
         List<Attribute> attributes = attributeRepo.saveOrFindAll(employee.getDesignation().getAttributes());
         Designation designation = designationRepo.findByDesignation(employee.getDesignation().getDesignation());
         if(designation==null){
@@ -63,30 +67,10 @@ public class EmployeeService {
         employee.setDesignation(designation);
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
 
-        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
+//        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
     }
 
-    public EmployeeResponseDTO registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
-        if(employeeRepo.findByEmail(employeeRequestDTO.email())!=null){
-            throw  new InvalidInputException("Email is already in use. Try with a different email.");
-        }
-        Employee employee = new Employee();
-        employee.setEmployeeId(employeeRequestDTO.employeeId());
-        employee.setName(employeeRequestDTO.name());
-        employee.setEmail(employeeRequestDTO.email());
-        employee.setAppraisalEligibility(AppraisalEligibility.NOT_ELIGIBLE);
-        employee.setJoiningDate(employeeRequestDTO.joiningDate());
-        employee.setPassword(passwordEncoder.encode(employeeRequestDTO.password()));
-        employee.setRoles(employeeRequestDTO.roles());
-        employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
-        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
-        if(designation==null){
-            throw  new InvalidInputException("Designation is not saved yet. Kindly create designation with respective attributes first.");
-        }
 
-        employee.setDesignation(designation);
-        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
-    }
     //ATTRIBUTES:
     public List<Attribute> getAttributes(Integer employeeId){
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
@@ -158,9 +142,13 @@ public class EmployeeService {
         return "success";
     }
 
-    public Notification readOrUnreadNotification(Integer notificationId) {
+    public Notification readOrUnreadNotification(Integer notificationId, Integer employeeId) {
         Notification notification = notificationRepo.findById(notificationId).orElse(null);
+
         if(notification!=null){
+            if(!Objects.equals(notification.getEmployee().getEmployeeId(), employeeId)){
+                throw new InvalidInputException("The notification belongs to a different employee.");
+            }
             notification.setRead(!notification.isRead());
             return notificationRepo.save(notification);
         }
@@ -168,9 +156,12 @@ public class EmployeeService {
         throw  new ResourceNotFoundException("Notification  not found.");
     }
 
-    public String deleteNotification(Integer notificationId) {
+    public String deleteNotification(Integer notificationId,  Integer employeeId) {
         Notification notification = notificationRepo.findById(notificationId).orElse(null);
         if(notification!=null){
+            if(!Objects.equals(notification.getEmployee().getEmployeeId(), employeeId)){
+                throw new InvalidInputException("The notification belongs to a different employee.");
+            }
             notificationRepo.delete(notification);
             return "success";
         }
@@ -179,10 +170,9 @@ public class EmployeeService {
     }
 
     //People
-    public List<EmployeeResponseDTO> findPeople(String name) {
+    public List<PartialEmployeeResponseDTO> findPeople(String name) {
         return employeeRepo.findByNameContainingIgnoreCase(name).stream()
-                .filter(employee -> !employee.getRoles().contains(Role.ADMIN))
-                .map(employee -> new EmployeeResponseDTOMapper().apply(employee))
+                .map(employee -> new PartialEmployeeResponseMapper().apply(employee))
                 .toList();
     }
 

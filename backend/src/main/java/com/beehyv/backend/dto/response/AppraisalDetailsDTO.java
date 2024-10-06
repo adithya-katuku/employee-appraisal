@@ -7,6 +7,7 @@ import java.util.List;
 public record AppraisalDetailsDTO(
     EmployeeResponseDTO employeeResponseDTO,
     List<AttributeDAO> attributes,
-    List<TaskResponseDTO> tasks
+    List<TaskResponseDTO> tasks,
+    Boolean fullyRated
 ) {
 }

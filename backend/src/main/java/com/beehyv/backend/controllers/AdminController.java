@@ -36,12 +36,12 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping("/info")
-    public EmployeeResponseDTO getInfo(){
+    public ResponseEntity<?> getInfo(){
         EmployeeDetails employeeDetails = (EmployeeDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.getEmployee(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.getEmployee(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @GetMapping("/all-employees")
@@ -50,15 +50,15 @@ public class AdminController {
         return new ResponseEntity<>(employeeResponseDTOS, HttpStatus.OK);
     }
 
-    @GetMapping("/employee/{employeeId}")
-    public EmployeeResponseDTO getEmployee(@PathVariable("employeeId") Integer employeeId){
-        return employeeService.getEmployee(employeeId);
-    }
+//    @GetMapping("/employee/{employeeId}")
+//    public EmployeeResponseDTO getEmployee(@PathVariable("employeeId") Integer employeeId){
+//        return employeeService.getEmployee(employeeId);
+//    }
 
     //CREATE EMPLOYEE:
     @PostMapping("/register")
     public EmployeeResponseDTO saveEmployee(@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO){
-        return employeeService.registerEmployee(employeeRequestDTO);
+        return adminService.registerEmployee(employeeRequestDTO);
     }
     @GetMapping("/all-designations")
     public ResponseEntity<?> getAllDesignations(){
@@ -99,12 +99,20 @@ public class AdminController {
 
     @PutMapping("/notifications/{notificationId}")
     public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
-        return employeeService.readOrUnreadNotification(notificationId);
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId());
     }
 
     @DeleteMapping("/notifications/{notificationId}")
     public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
-        return employeeService.deleteNotification(notificationId);
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId());
     }
 
     //ATTRIBUTES:
@@ -126,7 +134,6 @@ public class AdminController {
                 .getPrincipal();
         return employeeService.getTasks(employeeDetails.getEmployeeId());
     }
-
     @PostMapping("/tasks")
     public TaskResponseDTO addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
@@ -199,7 +206,7 @@ public class AdminController {
             return new ResponseEntity<>(Collections.singletonList(employeeService.getEmployee(employeeId)), HttpStatus.OK);
         }
         catch (NumberFormatException e){
-            return new ResponseEntity<>(employeeService.findPeople(name), HttpStatus.OK);
+            return new ResponseEntity<>(adminService.findPeople(name), HttpStatus.OK);
         }
 
     }

@@ -23,11 +23,19 @@ const EmployeeDetails = ({ employeeDetails }: Props) => {
         <Text>Designation: {employeeDetails.designation}</Text>
         <Text>Email: {employeeDetails.email}</Text>
         <Text>
-          Joining Date: {new Date(employeeDetails.joiningDate).toISOString().split('T')[0]}
+          Joining Date:{" "}
+          {new Date(employeeDetails.joiningDate).toISOString().split("T")[0]}
         </Text>
-        <Text>
-          Appraisal Eligibility: {employeeDetails.appraisalEligibility}
-        </Text>
+        {employeeDetails.appraisalEligibility && (
+          <Text>
+            Appraisal Eligibility: {employeeDetails.appraisalEligibility}
+          </Text>
+        )}
+        {employeeDetails.previousAppraisalDate && (
+          <Text>
+            Previous Appraisal Date: {new Date(employeeDetails.previousAppraisalDate).toISOString().split("T")[0]}
+          </Text>
+        )}
       </VStack>
     </Box>
   ) : (

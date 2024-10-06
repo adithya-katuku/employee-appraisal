@@ -1,12 +1,7 @@
 package com.beehyv.backend.services;
 
-import com.beehyv.backend.dto.mappers.AppraisalDTOMapper;
-import com.beehyv.backend.dto.mappers.EmployeeResponseDTOMapper;
-import com.beehyv.backend.dto.mappers.TaskResponseDTOMapper;
-import com.beehyv.backend.dto.request.AppraisalRequestDTO;
-import com.beehyv.backend.dto.request.DesignationRequestDTO;
-import com.beehyv.backend.dto.request.RateAttributeRequestDTO;
-import com.beehyv.backend.dto.request.RateTaskRequestDTO;
+import com.beehyv.backend.dto.mappers.*;
+import com.beehyv.backend.dto.request.*;
 import com.beehyv.backend.dto.response.*;
 import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.models.embeddable.AttributeDAO;
@@ -17,8 +12,10 @@ import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,6 +38,30 @@ public class AdminService {
     @Autowired
     private AppraisalService appraisalService;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+
+    public EmployeeResponseDTO registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
+        if(employeeRepo.findByEmail(employeeRequestDTO.email())!=null){
+            throw  new InvalidInputException("Email is already in use. Try with a different email.");
+        }
+        Employee employee = new Employee();
+        employee.setEmployeeId(employeeRequestDTO.employeeId());
+        employee.setName(employeeRequestDTO.name());
+        employee.setEmail(employeeRequestDTO.email());
+        employee.setAppraisalEligibility(AppraisalEligibility.NOT_ELIGIBLE);
+        employee.setJoiningDate(employeeRequestDTO.joiningDate());
+        employee.setPassword(passwordEncoder.encode(employeeRequestDTO.password()));
+        employee.setRoles(employeeRequestDTO.roles());
+        employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
+        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
+        if(designation==null){
+            throw  new InvalidInputException("Designation is not saved yet. Kindly create designation with respective attributes first.");
+        }
+
+        employee.setDesignation(designation);
+        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
+    }
+
     public List<EmployeeResponseDTO> findAllEmployees() {
         List<Employee> employees = employeeRepo.findByRole(Role.EMPLOYEE);
         if (employees == null) {
@@ -59,7 +80,7 @@ public class AdminService {
         if (appraisal.getAppraisalStatus() != AppraisalStatus.SUBMITTED) {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
         }
-        List<AttributeDAO> attributes = new ArrayList<>();
+        ArrayList<AttributeDAO> attributes = new ArrayList<>();
         for (AttributeDAO attributeDAO : rateAttributeRequestDTO.attributes()) {
             attributes.add(new AttributeDAO(attributeDAO.getName(), attributeDAO.getRating()));
         }
@@ -91,6 +112,9 @@ public class AdminService {
 
         if (employee == null) {
             throw new ResourceNotFoundException("Employee with id " + employeeId + " is  not found.");
+        }
+        if(employee.getRoles().contains(Role.ADMIN)){
+            throw new InvalidInputException("An admin cannot be appraised.");
         }
 //        employee.getAppraisalEligibility()!=AppraisalEligibility.PROCESSING
 //        employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0
@@ -135,8 +159,18 @@ public class AdminService {
                 .map(task -> new TaskResponseDTOMapper().apply(task))
                 .sorted((t1, t2) -> t1.taskId() - t2.taskId())
                 .toList();
-
-        return new AppraisalDetailsDTO(employeeResponseDTO, attributes, taskResponseDTOs);
+        int unrated = 0;
+        for(AttributeDAO attributeDAO: attributes){
+            if(attributeDAO.getRating()==null){
+                unrated++;
+            }
+        }
+        for(TaskResponseDTO taskResponseDTO:taskResponseDTOs){
+            if(taskResponseDTO.adminRating()==null){
+                unrated++;
+            }
+        }
+        return new AppraisalDetailsDTO(employeeResponseDTO, attributes, taskResponseDTOs, unrated==0);
     }
 
     public String submitRatingOfAppraisal(Integer appraisalId) {
@@ -146,6 +180,20 @@ public class AdminService {
         }
         if (appraisal.getAppraisalStatus() != AppraisalStatus.SUBMITTED) {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
+        }
+        int unrated = 0;
+        for(AttributeDAO attributeDAO:appraisal.getAttributes()){
+            if(attributeDAO.getRating()==null){
+                unrated++;
+            }
+        }
+        for(Task task:appraisal.getTasks()){
+            if(task.getAdminRating()==null){
+                unrated++;
+            }
+        }
+        if(unrated!=0){
+            throw new InvalidInputException("Appraisal with id " + appraisalId + " is not fully rated.");
         }
         appraisalService.changePreviousAppraisalDateAndEligibility(appraisal.getEmployeeId(), appraisal.getEndDate(), AppraisalEligibility.NOT_ELIGIBLE);
         appraisal.setAppraisalStatus(AppraisalStatus.APPROVED);
@@ -183,5 +231,11 @@ public class AdminService {
         designationRepo.save(designation);
 
         return "Success";
+    }
+
+    public List<FullEmployeeResponseDTO> findPeople(String name) {
+        return employeeRepo.findByNameContainingIgnoreCase(name).stream()
+                .map(employee -> new FullEmployeeDetailsMapper().apply(employee))
+                .toList();
     }
 }

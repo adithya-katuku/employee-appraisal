@@ -3,8 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import TaskModel from "../models/TaskModel";
 import AppraisalModel from "../models/AppraisalModel";
-import AppraisalRequestsFormEntry from "../models/admin/AppraisalRequestsFormEntry";
-import AppraisalRequestDetails from "../models/admin/AppraisalRequestDetails";
+import AppraisalRequestsFormEntry from "../models/admin/appraisal-requests/AppraisalRequestsFormEntry";
+import AppraisalRequestDetails from "../models/admin/appraisal-requests/AppraisalRequestDetails";
 import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
 import NotificationModel from "../models/NotificationModel";
 

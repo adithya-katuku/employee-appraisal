@@ -26,12 +26,12 @@ public class EmployeeController {
     private AppraisalService appraisalService;
 
     @GetMapping("/info")
-    public EmployeeResponseDTO getEmployee(){
+    public ResponseEntity<?> getEmployee(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.getEmployee(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.getEmployee(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     //ATTRIBUTES:
@@ -99,12 +99,20 @@ public class EmployeeController {
 
     @PutMapping("/notifications/{notificationId}")
     public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
-        return employeeService.readOrUnreadNotification(notificationId);
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId());
     }
 
     @DeleteMapping("/notifications/{notificationId}")
     public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
-        return employeeService.deleteNotification(notificationId);
+        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId());
     }
 
     //APPRAISALS:

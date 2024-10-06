@@ -8,16 +8,17 @@ interface Props {
   employeeDetails: EmployeeDetailsModel;
 }
 export const EmployeeDetailsContext = createContext({
-  employeeId:-1
+  employeeId: -1,
 });
 const AdminEmployeeProfileView = ({ employeeDetails }: Props) => {
   return (
-    <Box>
+    <Box  >
       <EmployeeDetails employeeDetails={employeeDetails} />
-
-      <EmployeeDetailsContext.Provider value={employeeDetails}>
-        <AdminEmployeeControls />
-      </EmployeeDetailsContext.Provider>
+      {employeeDetails.appraisalEligibility && (
+        <EmployeeDetailsContext.Provider value={employeeDetails}>
+          <AdminEmployeeControls />
+        </EmployeeDetailsContext.Provider>
+      )}
     </Box>
   );
 };

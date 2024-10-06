@@ -17,7 +17,9 @@ import { RootState } from "../stores/store";
 import { useSelector } from "react-redux";
 
 const People = () => {
-  const searchedName = useSelector((state: RootState) => state.store.searchedName);
+  const searchedName = useSelector(
+    (state: RootState) => state.store.searchedName
+  );
   const role = useSelector((state: RootState) => state.store.loginState.role);
   const [name, setName] = useState<string>(searchedName || "");
   const [debouncedName] = useDebounce(name, 1000);
@@ -31,13 +33,15 @@ const People = () => {
     return clearEmployees;
   }, [debouncedName]);
 
-  useEffect(()=>{
-    if(searchedName){
-      setName(searchedName)
+  useEffect(() => {
+    if (searchedName) {
+      setName(searchedName);
     }
-  }, [searchedName])
+  }, [searchedName]);
 
-  const placeHolder = `Please enter name ${role==="admin" ? "or id ":""}to search`
+  const placeholder = `Please enter name ${
+    role === "admin" ? "or id " : ""
+  }to search`;
 
   return (
     <Box>
@@ -46,19 +50,20 @@ const People = () => {
         <ChevronRightIcon />
         <Text>People</Text>
       </HStack>
-      <InputGroup>
-        <InputLeftElement pointerEvents="none">
-          <FaSearch />
-        </InputLeftElement>
-        <Input
-          type="text"
-          value={name}
-          placeholder={placeHolder}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </InputGroup>
-
-      <SelectEmployee />
+      <Box m="auto" maxW="60rem">
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <FaSearch />
+          </InputLeftElement>
+          <Input
+            type="text"
+            value={name}
+            placeholder={placeholder}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </InputGroup>
+        <SelectEmployee />
+      </Box>
     </Box>
   );
 };

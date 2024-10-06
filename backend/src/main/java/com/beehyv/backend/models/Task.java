@@ -24,9 +24,9 @@ public class Task {
     private String description;
     private Date startDate;
     private Date endDate;
-    private boolean appraisable=false;
-    private Double selfRating = (double) 0;
-    private Double adminRating = (double) 0;
+    private boolean appraisable;
+    private Double selfRating;
+    private Double adminRating;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "employee_id")
@@ -36,6 +36,7 @@ public class Task {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "appraisal_id")
     @JsonIgnore
+    @ToString.Exclude
     private Appraisal appraisal;
 
     public Task(String taskTitle, String description, Date startDate, Date endDate, boolean appraisable, Double selfRating, Double adminRating) {

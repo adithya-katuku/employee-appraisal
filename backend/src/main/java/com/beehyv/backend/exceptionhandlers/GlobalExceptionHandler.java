@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -101,6 +102,16 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create(baseType+HttpStatus.NOT_FOUND.value()));
 
         return new ResponseEntity<>(problemDetail, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<?> missingRequestCookieExceptionHandler(MissingRequestCookieException e){
+        logger.error(e.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        problemDetail.setType(URI.create(baseType+HttpStatus.BAD_REQUEST.value()));
+
+        return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

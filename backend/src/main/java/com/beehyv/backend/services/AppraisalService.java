@@ -17,10 +17,8 @@ import com.beehyv.backend.userdetails.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AppraisalService {
@@ -76,13 +74,11 @@ public class AppraisalService {
     public List<AppraisalDTO> getAppraisals(Integer employeeId) {
         return appraisalRepo.findByEmployeeIdOrderByEndDateDesc(employeeId)
                 .stream()
-                .filter(appraisal -> appraisal.getAppraisalStatus()==AppraisalStatus.APPROVED)
                 .map(appraisal -> new AppraisalDTOMapper().apply(appraisal))
                 .toList();
     }
 
     public AppraisalDTO submitAppraisal(Integer appraisalId, Integer employeeId) {
-        System.out.println("here");
         Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
         if(appraisal==null){
             throw  new ResourceNotFoundException("Appraisal with id "+appraisalId+" is  not found.");
@@ -97,14 +93,13 @@ public class AppraisalService {
         String description = "Employee " + employeeId + " has submitted his appraisal form. Please review the same";
         notifyAdmins(employeeId, title, description);
 
-        AppraisalDTO appraisalDTO = new AppraisalDTOMapper().apply(appraisal);
-
         List<AttributeDAO> attributeDAOs = employeeService.getAttributes(employeeId).stream()
-                        .map(attribute -> new AttributeDAO(attribute.getAttribute(), (double) -1))
-                        .toList();
+                        .map(attribute -> new AttributeDAO(attribute.getAttribute(), null))
+                        .collect(Collectors.toCollection(ArrayList::new));
+        appraisal.setAttributes(attributeDAOs);
         appraisalRepo.save(appraisal);
 
-        return appraisalDTO;
+        return new AppraisalDTOMapper().apply(appraisal);
     }
 
     public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {

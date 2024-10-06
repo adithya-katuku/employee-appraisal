@@ -26,7 +26,7 @@ const SelectEmployee = () => {
   }, [searchedEmployees]);
 
   return searchedEmployees ? (
-    <Box my="2">
+    <Box my="2"  >
       <Select
         onChange={(e) => {
           handleChange(parseInt(e.target.value));
@@ -40,7 +40,7 @@ const SelectEmployee = () => {
           );
         })}
       </Select>
-      <Box my="2">
+      <Box my="2" >
         {employeeDetails && (
           <ProfileView employeeDetails={employeeDetails} />
         )}

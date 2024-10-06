@@ -7,7 +7,7 @@ import {
   Tbody,
   Td,
 } from "@chakra-ui/react";
-import AppraisalRequestsFormEntry from "../../../../models/admin/AppraisalRequestsFormEntry";
+import AppraisalRequestsFormEntry from "../../../../models/admin/appraisal-requests/AppraisalRequestsFormEntry";
 import ViewDetails from "../buttons/ViewDetails";
 
 interface Props {

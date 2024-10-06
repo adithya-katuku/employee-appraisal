@@ -1,13 +1,13 @@
 import { Box, Button, useDisclosure } from "@chakra-ui/react";
 import AppraisalRequestModal from "../details-modal/AppraisalRequestModal";
-import useData from "../../../../hooks/useData";
+import useAdmin from "../../../../hooks/useAdmin";
 
 interface Props {
   appriasalId: number;
 }
 const ViewDetails = ({ appriasalId }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { fetchAppraisalRequestDetails } = useData();
+  const { fetchAppraisalRequestDetails } = useAdmin();
 
   const handleClick = async () => {
     await fetchAppraisalRequestDetails(appriasalId);

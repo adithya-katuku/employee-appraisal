@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   FormControl,
@@ -17,9 +18,11 @@ import {
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import useTasks from "../../../hooks/useTasks";
+import { RootState } from "../../../stores/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   isOpen: boolean;
@@ -27,11 +30,10 @@ interface Props {
 }
 
 const schema = z.object({
-  taskId: z.number().optional(),
-  taskTitle: z.string(),
-  description: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
+  taskTitle: z.string({message:"Task title cannot be empty."}),
+  description: z.string({message:"Task description cannot be empty."}),
+  startDate: z.string({message:"Task must have a start date."}),
+  endDate: z.string({message:"Task must have an end date."}),
   appraisable: z.boolean().optional(),
   selfRating: z
     .preprocess(
@@ -45,7 +47,8 @@ type validForm = z.infer<typeof schema>;
 
 const NewTaskModal = ({ isOpen, onClose }: Props) => {
   const [isAppraisable, setIsAppraisable] = useState(false);
-  const {addTask} = useTasks();
+  const { addTask } = useTasks();
+  const role = useSelector((state: RootState) => state.store.loginState.role);
 
   const {
     register,
@@ -59,10 +62,10 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
   };
 
   const onSubmit = async (data: validForm) => {
-    addTask(data)
+    addTask(data);
     handleClose();
   };
-  // console.log();
+
   const handleClose = () => {
     setIsAppraisable(false);
     reset();
@@ -96,25 +99,37 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
               </InputGroup>
               {errors.startDate && <Text>{errors.startDate.message}</Text>}
             </FormControl>
-            <FormControl my="1" p="1">
-              <Checkbox
-                size="lg"
-                {...register("appraisable")}
-                onChange={toggleAppraisal}
-              >
-                Mark for appraisal
-              </Checkbox>
-            </FormControl>
-            {isAppraisable && (
-              <FormControl isRequired my="1">
-                <FormLabel>Self Rating</FormLabel>
-                <Input
-                  type="number"
-                  placeholder="Rate your task out of 10"
-                  {...register("selfRating")}
-                />
-              </FormControl>
+            {role === "employee" && (
+              <>
+                <FormControl my="1" p="1">
+                  <Checkbox
+                    size="lg"
+                    {...register("appraisable")}
+                    onChange={toggleAppraisal}
+                  >
+                    Mark for appraisal
+                  </Checkbox>
+                </FormControl>
+                {isAppraisable && (
+                  <FormControl isRequired my="1">
+                    <FormLabel>Self Rating</FormLabel>
+                    <Input
+                      type="number"
+                      placeholder="Rate your task out of 10"
+                      {...register("selfRating")}
+                    />
+                  </FormControl>
+                )}
+              </>
             )}
+            <Box>
+              <Text color="red">{errors.description?.message}</Text>
+              <Text color="red">{errors.endDate?.message}</Text>
+              <Text color="red">{errors.selfRating?.message}</Text>
+              <Text color="red">{errors.startDate?.message}</Text>
+              <Text color="red">{errors.taskTitle?.message}</Text>
+              <Text color="red">{errors.root?.message}</Text>
+            </Box>
           </ModalBody>
 
           <ModalFooter>

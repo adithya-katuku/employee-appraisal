@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   FormControl,
@@ -21,6 +22,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import TaskModel from "../../../models/TaskModel";
 import useTasks from "../../../hooks/useTasks";
+import { RootState } from "../../../stores/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   isOpen: boolean;
@@ -29,11 +32,10 @@ interface Props {
 }
 
 const schema = z.object({
-  taskId: z.number().optional(),
-  taskTitle: z.string(),
-  description: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
+  taskTitle: z.string({message:"Task title cannot be empty."}),
+  description: z.string({message:"Task description cannot be empty."}),
+  startDate: z.string({message:"Task must have a start date."}),
+  endDate: z.string({message:"Task must have an end date."}),
   appraisable: z.boolean().optional(),
   selfRating: z
     .preprocess(
@@ -49,6 +51,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   const [isAppraisable, setIsAppraisable] = useState<boolean | undefined>(
     false
   );
+  const role = useSelector((state: RootState) => state.store.loginState.role);
   const { editTask } = useTasks();
   const {
     register,
@@ -64,15 +67,18 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
 
   useEffect(() => {
     setIsAppraisable(task.appraisable);
-    setValue("taskId", task.taskId);
     setValue("taskTitle", task.taskTitle);
     setValue("description", task.description);
     setValue("startDate", new Date(task.startDate).toISOString().split("T")[0]);
     setValue("endDate", new Date(task.endDate).toISOString().split("T")[0]);
-    setValue("appraisable", task.appraisable);
-    setValue("selfRating", task.selfRating);
+    if(role === "employee" && task.appraisable){
+      setValue("appraisable", task.appraisable);
+      setValue("selfRating", task.selfRating);
+    }
+    
   }, [
     isOpen,
+    role,
     setValue,
     task.appraisable,
     task.description,
@@ -84,7 +90,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   ]);
 
   const onSubmit = async (data: validForm) => {
-    editTask(data);
+    editTask({ ...data, taskId: task.taskId });
     handleClose();
   };
 
@@ -119,27 +125,38 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
                 <Input type="date" mx="1" {...register("startDate")} />
                 <Input type="date" mx="1" {...register("endDate")} />
               </InputGroup>
-              {errors.startDate && <Text>{errors.startDate.message}</Text>}
             </FormControl>
-            <FormControl my="1" p="1">
-              <Checkbox
-                size="lg"
-                {...register("appraisable")}
-                onChange={toggleAppraisal}
-              >
-                Mark for appraisal
-              </Checkbox>
-            </FormControl>
-            {isAppraisable && (
-              <FormControl isRequired my="1">
-                <FormLabel>Self Rating</FormLabel>
-                <Input
-                  type="number"
-                  placeholder="Rate your task out of 10"
-                  {...register("selfRating")}
-                />
-              </FormControl>
+            {role === "employee" && (
+              <>
+                <FormControl my="1" p="1">
+                  <Checkbox
+                    size="lg"
+                    {...register("appraisable")}
+                    onChange={toggleAppraisal}
+                  >
+                    Mark for appraisal
+                  </Checkbox>
+                </FormControl>
+                {isAppraisable && (
+                  <FormControl isRequired my="1">
+                    <FormLabel>Self Rating</FormLabel>
+                    <Input
+                      type="number"
+                      placeholder="Rate your task out of 10"
+                      {...register("selfRating")}
+                    />
+                  </FormControl>
+                )}
+              </>
             )}
+            <Box>
+              <Text color="red">{errors.description?.message}</Text>
+              <Text color="red">{errors.endDate?.message}</Text>
+              <Text color="red">{errors.selfRating?.message}</Text>
+              <Text color="red">{errors.startDate?.message}</Text>
+              <Text color="red">{errors.taskTitle?.message}</Text>
+              <Text color="red">{errors.root?.message}</Text>
+            </Box>
           </ModalBody>
 
           <ModalFooter>

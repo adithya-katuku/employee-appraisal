@@ -14,6 +14,5 @@ import lombok.*;
 public class AttributeDAO {
     @NotEmpty
     private String name;
-    @NotNull
     private Double rating;
 }

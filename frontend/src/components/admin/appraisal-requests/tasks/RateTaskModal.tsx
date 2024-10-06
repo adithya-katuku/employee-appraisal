@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
 import TaskModel from "../../../../models/TaskModel";
-import useData from "../../../../hooks/useData";
+import useAdmin from "../../../../hooks/useAdmin";
 
 interface Props {
   isOpen: boolean;
@@ -40,7 +40,7 @@ const schema = z.object({
 type validForm = z.infer<typeof schema>;
 
 const RateTaskModal = ({ isOpen, onClose, task, appraisalId }: Props) => {
-  const { rateTask, fetchAppraisalRequestDetails } = useData();
+  const { rateTask, fetchAppraisalRequestDetails } = useAdmin();
 
   const { register, handleSubmit, setValue, reset } = useForm<validForm>({
     resolver: zodResolver(schema),
