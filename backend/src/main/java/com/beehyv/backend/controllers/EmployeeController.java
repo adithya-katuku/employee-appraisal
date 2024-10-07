@@ -1,11 +1,7 @@
 package com.beehyv.backend.controllers;
 
 import com.beehyv.backend.dto.request.TaskRequestDTO;
-import com.beehyv.backend.dto.response.EmployeeResponseDTO;
-import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.userdetails.EmployeeDetails;
-import com.beehyv.backend.models.Attribute;
-import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AppraisalService;
 import com.beehyv.backend.services.EmployeeService;
 import jakarta.validation.Valid;
@@ -15,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
@@ -34,85 +29,70 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.getEmployee(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
-    //ATTRIBUTES:
-    @GetMapping("/attributes")
-    public List<Attribute> getAttributes(){
-        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return employeeService.getAttributes(employeeDetails.getEmployeeId());
-    }
-
     //TASKS:
     @GetMapping("/tasks")
-    public List<TaskResponseDTO> getTasks(){
+    public ResponseEntity<?> getTasks(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.getTasks(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.getTasks(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @PostMapping("/tasks")
-    public TaskResponseDTO addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+    public ResponseEntity<?> addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+        return new ResponseEntity<>(employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO), HttpStatus.OK);
     }
 
     @PutMapping("/tasks")
-    public TaskResponseDTO updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+    public ResponseEntity<?> updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+        return new ResponseEntity<>(employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO), HttpStatus.OK);
     }
 
     @PutMapping("/tasks/{taskId}")
-    public TaskResponseDTO rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
-        return employeeService.rateTaskBySelf(taskId, taskRating);
+    public ResponseEntity<?> rateTask(@PathVariable("taskId") Integer taskId, @RequestParam("rating") Double taskRating){
+        return new ResponseEntity<>(employeeService.rateTaskBySelf(taskId, taskRating), HttpStatus.OK);
     }
 
     @DeleteMapping("/tasks/{taskId}")
-    public String deleteTask(@PathVariable("taskId") Integer taskId){
-        return employeeService.deleteTask(taskId);
+    public ResponseEntity<?> deleteTask(@PathVariable("taskId") Integer taskId){
+        return new ResponseEntity<>(employeeService.deleteTask(taskId), HttpStatus.OK);
     }
 
     //NOTIFICATIONS:
     @GetMapping("/notifications")
-    public List<Notification> getNotifications(){
+    public ResponseEntity<?> getNotifications(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.getNotifications(employeeDetails.getEmployeeId());
-    }
-
-    @PostMapping("/notifications")
-    public String addNotificationToAdmins(@RequestBody Notification notification){
-        return employeeService.addNotificationToAdmins(notification);
+        return new ResponseEntity<>(employeeService.getNotifications(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @PutMapping("/notifications/{notificationId}")
-    public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
+    public ResponseEntity<?> readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @DeleteMapping("/notifications/{notificationId}")
-    public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
+    public ResponseEntity<?> deleteNotification(@PathVariable("notificationId") Integer notificationId){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     //APPRAISALS:
@@ -133,7 +113,7 @@ public class EmployeeController {
                 .getAuthentication()
                 .getPrincipal();
 
-        return new ResponseEntity<>(appraisalService.submitAppraisal(appraisalId, employeeDetails.getEmployeeId()), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.submitAppraisal(appraisalId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     //PEOPLE:

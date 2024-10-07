@@ -6,7 +6,7 @@ import { IoHome } from "react-icons/io5";
 const Dashboard = () => {
   useEffect(() => {
     localStorage.page = 0;
-  });
+  }, []);
   return (
     <Box>
       <HStack mb="2">

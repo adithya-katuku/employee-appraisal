@@ -10,11 +10,13 @@ import useData from "../hooks/useData";
 import SubmitAppraisal from "../components/appraisal/buttons/SubmitAppraisal";
 import AddExistingTasks from "../components/appraisal/buttons/AddExistingTasks";
 import CreateTask from "../components/task/buttons/CreateTask";
+import useTasks from "../hooks/useTasks";
 
 const Appraisal = () => {
   const appraisals = useSelector((state: RootState) => state.store.appraisals);
   const tasks = useSelector((state: RootState) => state.store.tasks);
-  const { fetchAppraisals, fetchTasks } = useData();
+  const { fetchAppraisals } = useData();
+  const {fetchTasks} = useTasks();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {

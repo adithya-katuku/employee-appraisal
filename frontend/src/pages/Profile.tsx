@@ -12,7 +12,7 @@ const Profile = () => {
   );
   useEffect(() => {
     localStorage.page = -1;
-  });
+  }, []);
   return (
     <Box>
       <HStack mb="2">

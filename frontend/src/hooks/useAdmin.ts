@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   RootState,
   setAppraisalRequestDetails,
@@ -7,23 +6,23 @@ import {
   setAppraisals,
   setTasks,
 } from "../stores/store";
-import axios from "axios";
 import StartAppraisalModel from "../models/admin/appraisal-requests/StartAppraisalModel";
 import RateAttributeModel from "../models/admin/appraisal-requests/RateAttributesModel";
 import RateTaskModel from "../models/admin/appraisal-requests/RateTaskModel";
+import useAPI from "./useAPI";
 
 const useAdmin = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { api } = useAPI();
 
   const startAppraisal = async (
     employeeId: number,
     startAppraisal: StartAppraisalModel
   ) => {
-    await axios
+    await api
       .put(
-        "http://localhost:8080/" + loginState.role + "/appraisal/" + employeeId,
+        loginState.role + "/appraisal/" + employeeId,
         { ...startAppraisal },
         {
           headers: {
@@ -34,59 +33,42 @@ const useAdmin = () => {
       .then(() => {})
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchEmployeeTasks = async (employeeId: number) => {
-    await axios
-      .get(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/employee/" +
-          employeeId +
-          "/tasks",
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
+    await api
+      .get(loginState.role + "/employee/" + employeeId + "/tasks", {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+      })
       .then((res) => {
         dispatch(setTasks(res.data));
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchEmployeeAppraisals = async (employeeId: number) => {
-    await axios
-      .get(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/employee/" +
-          employeeId +
-          "/appraisals",
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
+    await api
+      .get(loginState.role + "/employee/" + employeeId + "/appraisals", {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+      })
       .then((res) => {
         dispatch(setAppraisals(res.data));
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchAppraisalRequests = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/appraisal-requests", {
+    await api
+      .get(loginState.role + "/appraisal-requests", {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -96,23 +78,16 @@ const useAdmin = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchAppraisalRequestDetails = async (appraisalId: number) => {
-    await axios
-      .get(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
-          appraisalId,
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-        }
-      )
+    await api
+      .get(loginState.role + "/appraisal-requests/" + appraisalId, {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+      })
       .then((res) => {
         const employeeDetails = res.data.employeeResponseDTO;
         const attributes = res.data.attributes;
@@ -123,22 +98,19 @@ const useAdmin = () => {
             employeeDetails: employeeDetails,
             attributes: attributes,
             tasks: tasks,
-            fullyRated:fullyRated,
+            fullyRated: fullyRated,
           })
         );
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const rateTask = async (rateTask: RateTaskModel) => {
-    await axios
+    await api
       .put(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/tasks",
+        loginState.role + "/appraisal-requests/tasks",
         { ...rateTask },
         {
           headers: {
@@ -151,7 +123,6 @@ const useAdmin = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
@@ -159,13 +130,9 @@ const useAdmin = () => {
     appraisalId,
     attributes,
   }: RateAttributeModel) => {
-    await axios
+    await api
       .put(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
-          appraisalId +
-          "/attributes",
+        loginState.role + "/appraisal-requests/" + appraisalId + "/attributes",
         { attributes: [...attributes] },
         {
           headers: {
@@ -182,12 +149,9 @@ const useAdmin = () => {
   };
 
   const submitRating = async (appraisalId: number) => {
-    await axios
+    await api
       .put(
-        "http://localhost:8080/" +
-          loginState.role +
-          "/appraisal-requests/" +
-          appraisalId,
+        loginState.role + "/appraisal-requests/" + appraisalId,
         {},
         {
           headers: {

@@ -34,8 +34,6 @@ public class BeeConfiguration{
     private EmployeeDetailsService employeeDetailsService;
     @Autowired
     private JwtFilter jwtFilter;
-    @Autowired
-    private CustomLogoutHandler customLogoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,6 +46,7 @@ public class BeeConfiguration{
                 .httpBasic(withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(AbstractHttpConfigurer::disable)
                 .build();
     }
 

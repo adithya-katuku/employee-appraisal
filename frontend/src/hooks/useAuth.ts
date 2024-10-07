@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import usePaths from "./usePaths";
 import { AlertStatus, useToast } from "@chakra-ui/react";
+import useAPI from "./useAPI";
 
 interface loginForm {
   email: string;
@@ -27,6 +28,7 @@ const useAuth = () => {
   const channel = useBroadcast();
   const dispatch = useDispatch();
   const { options } = usePaths();
+  const { api } = useAPI();
   const toast = useToast();
   const callToast = (
     title: string,
@@ -43,34 +45,48 @@ const useAuth = () => {
   };
 
   const refreshJwt = async () => {
-    const res = await axios.post(
-      "http://localhost:8080/refresh-token",
-      {},
-      { withCredentials: true }
-    );
-    await loginWIthJwt(res.data.accessToken);
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/refresh-token",
+        {},
+        { withCredentials: true }
+      );
+      const { accessToken, role } = res.data;
+      const newLoginState = {
+        isLoggedIn: loginState.isLoggedIn,
+        role: role,
+        token: accessToken,
+      };
+      dispatch(login(newLoginState));
+      return accessToken;
+    } catch (err){
+      console.log("Failed to refresh access token.");
+      channel.postMessage({ type: "LOGOUT" });
+      throw err;
+    }
   };
 
-  const loginWIthJwt = async (jwt: string) => {
-    axios
-      .get("http://localhost:8080/jwt-login", {
+  const loginWIthJwt = async () => {
+    try {
+      const accessToken = await refreshJwt();
+      const res = await axios.get("http://localhost:8080/jwt-login", {
         headers: {
-          Authorization: "Bearer " + jwt,
+          Authorization: "Bearer " + accessToken,
         },
-      })
-      .then((res) => {
-        const newLoginState = {
-          isLoggedIn: true,
-          role: res.data.role,
-          token: jwt,
-        };
-        dispatch(login(newLoginState));
-        redirect();
-      })
-      .catch((err) => {
-        console.log(err);
       });
+      const newLoginState = {
+        isLoggedIn: true,
+        role: res.data.role,
+        token: accessToken,
+      };
+      dispatch(login(newLoginState));
+      redirect();
+    } catch (err) {
+      console.log("Failed to login with jwt.");
+      throw err;
+    }
   };
+
   const generateCaptcha = async () => {
     await axios
       .get("http://localhost:8080/captcha/generate-captcha")
@@ -79,6 +95,7 @@ const useAuth = () => {
         dispatch(setCaptchaId(data.captchaId));
       });
   };
+
   const loginWithCredentials = async ({
     email,
     password,
@@ -118,26 +135,16 @@ const useAuth = () => {
   };
 
   const logout = async () => {
-    await axios
-      .post(
-        "http://localhost:8080/log-out",
-        {},
-        {
-          headers: {
-            Authorization: "Bearer " + loginState.token,
-          },
-          withCredentials: true,
-        }
-      )
-      .then(() => {
-        const newLoginState = {
-          isLoggedIn: false,
-          role: "",
-          token: "jwt",
-        };
-        dispatch(login(newLoginState));
-        localStorage.clear();
-      });
+    await api.post(
+      "/logout",
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + loginState.token,
+        },
+        withCredentials: true,
+      }
+    );
     channel.postMessage({ type: "LOGOUT" });
   };
 
@@ -147,6 +154,7 @@ const useAuth = () => {
     redirect,
     loginWithCredentials,
     generateCaptcha,
+    loginWIthJwt,
   };
 };
 

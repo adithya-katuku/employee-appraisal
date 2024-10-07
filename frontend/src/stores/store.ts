@@ -3,8 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import TaskModel from "../models/TaskModel";
 import AppraisalModel from "../models/AppraisalModel";
-import AppraisalRequestsFormEntry from "../models/admin/appraisal-requests/AppraisalRequestsFormEntry";
-import AppraisalRequestDetails from "../models/admin/appraisal-requests/AppraisalRequestDetails";
+import AppraisalRequestsListEntryModel from "../models/admin/appraisal-requests/AppraisalRequestsListEntryModel";
+import AppraisalRequestDetailsModel from "../models/admin/appraisal-requests/AppraisalRequestDetailsModel";
 import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
 import NotificationModel from "../models/NotificationModel";
 
@@ -21,8 +21,8 @@ interface Store {
   loginState: LoginState;
   tasks: TaskModel[] | undefined;
   appraisals: AppraisalModel[] | undefined;
-  appraisalRequests: AppraisalRequestsFormEntry[] | undefined;
-  appraisalRequestDetails: AppraisalRequestDetails | undefined;
+  appraisalRequests: AppraisalRequestsListEntryModel[] | undefined;
+  appraisalRequestDetails: AppraisalRequestDetailsModel | undefined;
   searchedEmployees: EmployeeDetailsModel[] | undefined;
   searchedEmployeeDetails: EmployeeDetailsModel | undefined;
   notifications: NotificationModel[] | undefined;
@@ -85,7 +85,7 @@ export const slice = createSlice({
         task.taskId === action.payload.taskId ? action.payload : task
       );
     },
-    deleteTask: (state, action: PayloadAction<number>) => {
+    removeTask: (state, action: PayloadAction<number>) => {
       state.tasks = state.tasks?.filter(
         (task) => task.taskId !== action.payload
       );
@@ -95,13 +95,13 @@ export const slice = createSlice({
     },
     setAppraisalRequests: (
       state,
-      action: PayloadAction<AppraisalRequestsFormEntry[]>
+      action: PayloadAction<AppraisalRequestsListEntryModel[]>
     ) => {
       state.appraisalRequests = action.payload;
     },
     setAppraisalRequestDetails: (
       state,
-      action: PayloadAction<AppraisalRequestDetails>
+      action: PayloadAction<AppraisalRequestDetailsModel>
     ) => {
       state.appraisalRequestDetails = action.payload;
     },
@@ -146,7 +146,7 @@ export const {
   setTasks,
   appendTask,
   updateTask,
-  deleteTask,
+  removeTask,
   setAppraisals,
   setAppraisalRequests,
   setAppraisalRequestDetails,

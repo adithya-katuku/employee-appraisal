@@ -4,6 +4,7 @@ import com.beehyv.backend.exceptions.CustomAuthException;
 import com.beehyv.backend.models.RefreshToken;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.RefreshTokenRepo;
+import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.services.AppraisalService;
 import io.jsonwebtoken.Claims;
@@ -24,12 +25,14 @@ import java.util.*;
 @Service
 public class JwtService {
     @Autowired
-    private AppraisalService appraisalService;
-    @Autowired
     private RefreshTokenRepo refreshTokenRepo;
+    @Autowired
+    private EmployeeService employeeService;
+
+    private final long ACCESS_TOKEN_AGE = 1000*60*5;
+    private final long REFRESH_TOKEN_AGE = 1000*60*60*24;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
-
     private String SECRET_KEY = "";
 
     public JwtService(){
@@ -42,22 +45,23 @@ public class JwtService {
         claims.put("roles", employeeDetails.getRoles());
 
         if(!employeeDetails.getRoles().contains(Role.ADMIN)){
-            appraisalService.checkIfEmployeeEligibleForAppraisal(employeeDetails);
+            employeeService.checkIfEmployeeEligibleForAppraisal(employeeDetails);
         }
 
         return Jwts.builder()
                 .claims(claims)
                 .subject(employeeDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+1000*60*15))
+                .expiration(new Date(System.currentTimeMillis()+ACCESS_TOKEN_AGE))
                 .signWith(getKey())
                 .compact();
     }
+
     public String generateRefreshToken(EmployeeDetails employeeDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("employee-id", employeeDetails.getEmployeeId().toString());
         Date issueTime = new Date(System.currentTimeMillis());
-        Date expiryTime = new Date(System.currentTimeMillis()+1000*60*60*24);
+        Date expiryTime = new Date(System.currentTimeMillis()+REFRESH_TOKEN_AGE);
         storeRefreshToken(employeeDetails, issueTime, expiryTime);
 
         return Jwts.builder()

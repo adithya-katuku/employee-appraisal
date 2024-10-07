@@ -21,10 +21,6 @@ public class TaskService {
     @Autowired
     private EmployeeRepo employeeRepo;
     @Autowired
-    private DesignationRepo designationRepo;
-    @Autowired
-    private AttributeRepo attributeRepo;
-    @Autowired
     private TaskRepo taskRepo;
     @Autowired
     private AppraisalRepo appraisalRepo;
@@ -125,7 +121,7 @@ public class TaskService {
         if(task==null){
             throw  new ResourceNotFoundException("Task with id "+taskId+" is not found.");
         }
-        if(task.getAppraisal().getAppraisalStatus()!=AppraisalStatus.INITIATED){
+        if(task.getAppraisal()!=null && task.getAppraisal().getAppraisalStatus()!=AppraisalStatus.INITIATED){
             throw  new InvalidInputException("This task cannot be deleted.");
         }
         taskRepo.delete(task);

@@ -4,7 +4,6 @@ package com.beehyv.backend.controllers;
 import com.beehyv.backend.dto.request.LoginRequestDTO;
 import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.services.authentication.AuthenticationService;
-import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,12 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
-
-    @GetMapping("/home")
-    public String home(){
-        return "Home page";
-    }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response){
@@ -46,7 +39,7 @@ public class AuthenticationController {
         return new ResponseEntity<>(authenticationService.refreshToken(refreshToken, response), HttpStatus.OK);
     }
 
-    @PostMapping("/log-out")
+    @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response){
         EmployeeDetails employeeDetails = (EmployeeDetails) SecurityContextHolder
                 .getContext()

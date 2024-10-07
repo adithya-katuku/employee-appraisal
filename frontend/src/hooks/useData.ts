@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   clearSearchedEmployees,
   RootState,
@@ -6,20 +5,21 @@ import {
   setEmployeeDetails,
   setSearchedEmployees,
   setSearchedName,
-  setTasks,
 } from "../stores/store";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import EmployeeDetailsModel from "../models/EmployeeDetailsModel";
+import useTasks from "./useTasks";
+import useAPI from "./useAPI";
 
 const useData = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const {fetchTasks} = useTasks();
+  const { api } = useAPI();
 
   const fetchInfo = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/info", {
+    await api
+      .get(loginState.role + "/info", {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -29,29 +29,12 @@ const useData = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
-      });
-  };
-
-  const fetchTasks = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/tasks", {
-        headers: {
-          Authorization: "Bearer " + loginState.token,
-        },
-      })
-      .then((res) => {
-        dispatch(setTasks(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchAppraisals = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/appraisals", {
+    await api
+      .get(loginState.role + "/appraisals", {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -61,11 +44,11 @@ const useData = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
+
   const submitAppraisal = async (appraisalId: number) => {
-    await axios
+    await api
       .put(
         "http://localhost:8080/" +
           loginState.role +
@@ -88,8 +71,8 @@ const useData = () => {
   };
 
   const searchEmployees = async (name: string) => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/people/" + name, {
+    await api
+      .get(loginState.role + "/people/" + name, {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -110,7 +93,6 @@ const useData = () => {
   };
   return {
     fetchInfo,
-    fetchTasks,
     fetchAppraisals,
     searchEmployees,
     setSearchedEmployeeDetails,

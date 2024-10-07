@@ -41,7 +41,7 @@ const NotificationsButton = () => {
             fontSize="1rem"
             h="1rem"
             rounded="50%"
-            w="1rem"
+            w="1.7rem"
             color="red"
             fontWeight="bold"
             bg="white"

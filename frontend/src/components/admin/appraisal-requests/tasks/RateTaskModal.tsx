@@ -45,8 +45,9 @@ const RateTaskModal = ({ isOpen, onClose, task, appraisalId }: Props) => {
   const { register, handleSubmit, setValue, reset } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
-
-  setValue("taskId", task.taskId);
+  if (task.taskId) {
+    setValue("taskId", task.taskId);
+  }
   if (task.adminRating) {
     setValue("rating", task.adminRating >= 0 ? task.adminRating : 0);
   }

@@ -1,15 +1,9 @@
 package com.beehyv.backend.controllers;
 
-import com.beehyv.backend.configurations.filters.JwtFilter;
 import com.beehyv.backend.dto.request.*;
-import com.beehyv.backend.dto.response.EmployeeResponseDTO;
-import com.beehyv.backend.dto.response.TaskResponseDTO;
 import com.beehyv.backend.userdetails.EmployeeDetails;
-import com.beehyv.backend.models.Attribute;
-import com.beehyv.backend.models.Notification;
 import com.beehyv.backend.services.AdminService;
 import com.beehyv.backend.services.EmployeeService;
-import com.beehyv.backend.services.userdetailsservice.EmployeeDetailsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -28,10 +21,6 @@ import java.util.List;
 public class AdminController {
     @Autowired
     private EmployeeService employeeService;
-    @Autowired
-    private EmployeeDetailsService employeeDetailsService;
-    @Autowired
-    private JwtFilter jwtFilter;
     @Autowired
     private AdminService adminService;
 
@@ -44,21 +33,10 @@ public class AdminController {
         return new ResponseEntity<>(employeeService.getEmployee(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
-    @GetMapping("/all-employees")
-    public ResponseEntity<?> getAllEmployees(){
-        List<EmployeeResponseDTO> employeeResponseDTOS = adminService.findAllEmployees();
-        return new ResponseEntity<>(employeeResponseDTOS, HttpStatus.OK);
-    }
-
-//    @GetMapping("/employee/{employeeId}")
-//    public EmployeeResponseDTO getEmployee(@PathVariable("employeeId") Integer employeeId){
-//        return employeeService.getEmployee(employeeId);
-//    }
-
     //CREATE EMPLOYEE:
     @PostMapping("/register")
-    public EmployeeResponseDTO saveEmployee(@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO){
-        return adminService.registerEmployee(employeeRequestDTO);
+    public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO){
+        return new ResponseEntity<>(adminService.registerEmployee(employeeRequestDTO), HttpStatus.OK);
     }
     @GetMapping("/all-designations")
     public ResponseEntity<?> getAllDesignations(){
@@ -75,97 +53,80 @@ public class AdminController {
 
     //TASKS:
     @GetMapping("/employee/{employeeId}/tasks")
-    public List<TaskResponseDTO> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
-        return employeeService.getTasks(employeeId);
-    }
-
-    //NOTIFICATIONS:
-    @PostMapping("/employee/{employeeId}/notifications")
-    public Notification addNotificationToEmployee(@PathVariable("employeeId") Integer employeeId, @RequestBody Notification notification){
-        return adminService.addNotification(employeeId, notification);
+    public ResponseEntity<?> getEmployeeTasks(@PathVariable("employeeId") Integer employeeId){
+        return new ResponseEntity<>(employeeService.getTasks(employeeId), HttpStatus.OK);
     }
 
     //SELF:
     //NOTIFICATIONS:
     @GetMapping("/notifications")
-    public List<Notification> getNotifications(){
+    public ResponseEntity<?> getNotifications(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        return employeeService.getNotifications(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.getNotifications(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @PutMapping("/notifications/{notificationId}")
-    public Notification readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
+    public ResponseEntity<?> readOrUnreadNotification(@PathVariable("notificationId") Integer notificationId){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.readOrUnreadNotification(notificationId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @DeleteMapping("/notifications/{notificationId}")
-    public String deleteNotification(@PathVariable("notificationId") Integer notificationId){
+    public ResponseEntity<?> deleteNotification(@PathVariable("notificationId") Integer notificationId){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId());
-    }
-
-    //ATTRIBUTES:
-    @GetMapping("/attributes")
-    public List<Attribute> getAttributes(){
-        EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return employeeService.getAttributes(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.deleteNotification(notificationId, employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     //TASKS:
     @GetMapping("/tasks")
-    public List<TaskResponseDTO> getTasks(){
+    public ResponseEntity<?> getTasks(){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.getTasks(employeeDetails.getEmployeeId());
+        return new ResponseEntity<>(employeeService.getTasks(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
     @PostMapping("/tasks")
-    public TaskResponseDTO addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+    public ResponseEntity<?> addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+        return new ResponseEntity<>(employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO), HttpStatus.OK);
     }
     @PutMapping("/tasks")
-    public TaskResponseDTO updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
+    public ResponseEntity<?> updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO);
+        return new ResponseEntity<>(employeeService.updateTask(employeeDetails.getEmployeeId(), taskRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/tasks/{taskId}")
-    public String deleteTask(@PathVariable("taskId") Integer taskId){
-        return employeeService.deleteTask(taskId);
+    public ResponseEntity<?> deleteTask(@PathVariable("taskId") Integer taskId){
+        return new ResponseEntity<>(employeeService.deleteTask(taskId), HttpStatus.OK);
     }
-
 
     //APPRAISAL:
     @PutMapping("/appraisal/{employeeId}")
-    public String startAppraisal(@PathVariable("employeeId") Integer employeeId, @Valid @RequestBody AppraisalRequestDTO appraisalRequestDTO){
+    public ResponseEntity<?> startAppraisal(@PathVariable("employeeId") Integer employeeId, @Valid @RequestBody AppraisalRequestDTO appraisalRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        return adminService.startAppraisal(employeeDetails.getEmployeeId(), employeeId, appraisalRequestDTO);
+        return new ResponseEntity<>(adminService.startAppraisal(employeeDetails.getEmployeeId(), employeeId, appraisalRequestDTO), HttpStatus.OK);
     }
 
     @GetMapping("/appraisal-requests")
@@ -179,13 +140,13 @@ public class AdminController {
     }
 
     @PutMapping("/appraisal-requests/tasks")
-    public TaskResponseDTO rateTask(@Valid @RequestBody RateTaskRequestDTO rateTaskRequestDTO){
-        return adminService.rateTaskByAdmin(rateTaskRequestDTO);
+    public ResponseEntity<?> rateTask(@Valid @RequestBody RateTaskRequestDTO rateTaskRequestDTO){
+        return new ResponseEntity<>(adminService.rateTaskByAdmin(rateTaskRequestDTO), HttpStatus.OK);
     }
 
     @PutMapping("/appraisal-requests/{appraisalId}/attributes")
-    public String rateEmployeeAttribute(@PathVariable("appraisalId") Integer appraisalId, @Valid @RequestBody RateAttributeRequestDTO rateAttributeRequestDTO) {
-        return adminService.rateAttribute(appraisalId, rateAttributeRequestDTO);
+    public ResponseEntity<?> rateEmployeeAttribute(@PathVariable("appraisalId") Integer appraisalId, @Valid @RequestBody RateAttributesRequestDTO rateAttributesRequestDTO) {
+        return new ResponseEntity<>(adminService.rateAttribute(appraisalId, rateAttributesRequestDTO), HttpStatus.OK);
     }
 
     @PutMapping("/appraisal-requests/{appraisalId}")
@@ -194,7 +155,7 @@ public class AdminController {
     }
 
     @GetMapping("/employee/{employeeId}/appraisals")
-    public ResponseEntity<?> getPrevious(@PathVariable("employeeId") Integer employeeId){
+    public ResponseEntity<?> getPreviousAppraisals(@PathVariable("employeeId") Integer employeeId){
         return new ResponseEntity<>(adminService.getPreviousAppraisals(employeeId), HttpStatus.OK);
     }
 
@@ -208,6 +169,5 @@ public class AdminController {
         catch (NumberFormatException e){
             return new ResponseEntity<>(adminService.findPeople(name), HttpStatus.OK);
         }
-
     }
 }

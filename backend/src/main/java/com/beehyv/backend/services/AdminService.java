@@ -12,9 +12,7 @@ import com.beehyv.backend.models.enums.AppraisalStatus;
 import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,12 @@ import java.util.List;
 @Service
 public class AdminService {
     @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private AppraisalService appraisalService;
+    @Autowired
     private EmployeeRepo employeeRepo;
     @Autowired
     private DesignationRepo designationRepo;
@@ -32,15 +36,11 @@ public class AdminService {
     @Autowired
     private AppraisalRepo appraisalRepo;
     @Autowired
-    private TaskService taskService;
-    @Autowired
     private NotificationRepo notificationRepo;
-    @Autowired
-    private AppraisalService appraisalService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
-    public EmployeeResponseDTO registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
+    public String registerEmployee(@Valid EmployeeRequestDTO employeeRequestDTO) {
         if(employeeRepo.findByEmail(employeeRequestDTO.email())!=null){
             throw  new InvalidInputException("Email is already in use. Try with a different email.");
         }
@@ -59,20 +59,12 @@ public class AdminService {
         }
 
         employee.setDesignation(designation);
-        return new EmployeeResponseDTOMapper().apply(employeeRepo.save(employee));
-    }
-
-    public List<EmployeeResponseDTO> findAllEmployees() {
-        List<Employee> employees = employeeRepo.findByRole(Role.EMPLOYEE);
-        if (employees == null) {
-            throw new ResourceNotFoundException("No employees found.");
-        }
-        EmployeeResponseDTOMapper employeeResponseDTOMapper = new EmployeeResponseDTOMapper();
-        return employees.stream().map(employeeResponseDTOMapper).toList();
+        employeeRepo.save(employee);
+        return "Successfully registered employee " + employee.getEmployeeId();
     }
 
     //ATTRIBUTES:
-    public String rateAttribute(Integer appraisalId, RateAttributeRequestDTO rateAttributeRequestDTO) {
+    public String rateAttribute(Integer appraisalId, RateAttributesRequestDTO rateAttributesRequestDTO) {
         Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
         if (appraisal == null) {
             throw new ResourceNotFoundException("Appraisal with id " + appraisalId + " is not found.");
@@ -81,8 +73,8 @@ public class AdminService {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
         }
         ArrayList<AttributeDAO> attributes = new ArrayList<>();
-        for (AttributeDAO attributeDAO : rateAttributeRequestDTO.attributes()) {
-            attributes.add(new AttributeDAO(attributeDAO.getName(), attributeDAO.getRating()));
+        for (AttributeRequestDTO attributeRequestDTO : rateAttributesRequestDTO.attributes()) {
+            attributes.add(new AttributeDAO(attributeRequestDTO.name(), attributeRequestDTO.rating()));
         }
         appraisal.setAttributes(attributes);
         appraisalRepo.save(appraisal);
@@ -96,14 +88,16 @@ public class AdminService {
     }
 
     //NOTIFICATIONS:
-    public Notification addNotification(Integer employeeId, Notification notification) {
+    public void addNotification(Integer employeeId, String title, String description) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
-        if (employee != null) {
-            notification.setEmployee(employee);
-            return notificationRepo.save(notification);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee with id " + employeeId + " is  not found.");
         }
-
-        throw new ResourceNotFoundException("Employee with id " + employeeId + " is  not found.");
+        Notification notification = new Notification();
+        notification.setNotificationTitle(title);
+        notification.setDescription(description);
+        notification.setEmployee(employee);
+        notificationRepo.save(notification);
     }
 
     //Appraisal:
@@ -120,14 +114,15 @@ public class AdminService {
 //        employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0
         if (employee.getAppraisalEligibility() != AppraisalEligibility.PROCESSING) {
             Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
-            appraisalService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
+            employeeService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
             taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
 
             Notification notification = new Notification();
-            notification.setNotificationTitle("Appraisal!");
+            notification.setNotificationTitle("Appraisal Initiated!");
             notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
-
-            addNotification(employeeId, notification);
+            String title = "Appraisal!";
+            String description = "Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.";
+            addNotification(employeeId, title, description);
 
             return "Started appraisal process for the employee with id: " + employeeId;
         }
@@ -153,7 +148,7 @@ public class AdminService {
             throw new ResourceNotFoundException("Employee with id " + appraisal.getEmployeeId() + " is not found.");
         }
 
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTOMapper().apply(employee);
+        FullEmployeeResponseDTO employeeResponseDTO = new FullEmployeeDetailsMapper().apply(employee);
         List<AttributeDAO> attributes = appraisal.getAttributes();
         List<TaskResponseDTO> taskResponseDTOs = appraisal.getTasks().stream()
                 .map(task -> new TaskResponseDTOMapper().apply(task))
@@ -195,8 +190,12 @@ public class AdminService {
         if(unrated!=0){
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is not fully rated.");
         }
-        appraisalService.changePreviousAppraisalDateAndEligibility(appraisal.getEmployeeId(), appraisal.getEndDate(), AppraisalEligibility.NOT_ELIGIBLE);
+        employeeService.changePreviousAppraisalDateAndEligibility(appraisal.getEmployeeId(), appraisal.getEndDate(), AppraisalEligibility.NOT_ELIGIBLE);
         appraisal.setAppraisalStatus(AppraisalStatus.APPROVED);
+
+        String title = "Appraisal Rated!";
+        String description = "Your appraisal has been rated by admins.";
+        addNotification(appraisal.getEmployeeId(), title, description);
 
         appraisalRepo.save(appraisal);
 

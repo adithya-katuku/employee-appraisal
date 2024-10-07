@@ -31,7 +31,7 @@ const LoginForm = () => {
   const { register, handleSubmit } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
-  const { refreshJwt, redirect, generateCaptcha, loginWithCredentials } =
+  const { loginWIthJwt, redirect, generateCaptcha, loginWithCredentials } =
     useAuth();
   const loginState = useSelector((state: RootState) => state.store.loginState);
   const url = useSelector((state: RootState) => state.store.url);
@@ -39,7 +39,7 @@ const LoginForm = () => {
   useEffect(() => {
     const authFun = async () => {
       try {
-        await refreshJwt();
+        await loginWIthJwt();
       } catch {
         generateCaptcha();
       }
@@ -57,16 +57,19 @@ const LoginForm = () => {
   };
 
   return (
-    <Flex minH="100vh" align="center" justify="center" bg="gray.50">
+    <Flex minH="100vh" justify="center" bg="gray.100">
       <Box
         minW="md"
         mx="auto"
-        mt={10}
+        mt="15%"
         p={6}
+        h="fit-content"
         boxShadow="lg"
         borderRadius="md"
         borderWidth={1}
         borderColor="gray.200"
+        bg="white"
+        shadow="dark-lg"
       >
         <Heading mb={6} textAlign="center">
           Login

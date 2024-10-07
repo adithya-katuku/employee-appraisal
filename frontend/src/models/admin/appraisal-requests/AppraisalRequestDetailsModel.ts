@@ -2,7 +2,7 @@ import AttributeModel from "../../AttributeModel";
 import EmployeeDetails from "../../EmployeeDetailsModel";
 import TaskModel from "../../TaskModel";
 
-export default interface AppraisalRequestDetails {
+export default interface AppraisalRequestDetailsModel {
   employeeDetails: EmployeeDetails;
   attributes: AttributeModel[];
   tasks: TaskModel[];

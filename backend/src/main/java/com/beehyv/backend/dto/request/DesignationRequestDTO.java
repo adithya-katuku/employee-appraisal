@@ -1,7 +1,5 @@
 package com.beehyv.backend.dto.request;
 
-import com.beehyv.backend.models.Attribute;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 

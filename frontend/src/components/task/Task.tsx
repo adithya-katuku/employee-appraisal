@@ -40,7 +40,9 @@ const Task = (task: TaskModel) => {
       {role === "employee" && task.appraisable && (
         <>
           <Text fontSize="sm">Self Rating: {task.selfRating} / 10</Text>
-          <Text fontSize="sm">Admin Rating: {task.adminRating} / 10</Text>
+          {task.adminRating && (
+            <Text fontSize="sm">Admin Rating: {task.adminRating} / 10</Text>
+          )}
         </>
       )}
     </Box>

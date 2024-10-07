@@ -64,8 +64,7 @@ const NewDesignationModal = ({ isOpen, onClose }: Props) => {
   const {saveDesignation} = useRegister();
 
   const onSubmit = (data:validForm) => {
-    console.log(data);
-    saveDesignation(data);
+      saveDesignation(data);
     handleClose();
   };
   const handleClose = () => {

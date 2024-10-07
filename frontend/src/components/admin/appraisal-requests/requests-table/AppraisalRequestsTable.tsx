@@ -7,11 +7,11 @@ import {
   Tbody,
   Td,
 } from "@chakra-ui/react";
-import AppraisalRequestsFormEntry from "../../../../models/admin/appraisal-requests/AppraisalRequestsFormEntry";
+import AppraisalRequestsListEntryModel from "../../../../models/admin/appraisal-requests/AppraisalRequestsListEntryModel";
 import ViewDetails from "../buttons/ViewDetails";
 
 interface Props {
-  appraisalRequests: AppraisalRequestsFormEntry[];
+  appraisalRequests: AppraisalRequestsListEntryModel[];
 }
 
 const AppraisalTable = ({ appraisalRequests }: Props) => {

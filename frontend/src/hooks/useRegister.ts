@@ -1,18 +1,17 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { RootState, setAttributes, setDesignations } from "../stores/store";
-import axios from "axios";
 import DesignationModel from "../models/admin/register-employee/DesignationModel";
 import RegisterUserModel from "../models/admin/register-employee/RegisterUserModel";
+import useAPI from "./useAPI";
 
 const useRegister = () => {
   const loginState = useSelector((state: RootState) => state.store.loginState);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {api} = useAPI();
 
   const fetchDesignations = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/all-designations", {
+    await api
+      .get(loginState.role + "/all-designations", {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -22,13 +21,12 @@ const useRegister = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const fetchAttributes = async () => {
-    await axios
-      .get("http://localhost:8080/" + loginState.role + "/all-attributes", {
+    await api
+      .get(loginState.role + "/all-attributes", {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -38,13 +36,12 @@ const useRegister = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
 
   const saveDesignation = async (designation:DesignationModel) => {
-    await axios
-      .post("http://localhost:8080/" + loginState.role + "/all-designations", {...designation}, {
+    await api
+      .post(loginState.role + "/all-designations", {...designation}, {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
@@ -54,12 +51,11 @@ const useRegister = () => {
       })
       .catch((err) => {
         console.log(err);
-        navigate("/login");
       });
   };
   const saveUser = async (user:RegisterUserModel) => {
-    await axios
-      .post("http://localhost:8080/" + loginState.role + "/register", {...user}, {
+    await api
+      .post(loginState.role + "/register", {...user}, {
         headers: {
           Authorization: "Bearer " + loginState.token,
         },
