@@ -1,10 +1,10 @@
-import { Box, Checkbox, Flex, Text } from "@chakra-ui/react"
-import TaskModel from "../../../../models/TaskModel"
+import { Box, Checkbox, Flex, Text } from "@chakra-ui/react";
+import TaskModel from "../../../../models/TaskModel";
 
-interface Props{
-    task:TaskModel;
+interface Props {
+  task: TaskModel;
 }
-const ProfileTask = ({task}:Props) => {
+const ProfileTask = ({ task }: Props) => {
   return (
     <Box
       m="1"
@@ -14,7 +14,10 @@ const ProfileTask = ({task}:Props) => {
       rounded="lg"
       maxW="50rem"
     >
-      <Flex justifyContent="space-between">
+      <Flex
+        flexDir={{ base: "column", sm: "row" }}
+        justifyContent="space-between"
+      >
         <Box>
           <Text>{task.taskTitle}</Text>
           <Text fontSize="sm">
@@ -23,20 +26,29 @@ const ProfileTask = ({task}:Props) => {
               new Date(task.endDate).toISOString().split("T")[0]}
           </Text>
         </Box>
-        <Flex mx="2" alignItems="center" fontSize="sm" minW="fit-content">
-            <Checkbox isDisabled isChecked={task.appraisable} mx="2" />
-            <Text>Marked for appraisal</Text>
-          </Flex>
+        <Flex
+          mx={{ base: "0", sm: "2" }}
+          alignItems="center"
+          fontSize="sm"
+          minW="fit-content"
+        >
+          <Checkbox isDisabled isChecked={task.appraisable} mr="2" />
+          <Text>Marked for appraisal</Text>
+        </Flex>
       </Flex>
       <Text border="1px" borderColor="gray.200" rounded="md" p="1" my="1">
         {task.description}
       </Text>
-      <Text fontSize="sm">Self Rating: {task.selfRating} / 10</Text>
-      {task.adminRating && task.adminRating >= 0 && (
-        <Text fontSize="sm">Admin Rating: {task.adminRating} / 10</Text>
+      {task.appraisable && (
+        <>
+          <Text fontSize="sm">Self Rating: {task.selfRating} / 10</Text>
+          {task.adminRating && task.adminRating >= 0 && (
+            <Text fontSize="sm">Admin Rating: {task.adminRating} / 10</Text>
+          )}
+        </>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default ProfileTask
+export default ProfileTask;

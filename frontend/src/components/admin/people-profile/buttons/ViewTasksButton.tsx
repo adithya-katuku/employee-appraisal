@@ -13,8 +13,8 @@ const ViewTasksButton = () => {
     onOpen();
   };
   return (
-    <Box>
-      <Button colorScheme="blue" onClick={handleClick}>
+    <Box >
+      <Button colorScheme="blue" w={{base:"12rem", md:"fit-content"}} onClick={handleClick}>
         View Tasks
       </Button>
 

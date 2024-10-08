@@ -20,7 +20,7 @@ const Profile = () => {
         <ChevronRightIcon />
         <Text>Profile</Text>
       </HStack>
-      <Box m="auto" maxW="60rem">
+      <Box maxW="60rem">
         <EmployeeDetails employeeDetails={info} />
       </Box>
     </Box>

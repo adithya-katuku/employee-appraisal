@@ -5,7 +5,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -37,10 +36,9 @@ const schema = z.object({
   appraisable: z.boolean().optional(),
   selfRating: z
     .preprocess(
-      (value) => (typeof value === "string" ? parseFloat(value) : value),
-      z.number().positive().max(10)
-    )
-    .optional(),
+      (value) => (value ? typeof value === "string" ? parseFloat(value) : value:undefined),
+      z.number().positive().max(10).optional()
+    ),
 });
 
 type validForm = z.infer<typeof schema>;
@@ -73,13 +71,13 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW={{base:"90vw", md:"fit-content"}} >
         <ModalHeader>Add Task</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody>
+          <ModalBody >
             <FormControl isRequired my="1">
               <FormLabel>Task title</FormLabel>
               <Input placeholder="Title" {...register("taskTitle")} />
@@ -93,10 +91,10 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Duration</FormLabel>
-              <InputGroup>
-                <Input type="date" mx="1" {...register("startDate")} />
-                <Input type="date" mx="1" {...register("endDate")} />
-              </InputGroup>
+              <Box display={{md:"flex"}} >
+                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("startDate")} />
+                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("endDate")} />
+              </Box>
               {errors.startDate && <Text>{errors.startDate.message}</Text>}
             </FormControl>
             {role === "employee" && (

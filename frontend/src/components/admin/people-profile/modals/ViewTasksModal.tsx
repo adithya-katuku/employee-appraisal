@@ -22,7 +22,7 @@ const ViewTasksModal = ({ isOpen, onClose }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent  w={{base:"90vw", md:"100rem"}}>
         <ModalHeader>
           Employee Tasks:
           <ModalCloseButton />

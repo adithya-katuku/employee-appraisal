@@ -67,7 +67,7 @@ const RateTaskModal = ({ isOpen, onClose, task, appraisalId }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent  w={{base:"85vw", md:"80rem"}} >
         <ModalHeader>Rate Task</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit(onSubmit)}>

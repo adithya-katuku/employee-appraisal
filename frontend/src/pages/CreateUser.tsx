@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { IoHome } from "react-icons/io5";
 import NewDesignationButton from "../components/admin/create-user/buttons/NewDesignationButton";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useRegister from "../hooks/useRegister";
 import { useSelector } from "react-redux";
 import { RootState } from "../stores/store";
@@ -48,6 +48,8 @@ const CreateUser = () => {
     reset,
     formState: { errors },
   } = useForm<validForm>({ resolver: zodResolver(schema) });
+  const designationRef = useRef<Select | null>(null);
+  const rolesRef = useRef(null);
 
   const { fetchDesignations, saveUser } = useRegister();
   const existingRoles = ["ADMIN", "EMPLOYEE"];
@@ -93,13 +95,15 @@ const CreateUser = () => {
 
   const onSubmit = async (data: validForm) => {
     console.log(data);
-    await saveUser(data)
-      .then(() => {
-        reset();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if(designationRef.current)
+    reset();
+    // await saveUser(data)
+    //   .then(() => {
+    //     reset();
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   return (
@@ -135,7 +139,7 @@ const CreateUser = () => {
                 <NewDesignationButton />
               </Flex>
               <Select
-                options={designationOptions}
+                options={designationOptions} ref={designationRef} 
                 onChange={handleDesignationChange}
                 placeholder="Select designation"
               />
@@ -143,7 +147,7 @@ const CreateUser = () => {
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Roles:</FormLabel>
               <Select
-                options={roleOptions}
+                options={roleOptions} ref={rolesRef}
                 isMulti
                 onChange={handleRoleChange}
                 placeholder="Select roles"
@@ -155,13 +159,13 @@ const CreateUser = () => {
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Password:</FormLabel>
-              <Input type="password" {...register("password")} />
+              <Input  type="password" autoComplete="new-password" {...register("password")} />
             </FormControl>
             {errors.designation && (
               <Text color="red">{errors.designation.message}</Text>
             )}
             <Flex maxW="50rem" justify="center">
-              <Button type="submit" mt="2">
+              <Button type="submit" mt="2" colorScheme="green">
                 Save
               </Button>
             </Flex>

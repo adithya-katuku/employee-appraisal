@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RootState } from "./stores/store";
 import { Box } from "@chakra-ui/react";
 import Navbar from "./components/navbar/Navbar";
-import VerticalNavbar from "./components/navbar/VerticalNavbar";
+import Sidebar from "./components/navbar/Sidebar";
 import Wrapper from "./components/navbar/Wrapper";
 import Appraisal from "./pages/Appraisal";
 import Tasks from "./pages/Tasks";
@@ -23,7 +23,7 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Box p="3" display={isLoggedIn ? "flex" : "contents"}>
-        <VerticalNavbar />
+        <Sidebar />
         <Wrapper>
           <Routes>
             <Route path="/login" Component={Login}></Route>

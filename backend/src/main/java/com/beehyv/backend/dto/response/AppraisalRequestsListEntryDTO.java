@@ -1,6 +1,6 @@
 package com.beehyv.backend.dto.response;
 
-public record AppraisalFormEntryDTO(
+public record AppraisalRequestsListEntryDTO(
         Integer appraisalId,
         Integer employeeId,
         String employeeName

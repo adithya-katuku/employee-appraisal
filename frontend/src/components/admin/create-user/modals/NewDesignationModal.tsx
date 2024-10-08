@@ -75,7 +75,7 @@ const NewDesignationModal = ({ isOpen, onClose }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent  w={{base:"90vw"}}>
         <ModalHeader>
           New Designation
           <ModalCloseButton />

@@ -11,13 +11,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import {  RootState } from "../stores/store";
+import { RootState } from "../stores/store";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useAuth from "../hooks/useAuth";
-
 
 const schema = z.object({
   email: z.string(),
@@ -59,23 +58,23 @@ const LoginForm = () => {
   return (
     <Flex minH="100vh" justify="center" bg="gray.100">
       <Box
-        minW="md"
-        mx="auto"
-        mt="15%"
-        p={6}
-        h="fit-content"
+        mt={{sm:"15%"}}
+        p="6"
+        h={{sm:"fit-content"}}
+        w={{base:"100%", sm:"fit-content"}}
         boxShadow="lg"
         borderRadius="md"
-        borderWidth={1}
+        borderWidth="1"
         borderColor="gray.200"
         bg="white"
         shadow="dark-lg"
       >
-        <Heading mb={6} textAlign="center">
+        <Heading mb="6" textAlign="center">
           Login
         </Heading>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={4}>
+        <Box mx="auto" maxW={{base:"30rem", sm:"fit-content"}} >
+        <form  onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing="3">
             <FormControl id="email" isRequired>
               <FormLabel>Email</FormLabel>
               <Input
@@ -93,8 +92,10 @@ const LoginForm = () => {
                 {...register("password")}
               />
             </FormControl>
-            <Flex alignItems="center">
-              <Image minH="6.3rem" src={url} alt="Captcha" />
+            <Flex alignItems="center" p="1" >
+              <Box >
+                <Image minH="6.3rem" src={url} alt="Captcha" />
+              </Box>
               <Button
                 w="1rem"
                 margin="1"
@@ -118,6 +119,7 @@ const LoginForm = () => {
             </Button>
           </Stack>
         </form>
+        </Box>
       </Box>
     </Flex>
   );

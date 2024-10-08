@@ -22,6 +22,7 @@ const ViewDetails = ({ appriasalId }: Props) => {
         border="1px"
         borderColor="gray.400"
         colorScheme="blue"
+        size="sm"
       >
         View Details
       </Button>

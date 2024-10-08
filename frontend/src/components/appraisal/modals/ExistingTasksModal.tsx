@@ -22,7 +22,7 @@ const ExistingTasksModal = ({ isOpen, onClose }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent w={{base:"90vw", md:"100rem"}}>
         <ModalHeader>Add Existing Tasks</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

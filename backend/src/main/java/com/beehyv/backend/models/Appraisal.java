@@ -23,7 +23,7 @@ public class Appraisal {
     private Integer id;
     private Integer adminId;
     private Integer employeeId;
-    private AppraisalStatus appraisalStatus = AppraisalStatus.PENDING;
+    private AppraisalStatus appraisalStatus;
     private Double rating;
     private Date startDate;
     private Date endDate;

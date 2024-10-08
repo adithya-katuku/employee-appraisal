@@ -16,8 +16,8 @@ interface Props {
 
 const AppraisalTable = ({ appraisalRequests }: Props) => {
   return (
-    <TableContainer>
-      <Table maxW="50rem">
+    <TableContainer  >
+      <Table size="sm" maxW="50rem" >
         <Thead>
           <Tr>
             <Th>Employee ID</Th>
@@ -25,7 +25,7 @@ const AppraisalTable = ({ appraisalRequests }: Props) => {
             <Th>Action</Th>
           </Tr>
         </Thead>
-        <Tbody>
+        <Tbody >
           {appraisalRequests &&
             appraisalRequests.map((appraisalRequest, index) => (
               <Tr key={index}>

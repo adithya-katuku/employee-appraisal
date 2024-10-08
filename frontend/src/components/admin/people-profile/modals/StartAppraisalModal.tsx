@@ -55,7 +55,7 @@ const StartAppraisalModal = ({ isOpen, onClose }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent  w={{base:"90vw", md:"100rem"}}>
         <ModalHeader>Start Appraisal</ModalHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>

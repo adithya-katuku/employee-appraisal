@@ -24,7 +24,7 @@ const AppraisalRequest = () => {
         <ChevronRightIcon />
         <Text>Appraisal Requests</Text>
       </HStack>
-      <Box m="auto" maxW="60rem" >
+      <Box  maxW="90vw">
         {apprasialRequests && apprasialRequests.length > 0 ? (
           <AppraisalTable appraisalRequests={apprasialRequests} />
         ) : (

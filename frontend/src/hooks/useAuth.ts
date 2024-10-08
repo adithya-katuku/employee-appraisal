@@ -51,13 +51,7 @@ const useAuth = () => {
         {},
         { withCredentials: true }
       );
-      const { accessToken, role } = res.data;
-      const newLoginState = {
-        isLoggedIn: loginState.isLoggedIn,
-        role: role,
-        token: accessToken,
-      };
-      dispatch(login(newLoginState));
+      const { accessToken } = res.data;
       return accessToken;
     } catch (err){
       console.log("Failed to refresh access token.");
@@ -128,9 +122,10 @@ const useAuth = () => {
   };
 
   const redirect = () => {
-    const prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
+    let prevpage = localStorage.page ? parseInt(localStorage.page) : 0;
+    prevpage = Math.max(0, prevpage);
     dispatch(setSelectedPage(prevpage));
-    const path = prevpage >= 0 ? options[prevpage].path : options[0].path;
+    const path = options[prevpage].path;
     navigate(path);
   };
 

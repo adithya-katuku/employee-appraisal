@@ -17,7 +17,7 @@ const Wrapper = ({ children }: Props) => {
       m="1"
       rounded="md"
       flexGrow="1"
-      ml="17rem"
+      ml={{sm:"0rem", md:"17rem"}}
       minH="80vh"
     >
       {children}

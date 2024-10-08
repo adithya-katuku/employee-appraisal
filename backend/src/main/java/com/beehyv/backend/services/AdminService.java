@@ -69,7 +69,7 @@ public class AdminService {
         if (appraisal == null) {
             throw new ResourceNotFoundException("Appraisal with id " + appraisalId + " is not found.");
         }
-        if (appraisal.getAppraisalStatus() != AppraisalStatus.SUBMITTED) {
+        if (appraisal.getAppraisalStatus() != AppraisalStatus.UNDER_REVIEW) {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
         }
         ArrayList<AttributeDAO> attributes = new ArrayList<>();
@@ -130,7 +130,7 @@ public class AdminService {
         return "An appraisal for this employee ais already under process.";
     }
 
-    public List<AppraisalFormEntryDTO> getPendingAppraisalRequests() {
+    public List<AppraisalRequestsListEntryDTO> getPendingAppraisalRequests() {
         return appraisalService.getPendingAppraisalRequests();
     }
 
@@ -139,7 +139,7 @@ public class AdminService {
         if (appraisal == null) {
             throw new ResourceNotFoundException("Appraisal with id " + appraisalId + " is not found.");
         }
-        if (appraisal.getAppraisalStatus() != AppraisalStatus.SUBMITTED) {
+        if (appraisal.getAppraisalStatus() != AppraisalStatus.UNDER_REVIEW) {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
         }
 
@@ -173,7 +173,7 @@ public class AdminService {
         if (appraisal == null) {
             throw new ResourceNotFoundException("Appraisal with id " + appraisalId + " is not found.");
         }
-        if (appraisal.getAppraisalStatus() != AppraisalStatus.SUBMITTED) {
+        if (appraisal.getAppraisalStatus() != AppraisalStatus.UNDER_REVIEW) {
             throw new InvalidInputException("Appraisal with id " + appraisalId + " is already rated.");
         }
         int unrated = 0;

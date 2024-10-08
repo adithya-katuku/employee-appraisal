@@ -17,7 +17,11 @@ const Task = (task: TaskModel) => {
     >
       <Flex justifyContent="space-between">
         <Box>
-          <Text>{task.taskTitle}</Text>
+          <Text>
+            {task.taskTitle.length > 20
+              ? `${task.taskTitle.slice(0, 20)}...`
+              : task.taskTitle}
+          </Text>
           <Text fontSize="sm">
             {new Date(task.startDate).toISOString().split("T")[0] +
               " - " +
@@ -35,7 +39,9 @@ const Task = (task: TaskModel) => {
         </Box>
       </Flex>
       <Text border="1px" borderColor="gray.200" rounded="md" p="1" my="1">
-        {task.description}
+        {task.description.length > 200
+          ? `${task.description.slice(0, 200)}...`
+          : task.description}
       </Text>
       {role === "employee" && task.appraisable && (
         <>

@@ -5,7 +5,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -103,7 +102,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW={{base:"90vw", md:"fit-content"}}>
         <ModalHeader>Edit Task</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -121,10 +120,10 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Duration</FormLabel>
-              <InputGroup>
-                <Input type="date" mx="1" {...register("startDate")} />
-                <Input type="date" mx="1" {...register("endDate")} />
-              </InputGroup>
+              <Box display={{md:"flex"}} >
+                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("startDate")} />
+                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("endDate")} />
+              </Box>
             </FormControl>
             {role === "employee" && (
               <>

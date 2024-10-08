@@ -74,7 +74,7 @@ const useNotifications = () => {
       navigate(`/${loginState.role}/people`);
     }
 
-    if (notification.notificationTitle === "Appraisal Inititated!" || notification.notificationTitle === "Appraisal Rated!") {
+    if (notification.notificationTitle === "Appraisal!" || notification.notificationTitle === "Appraisal Rated!") {
       dispatch(setSelectedPage(3));
       navigate(`/${loginState.role}/appraisals`);
     }

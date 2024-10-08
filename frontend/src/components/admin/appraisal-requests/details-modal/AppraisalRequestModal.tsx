@@ -28,7 +28,7 @@ const AppraisalRequestModal = ({ isOpen, onClose, appraisalId }: Props) => {
   return appraisalRequestDetails ? (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalOverlay />
-      <ModalContent w="100rem">
+      <ModalContent w={{base:"90vw", md:"100rem"}}>
         <ModalHeader>Appraisal Request</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

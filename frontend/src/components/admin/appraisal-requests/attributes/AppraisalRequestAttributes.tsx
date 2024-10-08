@@ -64,7 +64,7 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
           {attributes.map((attribute, index) => (
             <FormControl key={attribute.name} m="1">
               <InputGroup>
-                <InputLeftAddon w="50%">{attribute.name}</InputLeftAddon>
+                <InputLeftAddon w={{base:"75%", md:"50%"}} >{attribute.name}</InputLeftAddon>
                 <Input
                   type="number"
                   isRequired
