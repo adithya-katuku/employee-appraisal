@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Spacer, Text } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { IoHome } from "react-icons/io5";
 import { useEffect } from "react";
@@ -18,18 +18,26 @@ const Tasks = () => {
   }, []);
 
   return (
-    <Box>
+    <Flex minH="100%" flexDir="column">
       <HStack mb="2">
         <IoHome />
         <ChevronRightIcon />
         <Text>Tasks</Text>
       </HStack>
-      <Flex justifyContent="center">{tasks && <TaskList tasks={tasks} />}</Flex>
-
+      <Flex  >
+      <Box
+        maxW="60rem"
+        alignContent="center"
+        alignItems="center"
+        justifyItems="center"
+      >
+        {tasks && <TaskList tasks={tasks} />}
+      </Box></Flex>
+      <Spacer />
       <Flex justifyContent="end" position="sticky" bottom="3">
         <AddTask />
       </Flex>
-    </Box>
+    </Flex>
   );
 };
 

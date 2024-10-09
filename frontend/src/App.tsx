@@ -9,16 +9,18 @@ import Sidebar from "./components/navbar/Sidebar";
 import Wrapper from "./components/navbar/Wrapper";
 import Appraisal from "./pages/Appraisal";
 import Tasks from "./pages/Tasks";
-import ProtectedRoutes from "./components/auth/ProtectedRoutes";
-import EmployeeRoutes from "./components/auth/EmployeeRoutes";
+import ProtectedRoutes from "./routes/ProtectedRoutes";
+import EmployeeRoutes from "./routes/EmployeeRoutes";
 import AppraisalRequest from "./pages/AppraisalRequest";
-import AdminRoutes from "./components/auth/AdminRoutes";
+import AdminRoutes from "./routes/AdminRoutes";
 import People from "./pages/People";
 import Profile from "./pages/Profile";
 import CreateUser from "./pages/CreateUser";
 
 function App() {
-  const isLoggedIn = useSelector((state: RootState) => state.store.loginState.isLoggedIn);
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.store.loginState.isLoggedIn
+  );
   return (
     <BrowserRouter>
       <Navbar />

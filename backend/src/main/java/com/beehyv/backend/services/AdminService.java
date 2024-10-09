@@ -110,24 +110,22 @@ public class AdminService {
         if(employee.getRoles().contains(Role.ADMIN)){
             throw new InvalidInputException("An admin cannot be appraised.");
         }
-//        employee.getAppraisalEligibility()!=AppraisalEligibility.PROCESSING
-//        employee.getPreviousAppraisalDate().compareTo(appraisalRequestDTO.startDate())>=0
-        if (employee.getAppraisalEligibility() != AppraisalEligibility.PROCESSING) {
-            Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
-            employeeService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
-            taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
-
-            Notification notification = new Notification();
-            notification.setNotificationTitle("Appraisal Initiated!");
-            notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
-            String title = "Appraisal!";
-            String description = "Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.";
-            addNotification(employeeId, title, description);
-
-            return "Started appraisal process for the employee with id: " + employeeId;
+        if (employee.getAppraisalEligibility() == AppraisalEligibility.PROCESSING) {
+            throw new InvalidInputException("An appraisal is already being processed for the employee.");
         }
+        Appraisal appraisal = appraisalService.addAppraisalEntry(adminId, employeeId, appraisalRequestDTO);
+        employeeService.changePreviousAppraisalDateAndEligibility(employeeId, appraisalRequestDTO.endDate(), AppraisalEligibility.PROCESSING);
+        taskService.addAppraisableTasksToAppraisalForm(employeeId, appraisal);
 
-        return "An appraisal for this employee ais already under process.";
+        Notification notification = new Notification();
+        notification.setNotificationTitle("Appraisal Initiated!");
+        notification.setDescription("Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.");
+        String title = "Appraisal!";
+        String description = "Congratulations! You are eligible for an appraisal. Please add your tasks to the appraisal form.";
+        addNotification(employeeId, title, description);
+
+        return "Started appraisal process for the employee with id: " + employeeId;
+
     }
 
     public List<AppraisalRequestsListEntryDTO> getPendingAppraisalRequests() {
@@ -203,7 +201,7 @@ public class AdminService {
     }
 
     public List<AppraisalDTO> getPreviousAppraisals(Integer employeeId) {
-        return appraisalService.getAppraisals(employeeId);
+        return appraisalService.getPreviousAppraisals(employeeId);
     }
 
     public List<String> getAllAttributes() {

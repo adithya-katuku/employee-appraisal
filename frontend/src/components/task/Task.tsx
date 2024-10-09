@@ -13,7 +13,9 @@ const Task = (task: TaskModel) => {
       border="1px"
       borderColor="gray.300"
       rounded="lg"
-      maxW="60rem"
+      
+      
+      // minW="100%"
     >
       <Flex justifyContent="space-between">
         <Box>
@@ -39,9 +41,7 @@ const Task = (task: TaskModel) => {
         </Box>
       </Flex>
       <Text border="1px" borderColor="gray.200" rounded="md" p="1" my="1">
-        {task.description.length > 200
-          ? `${task.description.slice(0, 200)}...`
-          : task.description}
+        {task.description}
       </Text>
       {role === "employee" && task.appraisable && (
         <>

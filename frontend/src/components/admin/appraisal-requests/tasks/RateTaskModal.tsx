@@ -32,7 +32,7 @@ const schema = z.object({
   rating: z
     .preprocess(
       (value) => (typeof value === "string" ? parseFloat(value) : value),
-      z.number().max(10)
+      z.number().max(10).min(0)
     )
     .optional(),
 });
@@ -42,7 +42,7 @@ type validForm = z.infer<typeof schema>;
 const RateTaskModal = ({ isOpen, onClose, task, appraisalId }: Props) => {
   const { rateTask, fetchAppraisalRequestDetails } = useAdmin();
 
-  const { register, handleSubmit, setValue, reset } = useForm<validForm>({
+  const { register, handleSubmit, setValue, reset, formState: { errors }, } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
   if (task.taskId) {
@@ -105,6 +105,7 @@ const RateTaskModal = ({ isOpen, onClose, task, appraisalId }: Props) => {
               <FormControl my="2">
                 <FormLabel>Admin Rating:</FormLabel>
                 <Input type="number" {...register("rating")} />
+                {errors.rating && <Text color="red">{errors.rating.message}</Text>}
               </FormControl>
             </Box>
           </ModalBody>

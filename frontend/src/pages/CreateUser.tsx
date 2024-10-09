@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { IoHome } from "react-icons/io5";
 import NewDesignationButton from "../components/admin/create-user/buttons/NewDesignationButton";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import useRegister from "../hooks/useRegister";
 import { useSelector } from "react-redux";
 import { RootState } from "../stores/store";
@@ -48,8 +48,6 @@ const CreateUser = () => {
     reset,
     formState: { errors },
   } = useForm<validForm>({ resolver: zodResolver(schema) });
-  const designationRef = useRef<Select | null>(null);
-  const rolesRef = useRef(null);
 
   const { fetchDesignations, saveUser } = useRegister();
   const existingRoles = ["ADMIN", "EMPLOYEE"];
@@ -95,15 +93,14 @@ const CreateUser = () => {
 
   const onSubmit = async (data: validForm) => {
     console.log(data);
-    if(designationRef.current)
-    reset();
-    // await saveUser(data)
-    //   .then(() => {
-    //     reset();
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+
+    await saveUser(data)
+      .then(() => {
+        reset();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -122,14 +119,23 @@ const CreateUser = () => {
                 type="number"
                 {...register("employeeId", { valueAsNumber: true })}
               />
+              {errors.employeeId && (
+              <Text color="red">{errors.employeeId.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Full Name:</FormLabel>
               <Input type="text" {...register("name")} />
+              {errors.name && (
+              <Text color="red">{errors.name.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Email:</FormLabel>
               <Input type="email" {...register("email")} />
+              {errors.email && (
+              <Text color="red">{errors.email.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="2">
               <Flex justify="space-between" my="1">
@@ -139,30 +145,46 @@ const CreateUser = () => {
                 <NewDesignationButton />
               </Flex>
               <Select
-                options={designationOptions} ref={designationRef} 
+                options={designationOptions}
                 onChange={handleDesignationChange}
                 placeholder="Select designation"
               />
+              {errors.designation && (
+              <Text color="red">{errors.designation.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Roles:</FormLabel>
               <Select
-                options={roleOptions} ref={rolesRef}
+                options={roleOptions}
                 isMulti
                 onChange={handleRoleChange}
                 placeholder="Select roles"
               />
+              {errors.roles && (
+              <Text color="red">{errors.roles.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Joining Date:</FormLabel>
               <Input type="date" {...register("joiningDate")} />
+              {errors.joiningDate && (
+              <Text color="red">{errors.joiningDate.message}</Text>
+            )}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Password:</FormLabel>
-              <Input  type="password" autoComplete="new-password" {...register("password")} />
+              <Input
+                type="password"
+                autoComplete="new-password"
+                {...register("password")}
+              />
+              {errors.password && (
+              <Text color="red">{errors.password.message}</Text>
+            )}
             </FormControl>
-            {errors.designation && (
-              <Text color="red">{errors.designation.message}</Text>
+            {errors.root && (
+              <Text color="red">{errors.root.message}</Text>
             )}
             <Flex maxW="50rem" justify="center">
               <Button type="submit" mt="2" colorScheme="green">

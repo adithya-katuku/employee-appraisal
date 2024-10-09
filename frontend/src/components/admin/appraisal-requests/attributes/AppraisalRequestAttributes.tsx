@@ -31,14 +31,22 @@ const attributesSchema = z.object({
 type validForm = z.infer<typeof attributesSchema>;
 
 const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
-  const { register, handleSubmit, setValue } = useForm<validForm>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<validForm>({
     resolver: zodResolver(attributesSchema),
   });
 
   const { rateAttributes, fetchAppraisalRequestDetails } = useAdmin();
 
-  const onSubmit = async(data: validForm) => {
-    await rateAttributes({ appraisalId: appraisalId, attributes: data.attributes });
+  const onSubmit = async (data: validForm) => {
+    await rateAttributes({
+      appraisalId: appraisalId,
+      attributes: data.attributes,
+    });
     fetchAppraisalRequestDetails(appraisalId);
   };
 
@@ -64,7 +72,9 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
           {attributes.map((attribute, index) => (
             <FormControl key={attribute.name} m="1">
               <InputGroup>
-                <InputLeftAddon w={{base:"75%", md:"50%"}} >{attribute.name}</InputLeftAddon>
+                <InputLeftAddon w={{ base: "75%", md: "50%" }}>
+                  {attribute.name}
+                </InputLeftAddon>
                 <Input
                   type="number"
                   isRequired
@@ -75,6 +85,9 @@ const AppraisalRequestAttributes = ({ appraisalId, attributes }: Props) => {
                   })}
                 />
               </InputGroup>
+              {errors.attributes && errors.attributes[index] && (
+                <Text color="red">{errors.attributes[index].message}</Text>
+              )}
             </FormControl>
           ))}
           <Flex justifyContent="end" m="1" mt="2">

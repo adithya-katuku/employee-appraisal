@@ -17,13 +17,13 @@ const NotificationsButton = () => {
   }
   const { fetchNotifications } = useNotifications();
   const handleClick = () => {
-    fetchNotifications();
     onOpen();
   };
   useEffect(() => {
+    fetchNotifications();
     const intervalId = setInterval(() => {
-      // fetchNotifications();
-    }, 5000);
+      fetchNotifications();
+    }, 30000);
 
     return () => clearInterval(intervalId);
   }, []);

@@ -81,6 +81,7 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
             <FormControl isRequired my="1">
               <FormLabel>Task title</FormLabel>
               <Input placeholder="Title" {...register("taskTitle")} />
+              {errors.taskTitle && <Text color="red">{errors.taskTitle.message}</Text>}
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Description</FormLabel>
@@ -88,6 +89,7 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
                 placeholder="Description"
                 {...register("description")}
               />
+              {errors.description && <Text color="red">{errors.description.message}</Text>}
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Duration</FormLabel>
@@ -95,7 +97,8 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
                 <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("startDate")} />
                 <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("endDate")} />
               </Box>
-              {errors.startDate && <Text>{errors.startDate.message}</Text>}
+              {errors.startDate && <Text color="red">Start date: {errors.startDate.message}</Text>}
+              {errors.endDate && <Text color="red">End date: {errors.endDate.message}</Text>}
             </FormControl>
             {role === "employee" && (
               <>
@@ -107,6 +110,7 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
                   >
                     Mark for appraisal
                   </Checkbox>
+                  {errors.appraisable && <Text color="red">{errors.appraisable.message}</Text>}
                 </FormControl>
                 {isAppraisable && (
                   <FormControl isRequired my="1">
@@ -116,16 +120,12 @@ const NewTaskModal = ({ isOpen, onClose }: Props) => {
                       placeholder="Rate your task out of 10"
                       {...register("selfRating")}
                     />
+                     {errors.selfRating && <Text color="red">Start date: {errors.selfRating.message}</Text>}
                   </FormControl>
                 )}
               </>
             )}
             <Box>
-              <Text color="red">{errors.description?.message}</Text>
-              <Text color="red">{errors.endDate?.message}</Text>
-              <Text color="red">{errors.selfRating?.message}</Text>
-              <Text color="red">{errors.startDate?.message}</Text>
-              <Text color="red">{errors.taskTitle?.message}</Text>
               <Text color="red">{errors.root?.message}</Text>
             </Box>
           </ModalBody>

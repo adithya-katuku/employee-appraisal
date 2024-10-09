@@ -79,8 +79,7 @@ const PreviousAppriaisalsModal = ({ isOpen, onClose }: Props) => {
                 </Flex>
               </Box>
               {appraisals &&
-                (appraisals[index].appraisalStatus === "APPROVED" ||
-                  appraisals[index].appraisalStatus === "REJECTED") && (
+                (appraisals[index].appraisalStatus === "APPROVED") && (
                   <Box my="1" p="2" pb="4">
                     <Text m="1" fontWeight="bold">
                       Attribute rating:

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
-import { login, RootState } from "../stores/store";
+import { login, RootState, store } from "../stores/store";
 import useBroadcast from "./useBroadcast";
 
 interface JwtPayload {
@@ -17,22 +17,16 @@ const useAPI = () => {
     baseURL: "http://localhost:8080",
   });
 
-  const refreshAccessToken = async (): Promise<string> => {
+  const refreshAccessToken = async (): Promise<{accessToken:string, role:string}> => {
     try {
       const res = await axios.post(
         "http://localhost:8080/refresh-token",
         {},
         { withCredentials: true }
       );
-
       const { accessToken, role } = res.data;
-      const newLoginState = {
-        isLoggedIn: loginState.isLoggedIn,
-        role: role,
-        token: accessToken,
-      };
-      dispatch(login(newLoginState));
-      return accessToken;
+      await refreshLogin(accessToken, role);
+      return { accessToken, role };
     } catch (err) {
       console.log("Failed to refresh token", err);
       channel.postMessage({ type: "LOGOUT" });
@@ -40,17 +34,28 @@ const useAPI = () => {
     }
   };
 
+  const refreshLogin = async(accessToken:string, role:string)=>{
+    const newLoginState = {
+      isLoggedIn: loginState.isLoggedIn,
+      role: role,
+      token: accessToken,
+    };
+    dispatch(login(newLoginState));
+    console.log(store.getState()); 
+  }
+
   api.interceptors.request.use(
     async (config) => {
-      const accessToken = loginState.token;
-      if (accessToken) {
-        const decodedToken = jwtDecode<JwtPayload>(accessToken);
+      const existingAccessToken = store.getState().store.loginState.token;
+      if (existingAccessToken) {
+        const decodedToken = jwtDecode<JwtPayload>(existingAccessToken);
         const isTokenExpired = decodedToken.exp * 1000 < Date.now();
         if (isTokenExpired) {
-          const newAccessToken = await refreshAccessToken();
-          config.headers["Authorization"] = `Bearer ${newAccessToken}`;
-        } else {
+          console.log("here", decodedToken.exp, decodedToken);
+          const { accessToken } = await refreshAccessToken();
           config.headers["Authorization"] = `Bearer ${accessToken}`;
+        } else {
+          config.headers["Authorization"] = `Bearer ${existingAccessToken}`;
         }
       }
       return config;
@@ -70,9 +75,14 @@ const useAPI = () => {
       ) {
         try {
           originalRequest._retry = true;
-          const newAccessToken = await refreshAccessToken();
-
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          const { accessToken, role } = await refreshAccessToken();
+          const newLoginState = {
+            isLoggedIn: loginState.isLoggedIn,
+            role: role,
+            token: accessToken,
+          };
+          dispatch(login(newLoginState));
+          originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
           return api(originalRequest);
         } catch (err) {
           console.log(err);

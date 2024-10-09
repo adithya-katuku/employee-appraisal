@@ -7,12 +7,16 @@ import { createContext } from "react";
 interface Props {
   employeeDetails: EmployeeDetailsModel;
 }
-export const EmployeeDetailsContext = createContext({
+export const EmployeeDetailsContext = createContext<{
+  employeeId: number;
+  previousAppraisalDate?: string;
+}>({
   employeeId: -1,
+  previousAppraisalDate: undefined,
 });
 const AdminEmployeeProfileView = ({ employeeDetails }: Props) => {
   return (
-    <Box  >
+    <Box>
       <EmployeeDetails employeeDetails={employeeDetails} />
       {employeeDetails.appraisalEligibility && (
         <EmployeeDetailsContext.Provider value={employeeDetails}>

@@ -29,9 +29,6 @@ public class JwtService {
     @Autowired
     private EmployeeService employeeService;
 
-    private final long ACCESS_TOKEN_AGE = 1000*60*5;
-    private final long REFRESH_TOKEN_AGE = 1000*60*60*24;
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
     private String SECRET_KEY = "";
 
@@ -48,11 +45,12 @@ public class JwtService {
             employeeService.checkIfEmployeeEligibleForAppraisal(employeeDetails);
         }
 
+        long ACCESS_TOKEN_AGE = 1000 * 60 * 5;
         return Jwts.builder()
                 .claims(claims)
                 .subject(employeeDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+ACCESS_TOKEN_AGE))
+                .expiration(new Date(System.currentTimeMillis()+ ACCESS_TOKEN_AGE))
                 .signWith(getKey())
                 .compact();
     }
@@ -61,7 +59,8 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("employee-id", employeeDetails.getEmployeeId().toString());
         Date issueTime = new Date(System.currentTimeMillis());
-        Date expiryTime = new Date(System.currentTimeMillis()+REFRESH_TOKEN_AGE);
+        long REFRESH_TOKEN_AGE = 1000 * 60 * 60 * 24;
+        Date expiryTime = new Date(System.currentTimeMillis()+ REFRESH_TOKEN_AGE);
         storeRefreshToken(employeeDetails, issueTime, expiryTime);
 
         return Jwts.builder()

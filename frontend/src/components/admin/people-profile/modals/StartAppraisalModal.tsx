@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext } from "react";
@@ -34,7 +35,7 @@ interface Props {
 }
 
 const StartAppraisalModal = ({ isOpen, onClose }: Props) => {
-  const { register, handleSubmit, setValue, reset } = useForm<validForm>({
+  const { register, handleSubmit, setValue, reset, formState:{errors} } = useForm<validForm>({
     resolver: zodResolver(schema),
   });
 
@@ -46,11 +47,13 @@ const StartAppraisalModal = ({ isOpen, onClose }: Props) => {
     reset();
   };
   const onSubmit = (data: validForm) => {
-    console.log(employeeDetails);
     console.log(data);
     startAppraisal(employeeDetails.employeeId, data);
     handleClose();
   };
+  if(employeeDetails.previousAppraisalDate){
+    setValue("startDate", new Date(employeeDetails.previousAppraisalDate).toISOString().split("T")[0])
+  }
   setValue("endDate", new Date().toISOString().split("T")[0]);
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
@@ -62,10 +65,12 @@ const StartAppraisalModal = ({ isOpen, onClose }: Props) => {
             <FormControl isRequired my="2">
               <FormLabel mx="1">Start Date: </FormLabel>
               <Input type="date" mx="1" {...register("startDate")} />
+              {errors.startDate && <Text color="red">Start date: {errors.startDate.message}</Text>}
             </FormControl>
             <FormControl isRequired my="2">
               <FormLabel mx="1">End Date: </FormLabel>
               <Input type="date" mx="1" {...register("endDate")} />
+              {errors.endDate && <Text color="red">Start date: {errors.endDate.message}</Text>}
             </FormControl>
           </ModalBody>
           <ModalFooter>

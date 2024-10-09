@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { Box, Flex, HStack, Select, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Select, Spacer, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoHome } from "react-icons/io5";
 import AttributeTable from "../components/attribute/AttributeTable";
@@ -34,7 +34,7 @@ const Appraisal = () => {
       </HStack>
       <Box m="auto" maxW="60rem">
         {appraisals && appraisals[index] ? (
-          <Box>
+          <Box >
             <Box my="1" p="2" pb="4" borderBottom="1px" borderColor="gray.500">
               <Text m="1" fontWeight="bold">
                 Appraisal period:
@@ -68,8 +68,7 @@ const Appraisal = () => {
                 </Text>
               </Flex>
             </Box>
-            {(appraisals[index].appraisalStatus === "APPROVED" ||
-                appraisals[index].appraisalStatus === "REJECTED") && (
+            {(appraisals[index].appraisalStatus === "APPROVED") && (
                 <Box my="1" p="2" pb="4">
                   <Text m="1" fontWeight="bold">
                     Attribute rating:
@@ -99,19 +98,24 @@ const Appraisal = () => {
             </Box>
 
             {appraisals[index].appraisalStatus === "INITIATED" && (
-                <Flex
-                  my="1"
-                  p="2"
-                  justifyContent="end"
-                  position="sticky"
-                  bottom="3"
-                >
-                  <SubmitAppraisal appraisalId={appraisals[index].id} />
-                </Flex>
+              <>
+              
+              <Flex justifyContent="end" position="sticky" bottom="3">
+                <SubmitAppraisal appraisalId={appraisals[index].id} />
+            </Flex></>
+                // <Flex
+                //   my="1"
+                //   p="2"
+                //   justifyContent="end"
+                //   position="sticky"
+                //   bottom="3"
+                // >
+                //   <SubmitAppraisal appraisalId={appraisals[index].id} />
+                // </Flex>
               )}
           </Box>
         ) : (
-          <Text>No appraisals yet :)</Text>
+          <Text textAlign="center" >No appraisals yet :)</Text>
         )}
       </Box>
     </Box>

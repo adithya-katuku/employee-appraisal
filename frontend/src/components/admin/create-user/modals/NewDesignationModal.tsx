@@ -85,16 +85,17 @@ const NewDesignationModal = ({ isOpen, onClose }: Props) => {
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Designation name:</FormLabel>
               <Input type="text" {...register("name")} />
+              {errors.name && <Text color="red" >{errors.name.message}</Text>}
             </FormControl>
             <FormControl maxW="50rem" isRequired my="3">
               <FormLabel>Attributes:</FormLabel>
 
               <CreatableSelect options={attributeOptions} isMulti onChange={handleAttributeChange} />
-            {errors.attributes && <Text color="red.400" >{errors.attributes.message}</Text>}
+            {errors.attributes && <Text color="red" >{errors.attributes.message}</Text>}
             </FormControl>
           </ModalBody>
           <ModalFooter gap="2">
-            <Button type="submit" colorScheme="green">
+            <Button type="submit" colorScheme="green" onClick={e=>e.stopPropagation()} >
               Save
             </Button>
             <Button colorScheme="red" variant="outline" onClick={handleClose}>

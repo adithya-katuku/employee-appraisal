@@ -43,6 +43,14 @@ public class AppraisalService {
                 .toList();
     }
 
+    public List<AppraisalDTO> getPreviousAppraisals(Integer employeeId) {
+        return appraisalRepo.findByEmployeeIdOrderByEndDateDesc(employeeId)
+                .stream()
+                .filter(appraisal -> appraisal.getAppraisalStatus()==AppraisalStatus.APPROVED)
+                .map(appraisal -> new AppraisalDTOMapper().apply(appraisal))
+                .toList();
+    }
+
     public AppraisalDTO submitAppraisal(Integer appraisalId, Integer employeeId) {
         Appraisal appraisal = appraisalRepo.findById(appraisalId).orElse(null);
         if (appraisal == null) {

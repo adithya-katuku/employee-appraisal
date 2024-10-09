@@ -54,7 +54,8 @@ const useRegister = () => {
       });
   };
   const saveUser = async (user:RegisterUserModel) => {
-    await api
+    try{
+      await api
       .post(loginState.role + "/register", {...user}, {
         headers: {
           Authorization: "Bearer " + loginState.token,
@@ -63,6 +64,12 @@ const useRegister = () => {
       .then(() => {
         fetchDesignations();
       })
+    }
+    catch (err){
+      console.log(err);
+      throw err;
+    }
+    
   };
 
   return {fetchDesignations, fetchAttributes, saveDesignation, saveUser};

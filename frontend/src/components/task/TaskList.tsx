@@ -1,19 +1,21 @@
-import { Box } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import TaskModel from "../../models/TaskModel";
 import Task from "./Task";
 
-interface Props{
-    tasks: TaskModel[]
+interface Props {
+  tasks: TaskModel[];
 }
 
-const TaskList = ({tasks}: Props) => {
-  return (
-    <Box>
+const TaskList = ({ tasks }: Props) => {
+  return tasks[0] ? (
+    <Flex flexDir="column" >
       {tasks &&
         tasks.map((task, index) => {
           return <Task {...task} key={index} />;
         })}
-    </Box>
+    </Flex>
+  ) : (
+    <Text>No tasks yet :)</Text>
   );
 };
 

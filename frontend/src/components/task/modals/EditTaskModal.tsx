@@ -31,10 +31,10 @@ interface Props {
 }
 
 const schema = z.object({
-  taskTitle: z.string({message:"Task title cannot be empty."}),
-  description: z.string({message:"Task description cannot be empty."}),
-  startDate: z.string({message:"Task must have a start date."}),
-  endDate: z.string({message:"Task must have an end date."}),
+  taskTitle: z.string({ message: "Task title cannot be empty." }),
+  description: z.string({ message: "Task description cannot be empty." }),
+  startDate: z.string({ message: "Task must have a start date." }),
+  endDate: z.string({ message: "Task must have an end date." }),
   appraisable: z.boolean().optional(),
   selfRating: z
     .preprocess(
@@ -70,11 +70,12 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
     setValue("description", task.description);
     setValue("startDate", new Date(task.startDate).toISOString().split("T")[0]);
     setValue("endDate", new Date(task.endDate).toISOString().split("T")[0]);
-    if(role === "employee" && task.appraisable){
+    if (role === "employee") {
       setValue("appraisable", task.appraisable);
-      setValue("selfRating", task.selfRating);
+      if (task.appraisable) {
+        setValue("selfRating", task.selfRating);
+      }
     }
-    
   }, [
     isOpen,
     role,
@@ -94,7 +95,6 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   };
 
   const handleClose = () => {
-    setIsAppraisable(task.appraisable);
     reset();
     onClose();
   };
@@ -102,7 +102,7 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
-      <ModalContent maxW={{base:"90vw", md:"fit-content"}}>
+      <ModalContent maxW={{ base: "90vw", md: "fit-content" }}>
         <ModalHeader>Edit Task</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,6 +110,9 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
             <FormControl isRequired my="1">
               <FormLabel>Task title</FormLabel>
               <Input placeholder="Title" {...register("taskTitle")} />
+              {errors.taskTitle && (
+                <Text color="red">{errors.taskTitle.message}</Text>
+              )}
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Description</FormLabel>
@@ -117,13 +120,32 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
                 placeholder="Description"
                 {...register("description")}
               />
+              {errors.description && (
+                <Text color="red">{errors.description.message}</Text>
+              )}
             </FormControl>
             <FormControl isRequired my="1">
               <FormLabel>Duration</FormLabel>
-              <Box display={{md:"flex"}} >
-                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("startDate")} />
-                <Input type="date" mx="1" my={{base:"0.5", md:"0"}} {...register("endDate")} />
+              <Box display={{ md: "flex" }}>
+                <Input
+                  type="date"
+                  mx="1"
+                  my={{ base: "0.5", md: "0" }}
+                  {...register("startDate")}
+                />
+                <Input
+                  type="date"
+                  mx="1"
+                  my={{ base: "0.5", md: "0" }}
+                  {...register("endDate")}
+                />
               </Box>
+              {errors.startDate && (
+                <Text color="red">Start date: {errors.startDate.message}</Text>
+              )}
+              {errors.endDate && (
+                <Text color="red">End date: {errors.endDate.message}</Text>
+              )}
             </FormControl>
             {role === "employee" && (
               <>
@@ -135,6 +157,9 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
                   >
                     Mark for appraisal
                   </Checkbox>
+                  {errors.appraisable && (
+                    <Text color="red">{errors.appraisable.message}</Text>
+                  )}
                 </FormControl>
                 {isAppraisable && (
                   <FormControl isRequired my="1">
@@ -144,16 +169,16 @@ const EditTaskModal = ({ isOpen, onClose, task }: Props) => {
                       placeholder="Rate your task out of 10"
                       {...register("selfRating")}
                     />
+                    {errors.selfRating && (
+                      <Text color="red">
+                        Start date: {errors.selfRating.message}
+                      </Text>
+                    )}
                   </FormControl>
                 )}
               </>
             )}
             <Box>
-              <Text color="red">{errors.description?.message}</Text>
-              <Text color="red">{errors.endDate?.message}</Text>
-              <Text color="red">{errors.selfRating?.message}</Text>
-              <Text color="red">{errors.startDate?.message}</Text>
-              <Text color="red">{errors.taskTitle?.message}</Text>
               <Text color="red">{errors.root?.message}</Text>
             </Box>
           </ModalBody>
