@@ -4,7 +4,6 @@ import com.beehyv.backend.dto.custom.CaptchaDTO;
 import com.beehyv.backend.dto.request.LoginRequestDTO;
 import com.beehyv.backend.dto.response.AuthenticationResponseDTO;
 import com.beehyv.backend.exceptions.CustomAuthException;
-import com.beehyv.backend.exceptions.InvalidInputException;
 import com.beehyv.backend.services.userdetailsservice.EmployeeDetailsService;
 import com.beehyv.backend.userdetails.EmployeeDetails;
 import com.beehyv.backend.models.enums.Role;
@@ -34,13 +33,12 @@ public class AuthenticationService {
 
     public AuthenticationResponseDTO handleLogin(LoginRequestDTO loginRequestDTO, HttpServletResponse response){
         if(!captchaService.verifyCaptcha(new CaptchaDTO(loginRequestDTO.captchaId(), loginRequestDTO.captchaAnswer()))){
-            throw new InvalidInputException("Invalid captcha");
+            throw new CustomAuthException("Invalid captcha");
         }
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.email(), loginRequestDTO.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-        System.out.println(employeeDetails);
         return handleSuccessfulValidation(employeeDetails, response);
     }
 
@@ -92,7 +90,6 @@ public class AuthenticationService {
         refreshCookie.setPath("/refresh-token");
         refreshCookie.setDomain("localhost");
         refreshCookie.setMaxAge(0);
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         jwtService.deleteRefreshToken(employeeId);
         response.addCookie(refreshCookie);

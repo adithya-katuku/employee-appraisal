@@ -96,6 +96,7 @@ public class AdminController {
                 .getPrincipal();
         return new ResponseEntity<>(employeeService.getTasks(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
+
     @PostMapping("/tasks")
     public ResponseEntity<?> addTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder
@@ -104,6 +105,7 @@ public class AdminController {
                 .getPrincipal();
         return new ResponseEntity<>(employeeService.addTask(employeeDetails.getEmployeeId(), taskRequestDTO), HttpStatus.OK);
     }
+
     @PutMapping("/tasks")
     public ResponseEntity<?> updateTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         EmployeeDetails employeeDetails = (EmployeeDetails)SecurityContextHolder

@@ -28,10 +28,12 @@ public class Task {
     private Double selfRating;
     private Double adminRating;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "appraisal_id")
     @JsonIgnore
     @ToString.Exclude

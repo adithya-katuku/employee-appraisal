@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
-    @Autowired
-    private AppraisalService appraisalService;
 
     @GetMapping("/info")
     public ResponseEntity<?> getEmployee(){
@@ -103,7 +101,7 @@ public class EmployeeController {
                 .getAuthentication()
                 .getPrincipal();
 
-        return new ResponseEntity<>(appraisalService.getAppraisals(employeeDetails.getEmployeeId()), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getAppraisals(employeeDetails.getEmployeeId()), HttpStatus.OK);
     }
 
     @PutMapping("/appraisals/{appraisalId}")

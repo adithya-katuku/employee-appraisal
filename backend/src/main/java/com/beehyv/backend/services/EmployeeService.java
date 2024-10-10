@@ -115,7 +115,14 @@ public class EmployeeService {
 
         throw  new ResourceNotFoundException("Notification  not found.");
     }
+    public void notifyAdmins(Integer employeeId, String title, String description) {
+        Notification notification = new Notification();
+        notification.setNotificationTitle(title);
+        notification.setDescription(description);
+        notification.setFromId(employeeId);
 
+        addNotificationToAdmins(notification);
+    }
     //PEOPLE:
     public List<PartialEmployeeResponseDTO> findPeople(String name) {
         return employeeRepo.findByNameContainingIgnoreCase(name).stream()
@@ -140,15 +147,6 @@ public class EmployeeService {
         }
     }
 
-    public void notifyAdmins(Integer employeeId, String title, String description) {
-        Notification notification = new Notification();
-        notification.setNotificationTitle(title);
-        notification.setDescription(description);
-        notification.setFromId(employeeId);
-
-        addNotificationToAdmins(notification);
-    }
-
     public void changePreviousAppraisalDateAndEligibility(Integer employeeId, Date newPreviousAppraisalDate, AppraisalEligibility newEligibility) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if(employee==null){
@@ -160,6 +158,10 @@ public class EmployeeService {
         employeeRepo.save(employee);
     }
 
+    public List<AppraisalDTO> getAppraisals(Integer employeeId) {
+        return appraisalService.getAppraisals(employeeId);
+    }
+
     public AppraisalDTO submitAppraisal(Integer appraisalId, Integer employeeId) {
         AppraisalDTO appraisal = appraisalService.submitAppraisal(appraisalId, employeeId);
 
@@ -169,4 +171,5 @@ public class EmployeeService {
 
         return appraisal;
     }
+
 }

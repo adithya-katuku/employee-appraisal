@@ -26,7 +26,14 @@ public class Designation {
 
     @OneToMany(mappedBy = "designation", cascade = CascadeType.ALL)
     @JsonIgnore
-    @ToString.Exclude
     private List<Employee> employees = new ArrayList<>();
 
+
+    @Override
+    public String toString() {
+        return "Designation{" +
+                "designationId=" + designationId +
+                ", designation='" + designation + '\'' +
+                '}';
+    }
 }
