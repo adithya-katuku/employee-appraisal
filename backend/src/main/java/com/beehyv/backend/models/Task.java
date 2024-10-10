@@ -28,24 +28,13 @@ public class Task {
     private Double selfRating;
     private Double adminRating;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "appraisal_id")
     @JsonIgnore
     @ToString.Exclude
     private Appraisal appraisal;
 
-    public Task(String taskTitle, String description, Date startDate, Date endDate, boolean appraisable, Double selfRating, Double adminRating) {
-        this.taskTitle = taskTitle;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.appraisable = appraisable;
-        this.selfRating = selfRating;
-        this.adminRating = adminRating;
-    }
 }

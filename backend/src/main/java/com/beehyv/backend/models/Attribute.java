@@ -17,5 +17,4 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attributeId;
     private  String attribute;
-
 }

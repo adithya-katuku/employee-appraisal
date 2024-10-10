@@ -13,9 +13,6 @@ const Task = (task: TaskModel) => {
       border="1px"
       borderColor="gray.300"
       rounded="lg"
-      
-      
-      // minW="100%"
     >
       <Flex justifyContent="space-between">
         <Box>

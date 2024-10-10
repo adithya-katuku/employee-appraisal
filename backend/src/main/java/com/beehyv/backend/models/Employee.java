@@ -21,7 +21,6 @@ public class Employee {
     @Id
     private Integer employeeId;
     private String name;
-    @Column(unique = true)
     private String email;
     private Date joiningDate;
     private List<Role> roles;

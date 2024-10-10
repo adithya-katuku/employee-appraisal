@@ -73,7 +73,6 @@ public class EmployeeService {
         return notificationRepo.findByEmployeeOrderByNotificationIdDesc(employee);
     }
 
-
     public void addNotificationToAdmins(Notification notification) {
         List<Employee> admins = employeeRepo.findByRole(Role.ADMIN);
         if(admins==null){

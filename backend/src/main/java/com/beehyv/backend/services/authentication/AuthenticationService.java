@@ -32,7 +32,6 @@ public class AuthenticationService {
     @Autowired
     private EmployeeDetailsService employeeDetailsService;
 
-
     public AuthenticationResponseDTO handleLogin(LoginRequestDTO loginRequestDTO, HttpServletResponse response){
         if(!captchaService.verifyCaptcha(new CaptchaDTO(loginRequestDTO.captchaId(), loginRequestDTO.captchaAnswer()))){
             throw new InvalidInputException("Invalid captcha");
@@ -41,7 +40,7 @@ public class AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.email(), loginRequestDTO.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-
+        System.out.println(employeeDetails);
         return handleSuccessfulValidation(employeeDetails, response);
     }
 

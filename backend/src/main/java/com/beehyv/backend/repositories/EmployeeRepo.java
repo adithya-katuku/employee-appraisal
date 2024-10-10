@@ -17,6 +17,4 @@ public interface EmployeeRepo extends JpaRepository<Employee, Integer> {
 
     List<Employee> findByNameContainingIgnoreCase(String name);
 
-//    @Query(value = "select * from employee e where :role >= all(e.roles) and appraisal_status = :appraisalStatus and joining_date < now() - interval '1 year' ", nativeQuery = true)
-//    List<Employee> findByEmployeesWhoAreEligibleForAppraisal(Role role, AppraisalStatus appraisalStatus);
 }

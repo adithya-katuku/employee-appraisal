@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Spacer, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Spacer, Text, VStack } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { IoHome } from "react-icons/io5";
 import { useEffect } from "react";
@@ -24,15 +24,7 @@ const Tasks = () => {
         <ChevronRightIcon />
         <Text>Tasks</Text>
       </HStack>
-      <Flex  >
-      <Box
-        maxW="60rem"
-        alignContent="center"
-        alignItems="center"
-        justifyItems="center"
-      >
-        {tasks && <TaskList tasks={tasks} />}
-      </Box></Flex>
+        <VStack maxW="60rem" ><Box minW="100%" >{tasks && <TaskList tasks={tasks} />}</Box> </VStack>
       <Spacer />
       <Flex justifyContent="end" position="sticky" bottom="3">
         <AddTask />

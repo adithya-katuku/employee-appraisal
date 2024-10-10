@@ -22,9 +22,7 @@ public class Notification {
     private boolean read = false;
     private Integer fromId ;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
     @JoinColumn(name = "employee_id")
     private Employee employee;
-
 }

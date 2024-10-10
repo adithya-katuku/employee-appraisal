@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { Box, Flex, HStack, Select, Spacer, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Select, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoHome } from "react-icons/io5";
 import AttributeTable from "../components/attribute/AttributeTable";
@@ -16,7 +16,7 @@ const Appraisal = () => {
   const appraisals = useSelector((state: RootState) => state.store.appraisals);
   const tasks = useSelector((state: RootState) => state.store.tasks);
   const { fetchAppraisals } = useData();
-  const {fetchTasks} = useTasks();
+  const { fetchTasks } = useTasks();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const Appraisal = () => {
       </HStack>
       <Box m="auto" maxW="60rem">
         {appraisals && appraisals[index] ? (
-          <Box >
+          <Flex  minH="100%" flexDir="column">
             <Box my="1" p="2" pb="4" borderBottom="1px" borderColor="gray.500">
               <Text m="1" fontWeight="bold">
                 Appraisal period:
@@ -48,18 +48,16 @@ const Appraisal = () => {
                 }}
               >
                 {appraisals.map((appraisal, index) => {
-                    return (
-                      <option value={index} key={index}>
-                        {new Date(appraisal.startDate)
-                          .toISOString()
-                          .split("T")[0] +
-                          "  to " +
-                          new Date(appraisal.endDate)
-                            .toISOString()
-                            .split("T")[0]}
-                      </option>
-                    );
-                  })}
+                  return (
+                    <option value={index} key={index}>
+                      {new Date(appraisal.startDate)
+                        .toISOString()
+                        .split("T")[0] +
+                        "  to " +
+                        new Date(appraisal.endDate).toISOString().split("T")[0]}
+                    </option>
+                  );
+                })}
               </Select>
               <Flex my="1" p="2" gap="2" alignItems="center">
                 <Text fontWeight="bold">Status: </Text>
@@ -68,26 +66,26 @@ const Appraisal = () => {
                 </Text>
               </Flex>
             </Box>
-            {(appraisals[index].appraisalStatus === "APPROVED") && (
-                <Box my="1" p="2" pb="4">
-                  <Text m="1" fontWeight="bold">
-                    Attribute rating:
-                  </Text>
-                  {appraisals[index].attributes && (
-                    <AttributeTable attributes={appraisals[index].attributes} />
-                  )}
-                </Box>
-              )}
+            {appraisals[index].appraisalStatus === "APPROVED" && (
+              <Box my="1" p="2" pb="4">
+                <Text m="1" fontWeight="bold">
+                  Attribute rating:
+                </Text>
+                {appraisals[index].attributes && (
+                  <AttributeTable attributes={appraisals[index].attributes} />
+                )}
+              </Box>
+            )}
             <Box my="1" p="2" pb="4">
               <Text m="1" fontWeight="bold">
                 Tasks:
               </Text>
               {appraisals[index].appraisalStatus === "INITIATED" && (
-                  <Flex>
-                    <CreateTask />
-                    <AddExistingTasks />
-                  </Flex>
-                )}
+                <Flex>
+                  <CreateTask />
+                  <AddExistingTasks />
+                </Flex>
+              )}
               {tasks && (
                 <TaskList
                   tasks={tasks.filter(
@@ -96,26 +94,18 @@ const Appraisal = () => {
                 />
               )}
             </Box>
-
             {appraisals[index].appraisalStatus === "INITIATED" && (
-              <>
-              
-              <Flex justifyContent="end" position="sticky" bottom="3">
-                <SubmitAppraisal appraisalId={appraisals[index].id} />
-            </Flex></>
-                // <Flex
-                //   my="1"
-                //   p="2"
-                //   justifyContent="end"
-                //   position="sticky"
-                //   bottom="3"
-                // >
-                //   <SubmitAppraisal appraisalId={appraisals[index].id} />
-                // </Flex>
-              )}
-          </Box>
+                <Flex
+                  justifyContent="end"
+                  position="sticky"
+                  bottom="3"
+                >
+                  <SubmitAppraisal appraisalId={appraisals[index].id} />
+                </Flex>
+            )}
+          </Flex >
         ) : (
-          <Text textAlign="center" >No appraisals yet :)</Text>
+          <Text textAlign="center">No appraisals yet :)</Text>
         )}
       </Box>
     </Box>

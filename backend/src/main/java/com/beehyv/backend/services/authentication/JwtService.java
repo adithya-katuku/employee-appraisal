@@ -6,7 +6,6 @@ import com.beehyv.backend.models.enums.Role;
 import com.beehyv.backend.repositories.RefreshTokenRepo;
 import com.beehyv.backend.services.EmployeeService;
 import com.beehyv.backend.userdetails.EmployeeDetails;
-import com.beehyv.backend.services.AppraisalService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

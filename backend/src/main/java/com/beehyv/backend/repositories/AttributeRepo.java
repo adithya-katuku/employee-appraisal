@@ -22,7 +22,6 @@ public interface AttributeRepo extends JpaRepository<Attribute, Integer> {
         List<Attribute> res = new ArrayList<>();
         for(Attribute attribute: attributes){
             res.add(saveOrFind(attribute));
-
         }
 
         return res;
