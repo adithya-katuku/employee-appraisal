@@ -6,7 +6,7 @@ import com.beehyv.backend.models.enums.Role;
 
 import java.util.function.Function;
 
-public class FullEmployeeDetailsMapper implements Function<Employee, FullEmployeeResponseDTO> {
+public class FullEmployeeResponseMapper implements Function<Employee, FullEmployeeResponseDTO> {
     @Override
     public FullEmployeeResponseDTO apply(Employee employee) {
         return new FullEmployeeResponseDTO(

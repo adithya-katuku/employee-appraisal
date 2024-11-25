@@ -44,6 +44,11 @@ public class AdminService {
         if(employeeRepo.findByEmail(employeeRequestDTO.email())!=null){
             throw  new InvalidInputException("Email is already in use. Try with a different email.");
         }
+        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
+        if(designation==null){
+            throw  new InvalidInputException("Designation is not saved yet. Kindly create designation with respective attributes first.");
+        }
+
         Employee employee = new Employee();
         employee.setEmployeeId(employeeRequestDTO.employeeId());
         employee.setName(employeeRequestDTO.name());
@@ -53,11 +58,6 @@ public class AdminService {
         employee.setPassword(passwordEncoder.encode(employeeRequestDTO.password()));
         employee.setRoles(employeeRequestDTO.roles());
         employee.setPreviousAppraisalDate(employeeRequestDTO.joiningDate());
-        Designation designation = designationRepo.findByDesignation(employeeRequestDTO.designation());
-        if(designation==null){
-            throw  new InvalidInputException("Designation is not saved yet. Kindly create designation with respective attributes first.");
-        }
-
         employee.setDesignation(designation);
         employeeRepo.save(employee);
         return "Successfully registered employee " + employee.getEmployeeId();
@@ -146,7 +146,7 @@ public class AdminService {
             throw new ResourceNotFoundException("Employee with id " + appraisal.getEmployeeId() + " is not found.");
         }
 
-        FullEmployeeResponseDTO employeeResponseDTO = new FullEmployeeDetailsMapper().apply(employee);
+        FullEmployeeResponseDTO employeeResponseDTO = new FullEmployeeResponseMapper().apply(employee);
         List<AttributeDAO> attributes = appraisal.getAttributes();
         List<TaskResponseDTO> taskResponseDTOs = appraisal.getTasks().stream()
                 .map(task -> new TaskResponseDTOMapper().apply(task))
@@ -232,7 +232,7 @@ public class AdminService {
 
     public List<FullEmployeeResponseDTO> findPeople(String name) {
         return employeeRepo.findByNameContainingIgnoreCase(name).stream()
-                .map(employee -> new FullEmployeeDetailsMapper().apply(employee))
+                .map(employee -> new FullEmployeeResponseMapper().apply(employee))
                 .toList();
     }
 }

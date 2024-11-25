@@ -28,7 +28,6 @@ public class Designation {
     @JsonIgnore
     private List<Employee> employees = new ArrayList<>();
 
-
     @Override
     public String toString() {
         return "Designation{" +

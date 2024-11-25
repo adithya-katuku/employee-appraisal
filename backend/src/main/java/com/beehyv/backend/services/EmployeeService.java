@@ -1,6 +1,6 @@
 package com.beehyv.backend.services;
 
-import com.beehyv.backend.dto.mappers.FullEmployeeDetailsMapper;
+import com.beehyv.backend.dto.mappers.FullEmployeeResponseMapper;
 import com.beehyv.backend.dto.mappers.PartialEmployeeResponseMapper;
 import com.beehyv.backend.dto.request.TaskRequestDTO;
 import com.beehyv.backend.dto.response.AppraisalDTO;
@@ -15,7 +15,6 @@ import com.beehyv.backend.models.*;
 import com.beehyv.backend.repositories.*;
 import com.beehyv.backend.userdetails.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,7 +35,7 @@ public class EmployeeService {
         if(employee==null){
             throw  new ResourceNotFoundException("Employee with id "+employeeId+" is  not found.");
         }
-        return new FullEmployeeDetailsMapper().apply(employee);
+        return new FullEmployeeResponseMapper().apply(employee);
     }
 
     //TASKS:
@@ -138,7 +137,8 @@ public class EmployeeService {
         Integer employeeId = employeeDetails.getEmployeeId();
         Date previousAppraisalDate = employeeDetails.getPreviousAppraisalDate();
 
-        if (previousAppraisalDate.before(calendar.getTime()) && employeeDetails.getAppraisalEligibility() == AppraisalEligibility.NOT_ELIGIBLE) {
+        if (previousAppraisalDate.before(calendar.getTime()) &&
+                employeeDetails.getAppraisalEligibility() == AppraisalEligibility.NOT_ELIGIBLE) {
             String title = "Pending Appraisal";
             String description = "Employee " + employeeId + " is eligible for appraisal.";
             notifyAdmins(employeeId, title, description);

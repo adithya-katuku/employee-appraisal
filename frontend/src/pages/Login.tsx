@@ -58,7 +58,7 @@ const LoginForm = () => {
   return (
     <Flex minH="100vh" justify="center" bg="gray.100">
       <Box
-        mt={{sm:"15%"}}
+        mt={{sm:"10%"}}
         p="6"
         h={{sm:"fit-content"}}
         w={{base:"100%", sm:"fit-content"}}

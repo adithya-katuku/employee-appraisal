@@ -39,6 +39,7 @@ public class AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.email(), loginRequestDTO.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+
         return handleSuccessfulValidation(employeeDetails, response);
     }
 

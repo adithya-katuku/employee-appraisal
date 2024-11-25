@@ -51,6 +51,7 @@ public class CaptchaService {
         try {
             ImageIO.write(image, "png", outputStream);
             String encodedImage = Base64.getEncoder().encodeToString(outputStream.toByteArray());
+
             CaptchaDTO captchaDTO = new CaptchaDTOMapper().apply(saveCaptcha(encodedImage, text));
             outputStream.close();
             return captchaDTO;
